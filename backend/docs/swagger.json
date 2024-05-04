@@ -5,26 +5,61 @@
     },
     "basePath": "/api/v1",
     "paths": {
-        "/example/helloworld": {
-            "get": {
-                "description": "do ping",
+        "/mmr/match": {
+            "post": {
+                "description": "Submit a match for MMR calculation",
                 "consumes": [
                     "application/json"
                 ],
                 "produces": [
                     "application/json"
                 ],
-                "tags": [
-                    "example"
+                "summary": "Submit a match",
+                "parameters": [
+                    {
+                        "description": "Match object",
+                        "name": "match",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/mmr.Match"
+                        }
+                    }
                 ],
-                "summary": "ping example",
                 "responses": {
                     "200": {
-                        "description": "OK",
+                        "description": "match submitted",
                         "schema": {
                             "type": "string"
                         }
                     }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "mmr.Match": {
+            "type": "object",
+            "properties": {
+                "team1": {
+                    "$ref": "#/definitions/mmr.MatchTeam"
+                },
+                "team2": {
+                    "$ref": "#/definitions/mmr.MatchTeam"
+                }
+            }
+        },
+        "mmr.MatchTeam": {
+            "type": "object",
+            "properties": {
+                "member1": {
+                    "type": "string"
+                },
+                "member2": {
+                    "type": "string"
+                },
+                "score": {
+                    "type": "integer"
                 }
             }
         }

@@ -3,26 +3,33 @@ package main
 import (
 	"net/http"
 
-	docs "example/web-service-gin/docs"
+	docs "mmr/backend/docs"
+	mmr "mmr/backend/mmr"
 
 	"github.com/gin-gonic/gin"
 	swaggerfiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
 )
 
-// @BasePath /api/v1
+//	@BasePath	/api/v1
 
-// PingExample godoc
-// @Summary ping example
-// @Schemes
-// @Description do ping
-// @Tags example
+// @Summary Submit a match
+// @Description Submit a match for MMR calculation
 // @Accept json
 // @Produce json
-// @Success 200 {string} Helloworld
-// @Router /example/helloworld [get]
-func Helloworld(g *gin.Context) {
-	g.JSON(http.StatusOK, "helloworld")
+// @Param match body mmr.Match true "Match object"
+// @Success 200 {string} string "match submitted"
+// @Router /mmr/match [post]
+func SubmitMatch(c *gin.Context) {
+	var json mmr.Match
+	err := c.BindJSON(&json)
+
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, "match submitted")
 }
 
 func main() {
@@ -30,12 +37,11 @@ func main() {
 	docs.SwaggerInfo.BasePath = "/api/v1"
 	v1 := r.Group("/api/v1")
 	{
-		eg := v1.Group("/example")
+		eg := v1.Group("/mmr")
 		{
-			eg.GET("/helloworld", Helloworld)
+			eg.POST("/match", SubmitMatch)
 		}
 	}
 	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerfiles.Handler))
 	r.Run(":8080")
-
 }

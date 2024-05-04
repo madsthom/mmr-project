@@ -1,10 +1,11 @@
 <script lang="ts">
   import '../app.pcss';
-  import Navbar from './components/navbar.svelte';
+  // import Navbar from './components/navbar.svelte';
 </script>
 
 <slot></slot>
-<Navbar />
+
+<!-- <Navbar /> -->
 
 <style lang="postcss">
 </style>

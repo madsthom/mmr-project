@@ -46,8 +46,8 @@ func SubmitMatch(c *gin.Context) {
 
 	fmt.Println(tm1m1, tm1m2, tm2m1, tm2m2)
 
-	team1 := createTeam(tm1m1, tm1m2, uint(json.Team1.Score))
-	team2 := createTeam(tm2m1, tm2m2, uint(json.Team2.Score))
+	team1 := createTeam(tm1m1, tm1m2, uint(json.Team1.Score), json.Team1.Score > json.Team2.Score)
+	team2 := createTeam(tm2m1, tm2m2, uint(json.Team2.Score), json.Team2.Score > json.Team1.Score)
 
 	fmt.Println(team1, team2)
 
@@ -67,9 +67,9 @@ func createMatch(teamOneId, teamTwoId uint) uint {
 	return match.ID
 }
 
-func createTeam(playerOneId, playerTwoId, score uint) uint {
+func createTeam(playerOneId, playerTwoId, score uint, winner bool) uint {
 	teamRepo := repos.NewTeamRepository(database.DB)
-	team, err := teamRepo.CreateTeam(playerOneId, playerTwoId, score)
+	team, err := teamRepo.CreateTeam(playerOneId, playerTwoId, score, winner)
 	if err != nil {
 		panic("Failed to create team")
 	}

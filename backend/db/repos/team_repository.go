@@ -7,7 +7,7 @@ import (
 )
 
 type ITeamRepository interface {
-	CreateTeam(playerOneId, playerTwoId, score uint) (*models.Team, error)
+	CreateTeam(playerOneId, playerTwoId, score uint, winner bool) (*models.Team, error)
 	ListTeams() ([]*models.Team, error)
 }
 
@@ -19,11 +19,12 @@ func NewTeamRepository(db *gorm.DB) ITeamRepository {
 	return &TeamRepository{db}
 }
 
-func (tr *TeamRepository) CreateTeam(playerOneId, playerTwoId, score uint) (*models.Team, error) {
+func (tr *TeamRepository) CreateTeam(playerOneId, playerTwoId, score uint, winner bool) (*models.Team, error) {
 	team := &models.Team{
 		UserOneID: playerOneId,
 		UserTwoID: playerTwoId,
 		Score:     score,
+		Winner: 	 winner,
 	}
 	if err := tr.db.Create(team).Error; err != nil {
 		return nil, err

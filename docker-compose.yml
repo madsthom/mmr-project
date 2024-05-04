@@ -2,14 +2,17 @@ version: "3.8"
 
 services:
   mysql:
-    image: mysql:latest
+    image: postgres:latest
     container_name: foosball_db
     ports:
-      - "3306:3306"
+      - 5432:5432
     environment:
-      MYSQL_ROOT_PASSWORD: root123!
-      MYSQL_DATABASE: foosball
-      MYSQL_USER: trifork
-      MYSQL_PASSWORD: trifork123!
+      - POSTGRES_USER=pg
+      - POSTGRES_PASSWORD=pass
+      - POSTGRES_DB=foosball
     volumes:
-      - ./mysql-data:/var/lib/mysql
+      - db:/var/lib/postgresql/data 
+
+
+volumes:
+  db:

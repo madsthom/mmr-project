@@ -6,7 +6,7 @@ data "external_schema" "gorm" {
     "ariga.io/atlas-provider-gorm",
     "load",
     "--path", "./db/models",
-    "--dialect", "mysql",
+    "--dialect", "postgres",
   ]
 }
 

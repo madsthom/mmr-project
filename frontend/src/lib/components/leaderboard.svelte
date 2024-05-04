@@ -7,6 +7,8 @@
       id: 1,
       name: 'maan',
       score: 1500,
+      wins: 0,
+      loses: 0,
     },
     {
       id: 2,
@@ -28,6 +30,8 @@
         <Table.Row>
           <Table.Head class="w-16">#</Table.Head>
           <Table.Head class="">Player</Table.Head>
+          <Table.Head class="">Wins</Table.Head>
+          <Table.Head class="">Losses</Table.Head>
           <Table.Head class="text-right">Score</Table.Head>
         </Table.Row>
       </Table.Header>

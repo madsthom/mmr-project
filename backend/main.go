@@ -10,6 +10,7 @@ import (
 	"github.com/gin-gonic/gin"
 	swaggerfiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
+	database "mmr/backend/db"
 )
 
 //	@BasePath	/api/v1
@@ -35,6 +36,7 @@ func SubmitMatch(c *gin.Context) {
 }
 
 func main() {
+	database.InitDatabase()
 	r := gin.Default()
 	docs.SwaggerInfo.BasePath = "/api/v1"
 	v1 := r.Group("/api/v1")

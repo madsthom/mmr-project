@@ -12,6 +12,7 @@ import (
 	database "mmr/backend/db"
 
 	"github.com/gin-gonic/gin"
+	"github.com/mafredri/go-trueskill"
 	swaggerfiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
 )
@@ -34,24 +35,46 @@ func SubmitMatch(c *gin.Context) {
 		return
 	}
 
-	// 1. Calculate MMR
-	// 2. Update users with new MMR
-	// 3. Create two teams
-	// 4. Create match with scores
+	user1 := getUser(json.Team1.Member1)
+	player1 := mmr.CreateNewPlayer(user1.Name, float64(user1.MMR))
+	user2 := getUser(json.Team1.Member2)
+	player2 := mmr.CreateNewPlayer(user2.Name, float64(user2.MMR))
 
-	tm1m1 := upsertUser(json.Team1.Member1, 1)
-	tm1m2 := upsertUser(json.Team1.Member2, 1)
-	tm2m1 := upsertUser(json.Team2.Member1, 1)
-	tm2m2 := upsertUser(json.Team2.Member2, 1)
+	team1 := mmr.Team{
+		Players: []mmr.Player{player1, player2},
+		Score:   int16(json.Team1.Score),
+	}
 
-	fmt.Println(tm1m1, tm1m2, tm2m1, tm2m2)
+	user3 := getUser(json.Team2.Member1)
+	player3 := mmr.CreateNewPlayer(user3.Name, float64(user3.MMR))
+	user4 := getUser(json.Team2.Member2)
+	player4 := mmr.CreateNewPlayer(user4.Name, float64(user4.MMR))
 
-	team1 := createTeam(tm1m1, tm1m2, uint(json.Team1.Score), json.Team1.Score > json.Team2.Score)
-	team2 := createTeam(tm2m1, tm2m2, uint(json.Team2.Score), json.Team2.Score > json.Team1.Score)
+	team2 := mmr.Team{
+		Players: []mmr.Player{player3, player4},
+		Score:   int16(json.Team2.Score),
+	}
 
-	fmt.Println(team1, team2)
+	ts := trueskill.New(trueskill.DrawProbabilityZero())
 
-	match := createMatch(team1, team2)
+	team1, team2 = mmr.CalculateNewMMR(ts, &team1, &team2)
+
+	user1.MMR = int(team1.Players[0].Player.Mu())
+	user2.MMR = int(team1.Players[1].Player.Mu())
+	user3.MMR = int(team2.Players[0].Player.Mu())
+	user4.MMR = int(team2.Players[1].Player.Mu())
+
+	tm1m1 := upsertUser(user1)
+	tm1m2 := upsertUser(user2)
+	tm2m1 := upsertUser(user3)
+	tm2m2 := upsertUser(user4)
+
+	dbteam1 := createTeam(tm1m1, tm1m2, uint(json.Team1.Score), json.Team1.Score > json.Team2.Score)
+	dbteam2 := createTeam(tm2m1, tm2m2, uint(json.Team2.Score), json.Team2.Score > json.Team1.Score)
+
+	fmt.Println(dbteam1, dbteam2)
+
+	match := createMatch(dbteam1, dbteam2)
 
 	fmt.Println(match)
 
@@ -63,22 +86,22 @@ func SubmitMatch(c *gin.Context) {
 // @Tags Leaderboard
 // @Accept json
 // @Produce json
-// @Success 200 {array} LeaderboardEntry
-// @Failure 500 {object} ErrorResponse
+// @Success 200 {array} repos.LeaderboardEntry
 // @Router /stats/leaderboard [get]
 func GetLeaderboard(c *gin.Context) {
-    // Initialize leaderboard repository
-    leaderboardRepo := repos.NewLeaderboardRepository(database.DB)
-    
-    // Fetch leaderboard entries
-    entries, err := leaderboardRepo.GetLeaderboard()
-    if err != nil {
-        c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch leaderboard entries"})
-        return
-    }
-    
-    // Return leaderboard entries as JSON response
-    c.JSON(http.StatusOK, entries)
+	// Initialize leaderboard repository
+	leaderboardRepo := repos.NewLeaderboardRepository(database.DB)
+
+	// Fetch leaderboard entries
+	entries, err := leaderboardRepo.GetLeaderboard()
+	fmt.Println(entries)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch leaderboard entries"})
+		return
+	}
+
+	// Return leaderboard entries as JSON response
+	c.JSON(http.StatusOK, gin.H{"entries": entries})
 }
 
 func createMatch(teamOneId, teamTwoId uint) uint {
@@ -99,17 +122,24 @@ func createTeam(playerOneId, playerTwoId, score uint, winner bool) uint {
 	return team.ID
 }
 
-func upsertUser(userName string, mmr int) uint {
+func upsertUser(user *models.User) uint {
+	userRepo := repos.NewUserRepository(database.DB)
+	user, err := userRepo.SaveUser(user)
+	if err != nil {
+		panic("Failed to save user")
+	}
+
+	return user.ID
+}
+
+func getUser(userName string) *models.User {
 	userRepo := repos.NewUserRepository(database.DB)
 	user, err := userRepo.GetOrCreateByName(userName)
 	if err != nil {
 		panic("Failed to find user")
-	} else {
-		user.MMR = mmr
-		userRepo.SaveUser(user)
 	}
 
-	return user.ID
+	return user
 }
 
 func main() {
@@ -124,7 +154,7 @@ func main() {
 		}
 		s := v1.Group("/stats")
 		{
-			s.GET("/leaderboard")
+			s.GET("/leaderboard", GetLeaderboard)
 		}
 	}
 	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerfiles.Handler))

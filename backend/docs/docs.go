@@ -45,11 +45,41 @@ const docTemplate = `{
                     }
                 }
             }
+        },
+        "/stats/leaderboard": {
+            "get": {
+                "description": "Get leaderboard stats including wins, loses, and MMR of users",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Leaderboard"
+                ],
+                "summary": "Get leaderboard stats",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/repos.LeaderboardEntry"
+                            }
+                        }
+                    }
+                }
+            }
         }
     },
     "definitions": {
         "mmr.Match": {
             "type": "object",
+            "required": [
+                "team1",
+                "team2"
+            ],
             "properties": {
                 "team1": {
                     "$ref": "#/definitions/mmr.MatchTeam"
@@ -61,6 +91,10 @@ const docTemplate = `{
         },
         "mmr.MatchTeam": {
             "type": "object",
+            "required": [
+                "member1",
+                "member2"
+            ],
             "properties": {
                 "member1": {
                     "type": "string"
@@ -69,6 +103,23 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "score": {
+                    "type": "integer"
+                }
+            }
+        },
+        "repos.LeaderboardEntry": {
+            "type": "object",
+            "properties": {
+                "loses": {
+                    "type": "integer"
+                },
+                "mmr": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "wins": {
                     "type": "integer"
                 }
             }

@@ -13,6 +13,10 @@ primary_region = 'ams'
 [env]
   PORT = '8080'
 
+[mounts]
+  source = "data"
+  destination="/data"
+
 [http_service]
   internal_port = 8080
   force_https = true

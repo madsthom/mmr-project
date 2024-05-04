@@ -6,6 +6,9 @@ definitions:
         $ref: '#/definitions/mmr.MatchTeam'
       team2:
         $ref: '#/definitions/mmr.MatchTeam'
+    required:
+    - team1
+    - team2
     type: object
   mmr.MatchTeam:
     properties:
@@ -14,6 +17,20 @@ definitions:
       member2:
         type: string
       score:
+        type: integer
+    required:
+    - member1
+    - member2
+    type: object
+  repos.LeaderboardEntry:
+    properties:
+      loses:
+        type: integer
+      mmr:
+        type: integer
+      name:
+        type: string
+      wins:
         type: integer
     type: object
 info:
@@ -39,4 +56,21 @@ paths:
           schema:
             type: string
       summary: Submit a match
+  /stats/leaderboard:
+    get:
+      consumes:
+      - application/json
+      description: Get leaderboard stats including wins, loses, and MMR of users
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/repos.LeaderboardEntry'
+            type: array
+      summary: Get leaderboard stats
+      tags:
+      - Leaderboard
 swagger: "2.0"

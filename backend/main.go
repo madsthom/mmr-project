@@ -31,7 +31,6 @@ func SubmitMatch(c *gin.Context) {
 		return
 	}
 
-	// Return json object successfully
 	c.JSON(http.StatusOK, gin.H{"message": fmt.Sprintf("Match submitted: %v", json)})
 }
 

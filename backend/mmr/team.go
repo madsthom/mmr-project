@@ -1,6 +1,8 @@
 package mmr
 
 import (
+	"fmt"
+
 	"github.com/mafredri/go-trueskill"
 )
 
@@ -68,7 +70,7 @@ func (t *Team) GetSigma() (sigma float64) {
 }
 
 func (t *Team) String() (s string) {
-	s = "Team of " + string(len(t.GetPlayers())) + " Players:"
+	s = "Team of " + fmt.Sprint(len(t.GetPlayers())) + " Players:"
 	for _, p := range t.GetPlayers() {
 		s += "\t" + p.String()
 	}

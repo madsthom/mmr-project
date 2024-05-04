@@ -1,26 +1,9 @@
 <script lang="ts">
   import * as Card from '$lib/components/ui/card';
   import * as Table from '$lib/components/ui/table';
+  import type { ReposLeaderboardEntry } from '../../api';
 
-  const data = [
-    {
-      id: 1,
-      name: 'maan',
-      score: 1500,
-      wins: 0,
-      loses: 0,
-    },
-    {
-      id: 2,
-      name: 'mbla',
-      score: 1456,
-    },
-    {
-      id: 3,
-      name: 'msth',
-      score: 1345,
-    },
-  ];
+  export let data: ReposLeaderboardEntry[];
 </script>
 
 <Card.Root class="">
@@ -36,11 +19,13 @@
         </Table.Row>
       </Table.Header>
       <Table.Body>
-        {#each data as { id, name, score }}
+        {#each data as { loses, name, wins, mmr }, idx}
           <Table.Row>
-            <Table.Cell class="w-16 font-bold">{id}</Table.Cell>
+            <Table.Cell class="w-16 font-bold">{idx + 1}</Table.Cell>
             <Table.Cell>{name}</Table.Cell>
-            <Table.Cell class="text-right">{score}</Table.Cell>
+            <Table.Cell>{wins}</Table.Cell>
+            <Table.Cell>{loses}</Table.Cell>
+            <Table.Cell class="text-right">{mmr}</Table.Cell>
           </Table.Row>
         {/each}
       </Table.Body>

@@ -31,19 +31,21 @@ export interface MmrMatch {
      * @type {MmrMatchTeam}
      * @memberof MmrMatch
      */
-    team1?: MmrMatchTeam;
+    team1: MmrMatchTeam;
     /**
      * 
      * @type {MmrMatchTeam}
      * @memberof MmrMatch
      */
-    team2?: MmrMatchTeam;
+    team2: MmrMatchTeam;
 }
 
 /**
  * Check if a given object implements the MmrMatch interface.
  */
 export function instanceOfMmrMatch(value: object): boolean {
+    if (!('team1' in value)) return false;
+    if (!('team2' in value)) return false;
     return true;
 }
 
@@ -57,8 +59,8 @@ export function MmrMatchFromJSONTyped(json: any, ignoreDiscriminator: boolean): 
     }
     return {
         
-        'team1': json['team1'] == null ? undefined : MmrMatchTeamFromJSON(json['team1']),
-        'team2': json['team2'] == null ? undefined : MmrMatchTeamFromJSON(json['team2']),
+        'team1': MmrMatchTeamFromJSON(json['team1']),
+        'team2': MmrMatchTeamFromJSON(json['team2']),
     };
 }
 

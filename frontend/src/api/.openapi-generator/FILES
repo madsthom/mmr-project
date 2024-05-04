@@ -1,8 +1,9 @@
-.openapi-generator-ignore
 apis/DefaultApi.ts
+apis/LeaderboardApi.ts
 apis/index.ts
 index.ts
 models/MmrMatch.ts
 models/MmrMatchTeam.ts
+models/ReposLeaderboardEntry.ts
 models/index.ts
 runtime.ts

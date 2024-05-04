@@ -10,7 +10,8 @@ var DB *gorm.DB
 
 func InitDatabase() {
     // Define the database configuration
-    dsn := "user:password@tcp(your-database-url:port)/dbname?charset=utf8mb4&parseTime=True&loc=Local"
+    dsn := "trifork:trifork123!@tcp(localhost:3306)/foosball?charset=utf8mb4&parseTime=True&loc=Local"
+
 
     // Open a connection to the database
     db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})

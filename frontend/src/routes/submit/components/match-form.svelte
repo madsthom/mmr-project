@@ -16,8 +16,6 @@
 
   export let data: SuperValidated<Infer<MatchSchema>>;
 
-  let isValid = false;
-
   const form = superForm(data, {
     validators: zodClient(matchSchema),
     dataType: 'json',

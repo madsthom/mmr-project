@@ -14,6 +14,7 @@ type Team struct {
   UserOne   User `gorm:"foreignKey:UserOneID"`
   UserTwoID uint
   UserTwo   User `gorm:"foreignKey:UserTwoID"`
+  Score int
 }
 
 type Match struct {

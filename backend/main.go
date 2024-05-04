@@ -58,12 +58,13 @@ func SubmitMatch(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": fmt.Sprintf("Match submitted: %v", json)})
 }
 
-// @Summary Retrieve leaderboard
-// @Description Retrieve leaderboard
-// @Accept
+// @Summary Get leaderboard stats
+// @Description Get leaderboard stats including wins, loses, and MMR of users
+// @Tags Leaderboard
+// @Accept json
 // @Produce json
-// @Param
-// @Success 200 {json} list of players
+// @Success 200 {array} LeaderboardEntry
+// @Failure 500 {object} ErrorResponse
 // @Router /stats/leaderboard [get]
 func GetLeaderboard(c *gin.Context) {
     // Initialize leaderboard repository

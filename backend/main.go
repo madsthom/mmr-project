@@ -1,41 +1,105 @@
 package main
 
 import (
+	"fmt"
 	"net/http"
 
-	docs "example/web-service-gin/docs"
+	"mmr/backend/db/models"
+	"mmr/backend/db/repos"
+	docs "mmr/backend/docs"
+	mmr "mmr/backend/mmr"
+
+	database "mmr/backend/db"
 
 	"github.com/gin-gonic/gin"
 	swaggerfiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
 )
 
-// @BasePath /api/v1
+//	@BasePath	/api/v1
 
-// PingExample godoc
-// @Summary ping example
-// @Schemes
-// @Description do ping
-// @Tags example
+// @Summary Submit a match
+// @Description Submit a match for MMR calculation
 // @Accept json
 // @Produce json
-// @Success 200 {string} Helloworld
-// @Router /example/helloworld [get]
-func Helloworld(g *gin.Context) {
-	g.JSON(http.StatusOK, "helloworld")
+// @Param match body mmr.Match true "Match object"
+// @Success 200 {string} string "match submitted"
+// @Router /mmr/match [post]
+func SubmitMatch(c *gin.Context) {
+	var json mmr.Match
+	err := c.BindJSON(&json)
+
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	// 1. Calculate MMR
+	// 2. Update users with new MMR
+	// 3. Create two teams
+	// 4. Create match with scores
+
+	tm1m1 := upsertUser(json.Team1.Member1, 1)
+	tm1m2 := upsertUser(json.Team1.Member2, 1)
+	tm2m1 := upsertUser(json.Team2.Member1, 1)
+	tm2m2 := upsertUser(json.Team2.Member2, 1)
+
+	fmt.Println(tm1m1, tm1m2, tm2m1, tm2m2)
+
+	team1 := createTeam(tm1m1, tm1m2, uint(json.Team1.Score))
+	team2 := createTeam(tm2m1, tm2m2, uint(json.Team2.Score))
+
+	fmt.Println(team1, team2)
+
+	match := createMatch(team1, team2)
+
+	fmt.Println(match)
+
+	c.JSON(http.StatusOK, gin.H{"message": fmt.Sprintf("Match submitted: %v", json)})
+}
+
+func createMatch(teamOneId, teamTwoId uint) uint {
+	matchRepo := repos.NewMatchRepository(database.DB)
+	match, err := matchRepo.CreateMatch(&models.Match{TeamOneID: teamOneId, TeamTwoID: teamTwoId})
+	if err != nil {
+		panic("Failed to create match")
+	}
+	return match.ID
+}
+
+func createTeam(playerOneId, playerTwoId, score uint) uint {
+	teamRepo := repos.NewTeamRepository(database.DB)
+	team, err := teamRepo.CreateTeam(playerOneId, playerTwoId, score)
+	if err != nil {
+		panic("Failed to create team")
+	}
+	return team.ID
+}
+
+func upsertUser(userName string, mmr int) uint {
+	userRepo := repos.NewUserRepository(database.DB)
+	user, err := userRepo.GetOrCreateByName(userName)
+	if err != nil {
+		panic("Failed to find user")
+	} else {
+		user.MMR = mmr
+		userRepo.SaveUser(user)
+	}
+
+	return user.ID
 }
 
 func main() {
+	database.InitDatabase()
 	r := gin.Default()
 	docs.SwaggerInfo.BasePath = "/api/v1"
 	v1 := r.Group("/api/v1")
 	{
-		eg := v1.Group("/example")
+		eg := v1.Group("/mmr")
 		{
-			eg.GET("/helloworld", Helloworld)
+			eg.POST("/match", SubmitMatch)
 		}
 	}
 	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerfiles.Handler))
 	r.Run(":8080")
-
 }

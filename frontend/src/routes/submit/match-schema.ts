@@ -2,7 +2,7 @@ import { z } from 'zod';
 
 const teamSchema = z.object({
   // TODO: Get all values from server or configuration file
-  score: z.number().int().positive().max(10),
+  score: z.number().int().min(0).max(10),
   member1: z.string().max(4).toLowerCase(),
   member2: z.string().max(4).toLowerCase(),
 });

@@ -13,6 +13,7 @@
   import { Button } from '$lib/components/ui/button';
   import MatchCard from '$lib/components/match-card.svelte';
   import { fade, slide, fly } from 'svelte/transition';
+  import { goto } from '$app/navigation';
 
   export let data: SuperValidated<Infer<MatchSchema>>;
 
@@ -34,10 +35,12 @@
   const setTeam1AsWinner = () => {
     $formData.team1.score = 10;
     $formData.team2.score = -1;
+    goto('#score-step');
   };
   const setTeam2AsWinner = () => {
     $formData.team2.score = 10;
     $formData.team1.score = -1;
+    goto('#score-step');
   };
 
   $: isMatchCardVisible =
@@ -52,9 +55,9 @@
     $formData.team2.member2 != '';
 </script>
 
-<form method="POST" use:enhance>
+<form method="post" use:enhance>
   <div class="flex flex-col gap-2">
-    <div class="flex flex-row gap-4">
+    <div id="players-step" class="flex flex-row gap-4">
       <div class="flex flex-1 flex-col">
         <h3 class="mb-2 text-center text-2xl">Team 1</h3>
         <MatchFormField
@@ -92,7 +95,7 @@
       </div>
     </div>
     {#if allInitialsFilled}
-      <div class="flex flex-col gap-4" transition:fade>
+      <div id="winner-step" class="flex flex-col gap-4" transition:fade>
         <h2 class="text-center text-4xl">Who won?</h2>
         <div class="flex flex-row gap-4">
           <Button
@@ -112,7 +115,7 @@
       </div>
     {/if}
     {#if loosingTeam}
-      <div class="flex flex-col gap-4" transition:fade>
+      <div id="score-step" class="flex flex-col gap-4" transition:fade>
         <h2 class="text-center text-4xl">
           What was {loosingTeam === 'team1' ? 'your' : 'their'} score?
         </h2>
@@ -124,6 +127,7 @@
                 : 'outline'}
               on:click={() => {
                 $formData[loosingTeam].score = score;
+                goto('#submit-step');
               }}
             >
               {score === 0 ? '🥚' : score}
@@ -133,10 +137,10 @@
       </div>
     {/if}
     {#if isMatchCardVisible}
-      <div class="flex flex-col gap-4" transition:fade>
+      <div id="submit-step" class="flex flex-col gap-4" transition:fade>
         <h2 class="text-center text-4xl">Submit?</h2>
         <MatchCard match={$formData} />
-        <Button>Submit match</Button>
+        <Form.Button>Submit the match</Form.Button>
       </div>
     {/if}
   </div>

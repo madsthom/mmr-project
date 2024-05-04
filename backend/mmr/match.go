@@ -6,7 +6,7 @@ type Match struct {
 }
 
 type MatchTeam struct {
-	Score   int    `json:"score"`
+	Score   uint   `json:"score"`
 	Member1 string `json:"member1" binding:"required"`
 	Member2 string `json:"member2" binding:"required"`
 }

@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	team "mmr/backend/mmr"
+	"mmr/backend/mmr"
 	"os"
 	"testing"
 
@@ -17,8 +17,8 @@ func TestMMRCalculation(t *testing.T) {
 	p3 := ts.NewPlayer()
 	p4 := ts.NewPlayer()
 
-	team1 := team.NewTeam([]trueskill.Player{p1, p2})
-	team2 := team.NewTeam([]trueskill.Player{p3, p4})
+	team1 := mmr.NewTeam([]trueskill.Player{p1, p2})
+	team2 := mmr.NewTeam([]trueskill.Player{p3, p4})
 
 	avgPlayer1 := trueskill.NewPlayer(team1.GetMu(), team1.GetSigma())
 	avgPlayer2 := trueskill.NewPlayer(team2.GetMu(), team2.GetSigma())

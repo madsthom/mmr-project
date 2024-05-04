@@ -2,6 +2,7 @@ package mmr
 
 import (
 	"fmt"
+	"math"
 
 	"github.com/mafredri/go-trueskill"
 )
@@ -38,16 +39,19 @@ func CalculateNewMMR(ts trueskill.Config, team1 *Team, team2 *Team) (Team, Team)
 	var loser trueskill.Player
 	var winnerTeam *Team
 	var loserTeam *Team
+	var win string
 	if team1.Score > team2.Score {
 		winner = avgTeam1
 		loser = avgTeam2
 		winnerTeam = team1
 		loserTeam = team2
+		win = "1"
 	} else {
 		winner = avgTeam2
 		loser = avgTeam1
 		winnerTeam = team2
 		loserTeam = team1
+		win = "2"
 	}
 
 	teams := []trueskill.Player{winner, loser}
@@ -56,8 +60,8 @@ func CalculateNewMMR(ts trueskill.Config, team1 *Team, team2 *Team) (Team, Team)
 	winnerAverageTeam := teamsWithNewSkills[0]
 	loserAverageTeam := teamsWithNewSkills[1]
 
-	winnerDiff := winner.Mu() - winnerAverageTeam.Mu()
-	loserDiff := loser.Mu() - loserAverageTeam.Mu()
+	winnerDiff := math.Abs(winner.Mu() - winnerAverageTeam.Mu())
+	loserDiff := math.Abs(loser.Mu() - loserAverageTeam.Mu())
 
 	fmt.Printf("Team1: %s\n", winnerAverageTeam)
 	fmt.Printf("Team2: %s\n", loserAverageTeam)
@@ -68,8 +72,13 @@ func CalculateNewMMR(ts trueskill.Config, team1 *Team, team2 *Team) (Team, Team)
 	winnerTeam.Players[0].Player = trueskill.NewPlayer(winnerTeam.Players[0].Player.Mu()+winnerDiff, winnerAverageTeam.Sigma())
 	winnerTeam.Players[1].Player = trueskill.NewPlayer(winnerTeam.Players[1].Player.Mu()+winnerDiff, winnerAverageTeam.Sigma())
 
-	loserTeam.Players[0].Player = trueskill.NewPlayer(loserTeam.Players[0].Player.Mu()+loserDiff, loserAverageTeam.Sigma())
-	loserTeam.Players[1].Player = trueskill.NewPlayer(loserTeam.Players[1].Player.Mu()+loserDiff, loserAverageTeam.Sigma())
+	loserTeam.Players[0].Player = trueskill.NewPlayer(loserTeam.Players[0].Player.Mu()-loserDiff, loserAverageTeam.Sigma())
+	loserTeam.Players[1].Player = trueskill.NewPlayer(loserTeam.Players[1].Player.Mu()-loserDiff, loserAverageTeam.Sigma())
 
-	return *team1, *team2
+	if win == "1" {
+		return *winnerTeam, *loserTeam
+	} else {
+		return *loserTeam, *winnerTeam
+	}
+
 }

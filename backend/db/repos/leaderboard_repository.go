@@ -7,10 +7,10 @@ import (
 )
 
 type LeaderboardEntry struct {
-	Name  string
-	MMR   int
-	Wins  int
-	Loses int
+	Name  string `json:"name"`
+	MMR   int    `json:"mmr"`
+	Wins  int    `json:"wins"`
+	Loses int    `json:"loses"`
 }
 
 // ILeaderboardRepository interface declaration
@@ -57,7 +57,7 @@ func (lr *LeaderboardRepository) GetLeaderboard() ([]*LeaderboardEntry, error) {
 		// Create a new LeaderboardEntry object and populate it with the user's information and the counts of wins and losses
 		entry := &LeaderboardEntry{
 			Name:  user.Name,
-			MMR:   user.MMR,
+			MMR:   user.MMR * 50,
 			Wins:  int(teamCounts.Winning),
 			Loses: int(teamCounts.Losing),
 		}

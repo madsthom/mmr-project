@@ -101,7 +101,7 @@ func GetLeaderboard(c *gin.Context) {
 	}
 
 	// Return leaderboard entries as JSON response
-	c.JSON(http.StatusOK, gin.H{"entries": entries})
+	c.JSON(http.StatusOK, entries)
 }
 
 func createMatch(teamOneId, teamTwoId uint) uint {

@@ -2,15 +2,14 @@ package main
 
 import (
 	"fmt"
-	"log"
 	"net/http"
 
 	database "example.com/m/v2/db"
 )
 
 func main() {
-	http.HandleFunc("/api/greeting", greetingHandler)
-	log.Fatal(http.ListenAndServe(":8080", nil))
+	// Initialize Database
+	database.InitDatabase()
 }
 
 func greetingHandler(w http.ResponseWriter, r *http.Request) {
@@ -24,6 +23,5 @@ func greetingHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintln(w, message)
 	
 
-	// Initialize Database
-	database.InitDatabase()
+	
 }

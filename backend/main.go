@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"net/http"
 
 	docs "mmr/backend/docs"
@@ -29,7 +30,8 @@ func SubmitMatch(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, "match submitted")
+	// Return json object successfully
+	c.JSON(http.StatusOK, gin.H{"message": fmt.Sprintf("Match submitted: %v", json)})
 }
 
 func main() {

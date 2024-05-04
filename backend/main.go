@@ -58,6 +58,28 @@ func SubmitMatch(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": fmt.Sprintf("Match submitted: %v", json)})
 }
 
+// @Summary Retrieve leaderboard
+// @Description Retrieve leaderboard
+// @Accept
+// @Produce json
+// @Param
+// @Success 200 {json} list of players
+// @Router /stats/leaderboard [get]
+func GetLeaderboard(c *gin.Context) {
+    // Initialize leaderboard repository
+    leaderboardRepo := repos.NewLeaderboardRepository(database.DB)
+    
+    // Fetch leaderboard entries
+    entries, err := leaderboardRepo.GetLeaderboard()
+    if err != nil {
+        c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch leaderboard entries"})
+        return
+    }
+    
+    // Return leaderboard entries as JSON response
+    c.JSON(http.StatusOK, entries)
+}
+
 func createMatch(teamOneId, teamTwoId uint) uint {
 	matchRepo := repos.NewMatchRepository(database.DB)
 	match, err := matchRepo.CreateMatch(&models.Match{TeamOneID: teamOneId, TeamTwoID: teamTwoId})
@@ -98,6 +120,10 @@ func main() {
 		eg := v1.Group("/mmr")
 		{
 			eg.POST("/match", SubmitMatch)
+		}
+		s := v1.Group("/stats")
+		{
+			s.GET("/leaderboard")
 		}
 	}
 	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerfiles.Handler))

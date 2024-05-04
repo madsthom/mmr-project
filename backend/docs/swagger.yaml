@@ -1,0 +1,42 @@
+basePath: /api/v1
+definitions:
+  mmr.Match:
+    properties:
+      team1:
+        $ref: '#/definitions/mmr.MatchTeam'
+      team2:
+        $ref: '#/definitions/mmr.MatchTeam'
+    type: object
+  mmr.MatchTeam:
+    properties:
+      member1:
+        type: string
+      member2:
+        type: string
+      score:
+        type: integer
+    type: object
+info:
+  contact: {}
+paths:
+  /mmr/match:
+    post:
+      consumes:
+      - application/json
+      description: Submit a match for MMR calculation
+      parameters:
+      - description: Match object
+        in: body
+        name: match
+        required: true
+        schema:
+          $ref: '#/definitions/mmr.Match'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: match submitted
+          schema:
+            type: string
+      summary: Submit a match
+swagger: "2.0"

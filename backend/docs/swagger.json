@@ -1,0 +1,67 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "contact": {}
+    },
+    "basePath": "/api/v1",
+    "paths": {
+        "/mmr/match": {
+            "post": {
+                "description": "Submit a match for MMR calculation",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Submit a match",
+                "parameters": [
+                    {
+                        "description": "Match object",
+                        "name": "match",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/mmr.Match"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "match submitted",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "mmr.Match": {
+            "type": "object",
+            "properties": {
+                "team1": {
+                    "$ref": "#/definitions/mmr.MatchTeam"
+                },
+                "team2": {
+                    "$ref": "#/definitions/mmr.MatchTeam"
+                }
+            }
+        },
+        "mmr.MatchTeam": {
+            "type": "object",
+            "properties": {
+                "member1": {
+                    "type": "string"
+                },
+                "member2": {
+                    "type": "string"
+                },
+                "score": {
+                    "type": "integer"
+                }
+            }
+        }
+    }
+}

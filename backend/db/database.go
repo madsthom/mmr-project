@@ -1,21 +1,16 @@
 package database
 
 import (
-	//"example.com/m/v2/db/models" // Import your models package
 	"example.com/m/v2/db/models"
-	"gorm.io/driver/mysql" // Import the MySQL driver
-	"gorm.io/gorm"         // Import GORM
+	"gorm.io/driver/sqlite"
+	"gorm.io/gorm"
 )
 
 var DB *gorm.DB
 
 func InitDatabase() {
     // Define the database configuration
-    dsn := "trifork:trifork123!@tcp(localhost:3306)/foosball?charset=utf8mb4&parseTime=True&loc=Local"
-
-
-    // Open a connection to the database
-    db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
+    db, err := gorm.Open(sqlite.Open("./db/foosball.db"), &gorm.Config{})
     if err != nil {
         panic("failed to connect to database")
     }

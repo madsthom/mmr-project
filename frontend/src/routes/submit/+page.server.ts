@@ -22,8 +22,8 @@ export const actions: Actions = {
     }
 
     try {
-      const res = await apiClient.mmrApi.mmrMatchPost({ match: form.data });
-      return { res };
+      await apiClient.mmrApi.mmrMatchPost({ match: form.data });
+      return { form };
     } catch (error) {
       return fail(500, {
         error,

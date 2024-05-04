@@ -1,28 +1,29 @@
 <script lang="ts">
+  import { goto } from '$app/navigation';
+  import LoadingOverlay from '$lib/components/loading-overlay.svelte';
+  import MatchCard from '$lib/components/match-card.svelte';
+  import { Button } from '$lib/components/ui/button';
   import * as Form from '$lib/components/ui/form';
+  import { fade } from 'svelte/transition';
   import {
     superForm,
     type Infer,
     type SuperValidated,
   } from 'sveltekit-superforms';
   import { zodClient } from 'sveltekit-superforms/adapters';
+  import type { MatchSchema } from '../match-schema';
   import { matchSchema } from '../match-schema';
-  import type { MatchForm, MatchSchema } from '../match-schema';
-  import { Input } from '$lib/components/ui/input';
   import MatchFormField from './match-form-field.svelte';
-  import { Button } from '$lib/components/ui/button';
-  import MatchCard from '$lib/components/match-card.svelte';
-  import { fade, slide, fly } from 'svelte/transition';
-  import { goto } from '$app/navigation';
 
   export let data: SuperValidated<Infer<MatchSchema>>;
 
   const form = superForm(data, {
     validators: zodClient(matchSchema),
     dataType: 'json',
+    delayMs: 500,
   });
 
-  const { form: formData, enhance } = form;
+  const { form: formData, enhance, submitting } = form;
 
   let loosingTeam: 'team1' | 'team2' | null = null;
   $: loosingTeam =
@@ -145,3 +146,5 @@
     {/if}
   </div>
 </form>
+
+<LoadingOverlay isLoading={$submitting} />

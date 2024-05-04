@@ -1,7 +1,7 @@
 package database
 
 import (
-	"example.com/m/v2/db/models"
+	"mmr/backend/db/models"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 )

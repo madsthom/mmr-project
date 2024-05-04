@@ -15,6 +15,7 @@ type Team struct {
 	UserTwoID uint
 	UserTwo   User `gorm:"foreignKey:UserTwoID"`
 	Score     uint
+	Winner    bool
 }
 
 type Match struct {

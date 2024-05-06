@@ -36,9 +36,9 @@ func SubmitMatch(c *gin.Context) {
 	}
 
 	user1 := getUser(json.Team1.Member1)
-	player1 := mmr.CreateNewPlayer(user1.Name, float64(user1.MMR))
+	player1 := mmr.CreateNewPlayer(user1.Name, float64(user1.Mu), user1.Sigma)
 	user2 := getUser(json.Team1.Member2)
-	player2 := mmr.CreateNewPlayer(user2.Name, float64(user2.MMR))
+	player2 := mmr.CreateNewPlayer(user2.Name, float64(user2.Mu), user2.Sigma)
 
 	team1 := mmr.Team{
 		Players: []mmr.Player{player1, player2},
@@ -46,9 +46,9 @@ func SubmitMatch(c *gin.Context) {
 	}
 
 	user3 := getUser(json.Team2.Member1)
-	player3 := mmr.CreateNewPlayer(user3.Name, float64(user3.MMR))
+	player3 := mmr.CreateNewPlayer(user3.Name, float64(user3.Mu), user3.Sigma)
 	user4 := getUser(json.Team2.Member2)
-	player4 := mmr.CreateNewPlayer(user4.Name, float64(user4.MMR))
+	player4 := mmr.CreateNewPlayer(user4.Name, float64(user4.Mu), user4.Sigma)
 
 	team2 := mmr.Team{
 		Players: []mmr.Player{player3, player4},
@@ -59,10 +59,18 @@ func SubmitMatch(c *gin.Context) {
 
 	team1, team2 = mmr.CalculateNewMMR(ts, &team1, &team2)
 
-	user1.MMR = int(team1.Players[0].Player.Mu())
-	user2.MMR = int(team1.Players[1].Player.Mu())
-	user3.MMR = int(team2.Players[0].Player.Mu())
-	user4.MMR = int(team2.Players[1].Player.Mu())
+	user1.Mu = team1.Players[0].Player.Mu()
+	user1.Sigma = team1.Players[0].Player.Sigma()
+	user1.MMR = int(user1.Mu - 3*user1.Sigma)
+	user2.Mu = team1.Players[1].Player.Mu()
+	user2.Sigma = team1.Players[1].Player.Sigma()
+	user2.MMR = int(user2.Mu - 3*user2.Sigma)
+	user3.Mu = team2.Players[0].Player.Mu()
+	user3.Sigma = team2.Players[0].Player.Sigma()
+	user3.MMR = int(user3.Mu - 3*user3.Sigma)
+	user4.Mu = team2.Players[1].Player.Mu()
+	user4.Sigma = team2.Players[1].Player.Sigma()
+	user4.MMR = int(user4.Mu - 3*user4.Sigma)
 
 	tm1m1 := upsertUser(user1)
 	tm1m2 := upsertUser(user2)

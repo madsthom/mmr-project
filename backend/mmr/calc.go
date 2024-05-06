@@ -7,10 +7,10 @@ import (
 	"github.com/mafredri/go-trueskill"
 )
 
-func CreateNewPlayer(initials string, mmr float64) Player {
+func CreateNewPlayer(initials string, mu float64, sigma float64) Player {
 	return Player{
 		Initials: initials,
-		Player:   trueskill.NewPlayer(mmr, trueskill.DefaultSigma),
+		Player:   trueskill.NewPlayer(mu, sigma),
 	}
 }
 

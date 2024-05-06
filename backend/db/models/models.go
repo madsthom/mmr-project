@@ -4,8 +4,10 @@ import "gorm.io/gorm"
 
 type User struct {
 	gorm.Model
-	Name string `gorm:"unique"`
-	MMR  int
+	Name  string `gorm:"unique"`
+	MMR   int
+	Mu    float64
+	Sigma float64
 }
 
 type Team struct {

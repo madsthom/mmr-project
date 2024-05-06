@@ -4,6 +4,7 @@ import (
 	"errors"
 	"mmr/backend/db/models"
 
+	"github.com/mafredri/go-trueskill"
 	"gorm.io/gorm"
 )
 
@@ -35,7 +36,7 @@ func (ur *UserRepository) GetOrCreateByName(name string) (*models.User, error) {
 	if err := ur.db.Where("name = ?", name).First(user).Error; err != nil {
 		// User not found in the database, let's create a new user
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			newUser := &models.User{Name: name, MMR: 25}
+			newUser := &models.User{Name: name, MMR: 0, Mu: trueskill.DefaultMu, Sigma: trueskill.DefaultSigma}
 			if err := ur.db.Create(newUser).Error; err != nil {
 				return nil, err // Return error if unable to create user
 			}

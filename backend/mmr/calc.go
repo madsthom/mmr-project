@@ -21,19 +21,22 @@ func GetAverageTeamPlayer(team *Team) trueskill.Player {
 	return trueskill.NewPlayer(averageMu, averageSigma)
 }
 
-func CalculateNewMMR(ts trueskill.Config, team1 *Team, team2 *Team) (Team, Team) {
+func CalculateNewMMR(team1 *Team, team2 *Team, verbose bool) (Team, Team) {
+	ts := trueskill.New(trueskill.DrawProbabilityZero())
 	avgTeam1 := GetAverageTeamPlayer(team1)
 	avgTeam2 := GetAverageTeamPlayer(team2)
 
-	fmt.Printf("Team1:\n")
-	fmt.Printf("- Player1: %s - mu: %v\n", team1.Players[0].Initials, team1.Players[0].Player.Mu())
-	fmt.Printf("- Player2: %s - mu: %v\n\n", team1.Players[1].Initials, team1.Players[1].Player.Mu())
-	fmt.Printf("Team2:\n")
-	fmt.Printf("- Player1: %s - mu: %v\n", team2.Players[0].Initials, team2.Players[0].Player.Mu())
-	fmt.Printf("- Player2: %s - mu: %v\n\n", team2.Players[1].Initials, team2.Players[1].Player.Mu())
+	if verbose {
+		fmt.Printf("Team1:\n")
+		fmt.Printf("- Player1: %s - mu: %v\n", team1.Players[0].Initials, team1.Players[0].Player.Mu())
+		fmt.Printf("- Player2: %s - mu: %v\n\n", team1.Players[1].Initials, team1.Players[1].Player.Mu())
+		fmt.Printf("Team2:\n")
+		fmt.Printf("- Player1: %s - mu: %v\n", team2.Players[0].Initials, team2.Players[0].Player.Mu())
+		fmt.Printf("- Player2: %s - mu: %v\n\n", team2.Players[1].Initials, team2.Players[1].Player.Mu())
 
-	fmt.Printf("AvgTeam1: %s\n", avgTeam1)
-	fmt.Printf("AvgTeam2: %s\n\n", avgTeam2)
+		fmt.Printf("AvgTeam1: %s\n", avgTeam1)
+		fmt.Printf("AvgTeam2: %s\n\n", avgTeam2)
+	}
 
 	var winner trueskill.Player
 	var loser trueskill.Player
@@ -63,11 +66,13 @@ func CalculateNewMMR(ts trueskill.Config, team1 *Team, team2 *Team) (Team, Team)
 	winnerDiff := math.Abs(winner.Mu() - winnerAverageTeam.Mu())
 	loserDiff := math.Abs(loser.Mu() - loserAverageTeam.Mu())
 
-	fmt.Printf("Winner: %s\n", winnerAverageTeam)
-	fmt.Printf("Loser: %s\n", loserAverageTeam)
-	fmt.Printf("Winner - Diff mu: %f\n", winnerDiff)
-	fmt.Printf("Loser - Diff mu: %f\n", loserDiff)
-	fmt.Println()
+	if verbose {
+		fmt.Printf("Winner: %s\n", winnerAverageTeam)
+		fmt.Printf("Loser: %s\n", loserAverageTeam)
+		fmt.Printf("Winner - Diff mu: %f\n", winnerDiff)
+		fmt.Printf("Loser - Diff mu: %f\n", loserDiff)
+		fmt.Println()
+	}
 
 	winnerTeam.Players[0].Player = trueskill.NewPlayer(winnerTeam.Players[0].Player.Mu()+winnerDiff, winnerAverageTeam.Sigma())
 	winnerTeam.Players[1].Player = trueskill.NewPlayer(winnerTeam.Players[1].Player.Mu()+winnerDiff, winnerAverageTeam.Sigma())

@@ -19,8 +19,8 @@ func TestTrueskillMMRCalculation(t *testing.T) {
 		Players: []mmr.Player{mmr.CreateNewPlayer("test3", trueskill.DefaultMu, trueskill.DefaultSigma), mmr.CreateNewPlayer("test4", trueskill.DefaultMu, trueskill.DefaultSigma)},
 		Score:   7,
 	}
-	ts := trueskill.New(trueskill.DrawProbabilityZero())
-	team1, team2 = mmr.CalculateNewMMR(ts, &team1, &team2)
+
+	team1, team2 = mmr.CalculateNewMMR(&team1, &team2, false)
 
 	assert.True(t, team1.Players[0].Player.Mu() > team2.Players[0].Player.Mu() && team1.Players[0].Player.Mu() > team2.Players[1].Player.Mu(), "team1 won")
 	assert.True(t, team1.Players[1].Player.Mu() > team2.Players[0].Player.Mu() && team1.Players[1].Player.Mu() > team2.Players[1].Player.Mu(), "team1 won")

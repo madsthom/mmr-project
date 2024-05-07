@@ -1,4 +1,4 @@
-package mmr
+package viewmodels
 
 type Match struct {
 	Team1 MatchTeam `json:"team1" binding:"required"`

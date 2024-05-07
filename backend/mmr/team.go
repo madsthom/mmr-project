@@ -11,39 +11,10 @@ type Team struct {
 	Score   int16
 }
 
-// // NewEmptyTeam creates a team without any players. To add players use
-// // AddPlayers.
-// func NewEmptyTeam() Team {
-// 	return Team{
-// 		players: make([]trueskill.Player, 0),
-// 	}
-// }
-
-// // NewTeam creates a team from a slice of players.
-// func NewTeam(p []trueskill.Player) (t Team) {
-// 	t.Players = p
-// 	return
-// }
-
 // Size returns the number of players in the team
 func (t *Team) Size() int {
 	return len(t.Players)
 }
-
-// // AddPlayer adds a single player to the team.
-// func (t *Team) AddPlayer(p trueskill.Player) {
-// 	t.Players = append(t.Players, p)
-// }
-
-// // AddPlayers adds players to the team.
-// func (t *Team) AddPlayers(p []trueskill.Player) {
-// 	t.Players = append(t.Players, p...)
-// }
-
-// // GetPlayers returns the players the team is composed of.
-// func (t *Team) GetPlayers() (p []trueskill.Player) {
-// 	return t.Players
-// }
 
 // GetAverageMu returns the average of all means of the team
 func (t *Team) GetAverageMu() (sum float64) {

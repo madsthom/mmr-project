@@ -1,7 +1,6 @@
 package mmrCustom
 
 import (
-	"fmt"
 	"math"
 )
 
@@ -53,25 +52,4 @@ func UpdateMMR(team1, team2 *Team, outcome MatchOutcome) {
 	for _, player := range team2.Players {
 		player.MMR += K * (team2Result - team2Expected)
 	}
-}
-
-func Example() {
-	// Initialize players with their initial MMR and uncertainty
-	player1 := &Player{Initials: "p1", MMR: 1500, Uncertainty: 200}
-	player2 := &Player{Initials: "p2", MMR: 1600, Uncertainty: 150}
-	player3 := &Player{Initials: "p3", MMR: 1400, Uncertainty: 180}
-	player4 := &Player{Initials: "p4", MMR: 1550, Uncertainty: 170}
-
-	// Create teams
-	team2 := &Team{Players: []*Player{player3, player4}}
-	team1 := &Team{Players: []*Player{player1, player2}}
-
-	// Simulate match outcome (team 1 wins)
-	UpdateMMR(team1, team2, Team1Wins)
-
-	// Display updated player MMRs
-	fmt.Println("Player 1 MMR:", player1.MMR)
-	fmt.Println("Player 2 MMR:", player2.MMR)
-	fmt.Println("Player 3 MMR:", player3.MMR)
-	fmt.Println("Player 4 MMR:", player4.MMR)
 }

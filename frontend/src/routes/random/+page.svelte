@@ -40,7 +40,10 @@
       </div>
     {/each}
   </div>
-  <Button on:click={generateTeams}>Generate Teams</Button>
+  <Button
+    disabled={players.some((p) => p == null || p.trim() === '')}
+    on:click={generateTeams}>Generate Teams</Button
+  >
   {#if teams.length === 2}
     <div class="flex flex-row gap-4 text-center">
       <div class="flex flex-1 flex-col">

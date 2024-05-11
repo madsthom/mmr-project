@@ -1,4 +1,5 @@
 <script lang="ts">
+  import PageTitle from '$lib/components/page-title.svelte';
   import type { PageServerData } from './$types';
   import MatchForm from './components/match-form.svelte';
 
@@ -6,6 +7,6 @@
 </script>
 
 <div class="flex flex-col gap-8">
-  <h1 class="font-extrabol text-center text-6xl">Submit match</h1>
+  <PageTitle>Submit match</PageTitle>
   <MatchForm data={data.form} />
 </div>

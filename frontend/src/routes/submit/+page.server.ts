@@ -5,9 +5,19 @@ import { zod } from 'sveltekit-superforms/adapters';
 import type { Actions, PageServerLoad } from './$types';
 import { matchSchema } from './match-schema';
 
-export const load: PageServerLoad = async () => {
+export const load: PageServerLoad = async ({ url }) => {
+  const player1 = url.searchParams.get('player1') ?? '';
+  const player2 = url.searchParams.get('player2') ?? '';
+  const player3 = url.searchParams.get('player3') ?? '';
+  const player4 = url.searchParams.get('player4') ?? '';
+
   return {
-    form: await superValidate(zod(matchSchema)),
+    form: await superValidate(zod(matchSchema), {
+      defaults: {
+        team1: { member1: player1, member2: player2, score: -1 },
+        team2: { member1: player3, member2: player4, score: -1 },
+      },
+    }),
   };
 };
 

@@ -1,6 +1,6 @@
 <script lang="ts">
   import Button from '../../lib/components/ui/button/button.svelte';
-  import { Plus, CircleUser, Home } from 'lucide-svelte';
+  import { Plus, CircleUser, Home, Shuffle } from 'lucide-svelte';
   import NavbarNav from './navbar-nav.svelte';
 </script>
 
@@ -14,6 +14,6 @@
       <Home />
     </NavbarNav>
     <NavbarNav isPrimary path="/submit"><Plus /></NavbarNav>
-    <NavbarNav path="/profile"><CircleUser /></NavbarNav>
+    <NavbarNav path="/random"><Shuffle /></NavbarNav>
   </div>
 </nav>

@@ -3,7 +3,7 @@ package controllers
 import (
 	"fmt"
 	"mmr/backend/mmr"
-	viewmodels "mmr/backend/models"
+	view "mmr/backend/models"
 	services "mmr/backend/services"
 	"net/http"
 
@@ -14,15 +14,17 @@ type MatchController struct{}
 
 //	@BasePath	/api/v1
 
-// @Summary Submit a match
-// @Description Submit a match for MMR calculation
-// @Accept json
-// @Produce json
-// @Param match body mmr.Match true "Match object"
-// @Success 200 {string} string "match submitted"
-// @Router /mmr/match [post]
+// SubmitMatch godoc
+//
+//	@Summary		Submit a match
+//	@Description	Submit a match for MMR calculation
+//	@Accept			json
+//	@Produce		json
+//	@Param			match	body		view.Match	true	"Match object"
+//	@Success		200		{string}	string		"match submitted"
+//	@Router			/mmr/matches [post]
 func (m MatchController) SubmitMatch(c *gin.Context) {
-	var json viewmodels.Match
+	var json view.Match
 	err := c.BindJSON(&json)
 
 	if err != nil {
@@ -82,4 +84,25 @@ func (m MatchController) SubmitMatch(c *gin.Context) {
 	fmt.Println(match)
 
 	c.JSON(http.StatusOK, gin.H{"message": fmt.Sprintf("Match submitted: %v", json)})
+}
+
+// GetMatches
+//
+//	@Summary		Get matches
+//	@Description	Get all matches
+//	@Produce		json
+//	@Success		200	{object}	[]view.MatchDetails
+//	@Router			/mmr/matches [get]
+func (m MatchController) GetMatches(c *gin.Context) {
+	matchService := new(services.MatchService)
+
+	matchesResult := matchService.GetMatches()
+
+	var matches []view.MatchDetails
+	for _, value := range matchesResult {
+		match := view.MatchDetailsViewFromModel(*value)
+		matches = append(matches, match)
+	}
+
+	c.JSON(http.StatusOK, matches)
 }

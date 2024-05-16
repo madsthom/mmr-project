@@ -45,3 +45,14 @@ func (ms MatchService) GetUser(userName string) *models.User {
 
 	return user
 }
+
+func (ms MatchService) GetMatches() []*models.Match {
+	matchRepo := repos.NewMatchRepository(database.DB)
+	matches, err := matchRepo.ListMatches()
+
+	if err != nil {
+		panic("Failed to get matches")
+	}
+
+	return matches
+}

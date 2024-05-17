@@ -7,10 +7,15 @@ data "external_schema" "gorm" {
   ]
 }
 
+variable "db_url" {
+  type    = string
+  default = "postgres://localhost:5432/mmr_project?user=postgres&password=this_is_a_hard_password1337&sslmode=disable"
+}
+
 env "gorm" {
   src = data.external_schema.gorm.url
-  dev = "postgres://localhost:5432/mmr_project?user=postgres&password=this_is_a_hard_password1337&sslmode=disable"
-  url = "postgres://localhost:5432/mmr_project?user=postgres&password=this_is_a_hard_password1337&sslmode=disable"
+  dev = var.db_url
+  url = var.db_url
   migration {
     dir = "file://migrations"
   }

@@ -1,0 +1,11 @@
+version: '3.1'
+
+services:
+  db:
+    image: postgres
+    restart: always
+    environment:
+      POSTGRES_PASSWORD: this_is_a_hard_password1337
+      POSTGRES_DB: mmr_project
+    ports:
+      - "5432:5432"

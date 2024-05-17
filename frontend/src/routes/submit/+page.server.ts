@@ -32,7 +32,7 @@ export const actions: Actions = {
     }
 
     try {
-      await apiClient.mmrApi.mmrMatchPost({ match: form.data });
+      await apiClient.mmrApi.mmrMatchesPost({ match: form.data });
       return { form };
     } catch (error) {
       return fail(500, {

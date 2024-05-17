@@ -3,6 +3,7 @@ package server
 import (
 	controllers "mmr/backend/controllers"
 	"mmr/backend/docs"
+	"net/http"
 
 	"github.com/gin-gonic/gin"
 	swaggerfiles "github.com/swaggo/files"
@@ -20,14 +21,19 @@ func NewRouter() *gin.Engine {
 		mg := v1.Group("/mmr")
 		{
 			match := new(controllers.MatchController)
-			mg.POST("/match", match.SubmitMatch)
+			mg.POST("/matches", match.SubmitMatch)
+			mg.GET("/matches", match.GetMatches)
 		}
 		s := v1.Group("/stats")
 		{
 			leaderboard := new(controllers.LeaderboardController)
 			s.GET("/leaderboard", leaderboard.GetLeaderboard)
 		}
+
 	}
+	router.GET("/swagger", func(ctx *gin.Context) {
+		ctx.Redirect(http.StatusPermanentRedirect, "/swagger/index.html")
+	})
 	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerfiles.Handler))
 
 	return router

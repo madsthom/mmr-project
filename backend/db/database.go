@@ -1,26 +1,29 @@
 package database
 
 import (
-	"mmr/backend/db/models"
+	"fmt"
 	"os"
 
-	"gorm.io/driver/sqlite"
+	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
 
 var DB *gorm.DB
 
 func Init() {
+	dsn := fmt.Sprintf(
+		"host=%s user=%s password=%s dbname=%s port=%s sslmode=disable",
+		os.Getenv("DB_HOST"),
+		os.Getenv("DB_USER"),
+		os.Getenv("DB_PASSWORD"),
+		os.Getenv("DB_NAME"),
+		os.Getenv("DB_PORT"),
+	)
+
 	// Define the database configuration
-	db, err := gorm.Open(sqlite.Open(os.Getenv("DATABASE_URL")), &gorm.Config{})
+	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
 	if err != nil {
 		panic("failed to connect to database")
-	}
-
-	// Auto Migrate your models
-	err = db.AutoMigrate(&models.User{}, &models.Team{}, &models.Match{})
-	if err != nil {
-		panic("failed to auto migrate models")
 	}
 
 	// Assign the database connection to the global variable

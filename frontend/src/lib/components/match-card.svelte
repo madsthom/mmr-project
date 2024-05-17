@@ -1,8 +1,11 @@
 <script lang="ts">
   import * as Card from '$lib/components/ui/card';
+  import type { ViewMatchDetails } from '../../api';
   import type { MatchForm } from '../../routes/submit/match-schema';
 
-  export let match: MatchForm;
+  export let match: Omit<ViewMatchDetails, 'date'> & {
+    date: string | undefined;
+  };
 </script>
 
 <Card.Root>
@@ -19,7 +22,17 @@
         <p>{match.team1.member2}</p>
       </div>
     </div>
-    <div class="flex flex-col items-center">vs.</div>
+    <div class="flex flex-col items-center">
+      vs.
+      {#if match.date}
+        <p class="text-muted-foreground">
+          {new Date(match.date).toLocaleTimeString(undefined, {
+            hour: '2-digit',
+            minute: '2-digit',
+          })}
+        </p>
+      {/if}
+    </div>
     <div
       class="flex flex-1 flex-row items-center gap-4"
       class:text-primary={match.team2.score === 10}

@@ -1,27 +1,4 @@
-basePath: /api/v1
 definitions:
-  mmr.Match:
-    properties:
-      team1:
-        $ref: '#/definitions/mmr.MatchTeam'
-      team2:
-        $ref: '#/definitions/mmr.MatchTeam'
-    required:
-    - team1
-    - team2
-    type: object
-  mmr.MatchTeam:
-    properties:
-      member1:
-        type: string
-      member2:
-        type: string
-      score:
-        type: integer
-    required:
-    - member1
-    - member2
-    type: object
   repos.LeaderboardEntry:
     properties:
       loses:
@@ -33,10 +10,58 @@ definitions:
       wins:
         type: integer
     type: object
+  view.Match:
+    properties:
+      team1:
+        $ref: '#/definitions/view.MatchTeam'
+      team2:
+        $ref: '#/definitions/view.MatchTeam'
+    required:
+    - team1
+    - team2
+    type: object
+  view.MatchDetails:
+    properties:
+      date:
+        type: string
+      team1:
+        $ref: '#/definitions/view.MatchTeam'
+      team2:
+        $ref: '#/definitions/view.MatchTeam'
+    required:
+    - date
+    - team1
+    - team2
+    type: object
+  view.MatchTeam:
+    properties:
+      member1:
+        type: string
+      member2:
+        type: string
+      score:
+        type: integer
+    required:
+    - member1
+    - member2
+    - score
+    type: object
 info:
   contact: {}
 paths:
-  /mmr/match:
+  /mmr/matches:
+    get:
+      description: Get all matches
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/view.MatchDetails'
+            type: array
+      summary: Get matches
     post:
       consumes:
       - application/json
@@ -47,7 +72,7 @@ paths:
         name: match
         required: true
         schema:
-          $ref: '#/definitions/mmr.Match'
+          $ref: '#/definitions/view.Match'
       produces:
       - application/json
       responses:

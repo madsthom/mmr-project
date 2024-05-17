@@ -28,8 +28,17 @@ func (mr *MatchRepository) CreateMatch(match *models.Match) (*models.Match, erro
 
 func (mr *MatchRepository) ListMatches() ([]*models.Match, error) {
 	var matches []*models.Match
-	if err := mr.db.Find(&matches).Error; err != nil {
+
+	err := mr.db.Model(&models.Match{}).
+		Preload("TeamOne.UserOne").
+		Preload("TeamOne.UserTwo").
+		Preload("TeamTwo.UserOne").
+		Preload("TeamTwo.UserTwo").
+		Find(&matches).Error
+
+	if err != nil {
 		return nil, err
 	}
+
 	return matches, nil
 }

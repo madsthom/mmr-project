@@ -15,15 +15,18 @@
 
 import * as runtime from '../runtime';
 import type {
-  MmrMatch,
+  ViewMatch,
+  ViewMatchDetails,
 } from '../models/index';
 import {
-    MmrMatchFromJSON,
-    MmrMatchToJSON,
+    ViewMatchFromJSON,
+    ViewMatchToJSON,
+    ViewMatchDetailsFromJSON,
+    ViewMatchDetailsToJSON,
 } from '../models/index';
 
-export interface MmrMatchPostRequest {
-    match: MmrMatch;
+export interface MmrMatchesPostRequest {
+    match: ViewMatch;
 }
 
 /**
@@ -32,14 +35,42 @@ export interface MmrMatchPostRequest {
 export class DefaultApi extends runtime.BaseAPI {
 
     /**
+     * Get all matches
+     * Get matches
+     */
+    async mmrMatchesGetRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<ViewMatchDetails>>> {
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        const response = await this.request({
+            path: `/mmr/matches`,
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => jsonValue.map(ViewMatchDetailsFromJSON));
+    }
+
+    /**
+     * Get all matches
+     * Get matches
+     */
+    async mmrMatchesGet(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<ViewMatchDetails>> {
+        const response = await this.mmrMatchesGetRaw(initOverrides);
+        return await response.value();
+    }
+
+    /**
      * Submit a match for MMR calculation
      * Submit a match
      */
-    async mmrMatchPostRaw(requestParameters: MmrMatchPostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<string>> {
+    async mmrMatchesPostRaw(requestParameters: MmrMatchesPostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<string>> {
         if (requestParameters['match'] == null) {
             throw new runtime.RequiredError(
                 'match',
-                'Required parameter "match" was null or undefined when calling mmrMatchPost().'
+                'Required parameter "match" was null or undefined when calling mmrMatchesPost().'
             );
         }
 
@@ -50,11 +81,11 @@ export class DefaultApi extends runtime.BaseAPI {
         headerParameters['Content-Type'] = 'application/json';
 
         const response = await this.request({
-            path: `/mmr/match`,
+            path: `/mmr/matches`,
             method: 'POST',
             headers: headerParameters,
             query: queryParameters,
-            body: MmrMatchToJSON(requestParameters['match']),
+            body: ViewMatchToJSON(requestParameters['match']),
         }, initOverrides);
 
         if (this.isJsonMime(response.headers.get('content-type'))) {
@@ -68,8 +99,8 @@ export class DefaultApi extends runtime.BaseAPI {
      * Submit a match for MMR calculation
      * Submit a match
      */
-    async mmrMatchPost(requestParameters: MmrMatchPostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<string> {
-        const response = await this.mmrMatchPostRaw(requestParameters, initOverrides);
+    async mmrMatchesPost(requestParameters: MmrMatchesPostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<string> {
+        const response = await this.mmrMatchesPostRaw(requestParameters, initOverrides);
         return await response.value();
     }
 

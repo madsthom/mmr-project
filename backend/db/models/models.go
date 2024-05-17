@@ -1,5 +1,6 @@
 package models
 
+import _ "ariga.io/atlas-provider-gorm/gormschema"
 import "gorm.io/gorm"
 
 type User struct {

@@ -15,7 +15,25 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
-        "/mmr/match": {
+        "/mmr/matches": {
+            "get": {
+                "description": "Get all matches",
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Get matches",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/view.MatchDetails"
+                            }
+                        }
+                    }
+                }
+            },
             "post": {
                 "description": "Submit a match for MMR calculation",
                 "consumes": [
@@ -32,7 +50,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/mmr.Match"
+                            "$ref": "#/definitions/view.Match"
                         }
                     }
                 ],
@@ -74,39 +92,6 @@ const docTemplate = `{
         }
     },
     "definitions": {
-        "mmr.Match": {
-            "type": "object",
-            "required": [
-                "team1",
-                "team2"
-            ],
-            "properties": {
-                "team1": {
-                    "$ref": "#/definitions/mmr.MatchTeam"
-                },
-                "team2": {
-                    "$ref": "#/definitions/mmr.MatchTeam"
-                }
-            }
-        },
-        "mmr.MatchTeam": {
-            "type": "object",
-            "required": [
-                "member1",
-                "member2"
-            ],
-            "properties": {
-                "member1": {
-                    "type": "string"
-                },
-                "member2": {
-                    "type": "string"
-                },
-                "score": {
-                    "type": "integer"
-                }
-            }
-        },
         "repos.LeaderboardEntry": {
             "type": "object",
             "properties": {
@@ -123,6 +108,59 @@ const docTemplate = `{
                     "type": "integer"
                 }
             }
+        },
+        "view.Match": {
+            "type": "object",
+            "required": [
+                "team1",
+                "team2"
+            ],
+            "properties": {
+                "team1": {
+                    "$ref": "#/definitions/view.MatchTeam"
+                },
+                "team2": {
+                    "$ref": "#/definitions/view.MatchTeam"
+                }
+            }
+        },
+        "view.MatchDetails": {
+            "type": "object",
+            "required": [
+                "date",
+                "team1",
+                "team2"
+            ],
+            "properties": {
+                "date": {
+                    "type": "string"
+                },
+                "team1": {
+                    "$ref": "#/definitions/view.MatchTeam"
+                },
+                "team2": {
+                    "$ref": "#/definitions/view.MatchTeam"
+                }
+            }
+        },
+        "view.MatchTeam": {
+            "type": "object",
+            "required": [
+                "member1",
+                "member2",
+                "score"
+            ],
+            "properties": {
+                "member1": {
+                    "type": "string"
+                },
+                "member2": {
+                    "type": "string"
+                },
+                "score": {
+                    "type": "integer"
+                }
+            }
         }
     }
 }`
@@ -131,7 +169,7 @@ const docTemplate = `{
 var SwaggerInfo = &swag.Spec{
 	Version:          "",
 	Host:             "",
-	BasePath:         "/api/v1",
+	BasePath:         "",
 	Schemes:          []string{},
 	Title:            "",
 	Description:      "",

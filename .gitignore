@@ -3,3 +3,4 @@ backend/db/foosball.db
 .env
 backend/.env.local
 backend/.env
+.DS_Store

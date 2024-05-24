@@ -46,4 +46,14 @@ Run `go test ./test/...` in the backend folder to run tests
 
 ### Migrate db
 
+We use [Atlas](https://atlasgo.io/) for database migrations.
+
+You can install it with in various ways ([found here](https://atlasgo.io/getting-started#installation)). For example, with brew:
+
+```bash
+brew install ariga/tap/atlas
+```
+
+To apply the migrations run:
+
 `atlas migrate apply --env gorm --revisions-schema public --allow-dirty`

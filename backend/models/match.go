@@ -17,14 +17,14 @@ type MatchDetails struct {
 }
 
 type MatchTeam struct {
-	Score   uint   `json:"score" binding:"required"`
+	Score   *uint  `json:"score" binding:"required"`
 	Member1 string `json:"member1" binding:"required"`
 	Member2 string `json:"member2" binding:"required"`
 }
 
 func MatchTeamViewFromModel(team models.Team) MatchTeam {
 	return MatchTeam{
-		Score:   team.Score,
+		Score:   &team.Score,
 		Member1: team.UserOne.Name,
 		Member2: team.UserTwo.Name,
 	}

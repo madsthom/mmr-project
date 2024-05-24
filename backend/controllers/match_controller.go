@@ -38,10 +38,12 @@ func (m MatchController) SubmitMatch(c *gin.Context) {
 	player1 := mmr.CreateNewPlayer(user1.Name, float64(user1.Mu), user1.Sigma)
 	user2 := matchService.GetUser(json.Team1.Member2)
 	player2 := mmr.CreateNewPlayer(user2.Name, float64(user2.Mu), user2.Sigma)
+	team1Score := *json.Team1.Score
+	team2Score := *json.Team2.Score
 
 	team1 := mmr.Team{
 		Players: []mmr.Player{player1, player2},
-		Score:   int16(json.Team1.Score),
+		Score:   int16(team1Score),
 	}
 
 	user3 := matchService.GetUser(json.Team2.Member1)
@@ -51,7 +53,7 @@ func (m MatchController) SubmitMatch(c *gin.Context) {
 
 	team2 := mmr.Team{
 		Players: []mmr.Player{player3, player4},
-		Score:   int16(json.Team2.Score),
+		Score:   int16(team2Score),
 	}
 
 	team1, team2 = mmr.CalculateNewMMR(&team1, &team2, false)
@@ -74,8 +76,8 @@ func (m MatchController) SubmitMatch(c *gin.Context) {
 	tm2m1 := matchService.UpsertUser(user3)
 	tm2m2 := matchService.UpsertUser(user4)
 
-	dbteam1 := matchService.CreateTeam(tm1m1, tm1m2, uint(json.Team1.Score), json.Team1.Score > json.Team2.Score)
-	dbteam2 := matchService.CreateTeam(tm2m1, tm2m2, uint(json.Team2.Score), json.Team2.Score > json.Team1.Score)
+	dbteam1 := matchService.CreateTeam(tm1m1, tm1m2, team1Score, team1Score > team2Score)
+	dbteam2 := matchService.CreateTeam(tm2m1, tm2m2, team2Score, team2Score > team1Score)
 
 	fmt.Println(dbteam1, dbteam2)
 

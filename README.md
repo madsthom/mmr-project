@@ -34,6 +34,8 @@ go mod tidy
 
 Run the backend server:
 
+First start a local postgres db. You can use the docker-compose file in the backend directory.
+
 ```bash
 go run main.go
 ```
@@ -44,4 +46,4 @@ Run `go test ./test/...` in the backend folder to run tests
 
 ### Migrate db
 
-`atlas migrate apply --var url="[DATABASE_URL]" --env gorm --revisions-schema public --allow-dirty`
+`atlas migrate apply --env gorm --revisions-schema public --allow-dirty`

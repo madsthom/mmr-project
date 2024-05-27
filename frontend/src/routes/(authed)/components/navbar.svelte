@@ -1,6 +1,5 @@
 <script lang="ts">
-  import Button from '../../lib/components/ui/button/button.svelte';
-  import { Plus, CircleUser, Home, Shuffle } from 'lucide-svelte';
+  import { Home, Plus, Shuffle } from 'lucide-svelte';
   import NavbarNav from './navbar-nav.svelte';
 </script>
 

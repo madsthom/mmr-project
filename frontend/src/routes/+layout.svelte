@@ -1,15 +1,22 @@
 <script lang="ts">
+  import { invalidate } from '$app/navigation';
+  import { onMount } from 'svelte';
   import '../app.pcss';
-  import Navbar from './components/navbar.svelte';
+
+  export let data;
+
+  let { supabase, session } = data;
+  $: ({ supabase, session } = data);
+
+  onMount(() => {
+    const { data } = supabase.auth.onAuthStateChange((event, _session) => {
+      if (_session?.expires_at !== session?.expires_at) {
+        invalidate('supabase:auth');
+      }
+    });
+
+    return () => data.subscription.unsubscribe();
+  });
 </script>
 
-<main class="mx-auto mb-16 max-w-screen-sm overflow-auto p-4">
-  <slot></slot>
-</main>
-<Navbar />
-
-<style lang="postcss">
-  :global(body) {
-    @apply min-h-screen;
-  }
-</style>
+<slot />

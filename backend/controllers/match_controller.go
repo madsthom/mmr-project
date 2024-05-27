@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"fmt"
+	"mmr/backend/db/models"
 	"mmr/backend/mmr"
 	view "mmr/backend/models"
 	services "mmr/backend/services"
@@ -35,9 +36,9 @@ func (m MatchController) SubmitMatch(c *gin.Context) {
 	matchService := new(services.MatchService)
 
 	user1 := matchService.GetUser(json.Team1.Member1)
-	player1 := mmr.CreateNewPlayer(user1.Name, float64(user1.Mu), user1.Sigma)
+	player1 := m.createPlayer(matchService, user1)
 	user2 := matchService.GetUser(json.Team1.Member2)
-	player2 := mmr.CreateNewPlayer(user2.Name, float64(user2.Mu), user2.Sigma)
+	player2 := m.createPlayer(matchService, user2)
 	team1Score := *json.Team1.Score
 	team2Score := *json.Team2.Score
 
@@ -47,9 +48,9 @@ func (m MatchController) SubmitMatch(c *gin.Context) {
 	}
 
 	user3 := matchService.GetUser(json.Team2.Member1)
-	player3 := mmr.CreateNewPlayer(user3.Name, float64(user3.Mu), user3.Sigma)
+	player3 := m.createPlayer(matchService, user3)
 	user4 := matchService.GetUser(json.Team2.Member2)
-	player4 := mmr.CreateNewPlayer(user4.Name, float64(user4.Mu), user4.Sigma)
+	player4 := m.createPlayer(matchService, user4)
 
 	team2 := mmr.Team{
 		Players: []mmr.Player{player3, player4},
@@ -60,16 +61,16 @@ func (m MatchController) SubmitMatch(c *gin.Context) {
 
 	user1.Mu = team1.Players[0].Player.Mu()
 	user1.Sigma = team1.Players[0].Player.Sigma()
-	user1.MMR = int(user1.Mu - 3*user1.Sigma)
+	user1.MMR = int(mmr.MapTrueSkillToMMR(user1.Mu, user1.Sigma))
 	user2.Mu = team1.Players[1].Player.Mu()
 	user2.Sigma = team1.Players[1].Player.Sigma()
-	user2.MMR = int(user2.Mu - 3*user2.Sigma)
+	user2.MMR = int(mmr.MapTrueSkillToMMR(user2.Mu, user2.Sigma))
 	user3.Mu = team2.Players[0].Player.Mu()
 	user3.Sigma = team2.Players[0].Player.Sigma()
-	user3.MMR = int(user3.Mu - 3*user3.Sigma)
+	user3.MMR = int(mmr.MapTrueSkillToMMR(user3.Mu, user3.Sigma))
 	user4.Mu = team2.Players[1].Player.Mu()
 	user4.Sigma = team2.Players[1].Player.Sigma()
-	user4.MMR = int(user4.Mu - 3*user4.Sigma)
+	user4.MMR = int(mmr.MapTrueSkillToMMR(user4.Mu, user4.Sigma))
 
 	tm1m1 := matchService.UpsertUser(user1)
 	tm1m2 := matchService.UpsertUser(user2)
@@ -84,6 +85,17 @@ func (m MatchController) SubmitMatch(c *gin.Context) {
 	match := matchService.CreateMatch(dbteam1, dbteam2)
 
 	fmt.Println(match)
+
+	matchService.CreatePlayerHistory(match, user1.ID, user1.Mu, user1.Sigma, user1.MMR)
+	matchService.CreatePlayerHistory(match, user2.ID, user2.Mu, user2.Sigma, user2.MMR)
+	matchService.CreatePlayerHistory(match, user3.ID, user3.Mu, user3.Sigma, user3.MMR)
+	matchService.CreatePlayerHistory(match, user4.ID, user4.Mu, user4.Sigma, user4.MMR)
+
+	user1OldMMR := int(mmr.MapTrueSkillToMMR(player1.Player.Mu(), player1.Player.Sigma()))
+	user2OldMMR := int(mmr.MapTrueSkillToMMR(player2.Player.Mu(), player2.Player.Sigma()))
+	user3OldMMR := int(mmr.MapTrueSkillToMMR(player3.Player.Mu(), player3.Player.Sigma()))
+	user4OldMMR := int(mmr.MapTrueSkillToMMR(player4.Player.Mu(), player4.Player.Sigma()))
+	matchService.CreateMatchMMRCalculation(match, user1.MMR-user1OldMMR, user2.MMR-user2OldMMR, user3.MMR-user3OldMMR, user4.MMR-user4OldMMR)
 
 	c.JSON(http.StatusOK, gin.H{"message": fmt.Sprintf("Match submitted: %v", json)})
 }
@@ -107,4 +119,13 @@ func (m MatchController) GetMatches(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, matches)
+}
+
+func (m MatchController) createPlayer(matchService *services.MatchService, user *models.User) mmr.Player {
+	Mu, Sigma := matchService.GetPlayerMuAndSigma(user.ID)
+	return mmr.CreateNewPlayer(user.Name, Mu, Sigma)
+}
+
+func (m MatchController) calculateMMR(mu float64, sigma float64) int {
+	return int(mu - 3*sigma)
 }

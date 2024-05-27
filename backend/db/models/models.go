@@ -11,6 +11,17 @@ type User struct {
 	Sigma float64
 }
 
+type PlayerHistory struct {
+	gorm.Model
+	UserID  uint
+	User    User `gorm:"foreignKey:UserID"`
+	MMR     int
+	Mu      float64
+	Sigma   float64
+	MatchID uint
+	Match   Match `gorm:"foreignKey:MatchID"`
+}
+
 type Team struct {
 	gorm.Model
 	UserOneID uint
@@ -27,4 +38,14 @@ type Match struct {
 	TeamOne   Team `gorm:"foreignKey:TeamOneID"`
 	TeamTwoID uint
 	TeamTwo   Team `gorm:"foreignKey:TeamTwoID"`
+}
+
+type MMRCalculation struct {
+	gorm.Model
+	MatchID                  uint
+	Match                    Match `gorm:"foreignKey:MatchID"`
+	TeamOnePlayerOneMMRDelta int
+	TeamOnePlayerTwoMMRDelta int
+	TeamTwoPlayerOneMMRDelta int
+	TeamTwoPlayerTwoMMRDelta int
 }

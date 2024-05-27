@@ -56,4 +56,16 @@ brew install ariga/tap/atlas
 
 To apply the migrations run:
 
-`atlas migrate apply --env gorm --revisions-schema public --allow-dirty`
+```bash
+atlas migrate apply --env gorm --revisions-schema public --allow-dirty`
+```
+
+#### New migration
+
+In order to add a new migration, you can run:
+
+```bash
+atlas migrate diff <name_of_migration> --env gorm
+```
+
+This will create a new migration file in the `migrations` folder with the name `YYYYMMddHHmmss<name_of_migration>.sql` based on the changes you've made to the GORM models.

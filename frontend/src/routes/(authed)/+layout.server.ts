@@ -1,15 +1,5 @@
-import type { LayoutServerLoad } from './$types';
-import { redirect } from '@sveltejs/kit';
-
-export const load = (async ({ locals: { safeGetSession } }) => {
-  const { session, user } = await safeGetSession();
-
-  if (!session) {
-    throw redirect(303, '/login');
-  }
-
-  return {
-    session,
-    user,
-  };
-}) satisfies LayoutServerLoad;
+/**
+ * This file is necessary to ensure protection of all routes in the `private`
+ * directory. It makes the routes in this directory _dynamic_ routes, which
+ * send a server request, and thus trigger `hooks.server.ts`.
+ **/

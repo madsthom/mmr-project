@@ -1,4 +1,3 @@
-<!-- src/routes/+page.svelte -->
 <script lang="ts">
   import { ThemeSupa } from '@supabase/auth-ui-shared';
   import { Auth } from '@supabase/auth-ui-svelte';

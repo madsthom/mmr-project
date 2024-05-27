@@ -11,7 +11,12 @@ import (
 type IUserRepository interface {
 	ListUsers() ([]*models.User, error)
 	GetOrCreateByName(name string) (*models.User, error)
+	GetByID(id uint) (*models.User, error)
 	SaveUser(user *models.User) (*models.User, error)
+	StoreRanking(matchID uint, userID uint, mu float64, sigma float64, mmr int) (*models.PlayerHistory, error)
+	StoreMatchMMRCalculation(matchID uint, player1Delta int, player2Delta int, player3Delta int, player4Delta int) (*models.MMRCalculation, error)
+	GetLatestPlayerHistory(playerID uint) (*models.PlayerHistory, error)
+	ClearPlayerHistories()
 }
 
 type UserRepository struct {
@@ -48,9 +53,57 @@ func (ur *UserRepository) GetOrCreateByName(name string) (*models.User, error) {
 	return user, nil // Return the found user
 }
 
+func (ur *UserRepository) GetByID(id uint) (*models.User, error) {
+	user := &models.User{}
+	if err := ur.db.Where("id = ?", id).First(user).Error; err != nil {
+		return nil, err
+	}
+	return user, nil
+}
+
 func (ur *UserRepository) SaveUser(user *models.User) (*models.User, error) {
 	if err := ur.db.Save(user).Error; err != nil {
 		return nil, err
 	}
 	return user, nil
+}
+
+func (ur *UserRepository) StoreRanking(matchID uint, userID uint, mu float64, sigma float64, mmr int) (*models.PlayerHistory, error) {
+	playerHistory := &models.PlayerHistory{
+		UserID:  userID,
+		MMR:     mmr,
+		Mu:      mu,
+		Sigma:   sigma,
+		MatchID: matchID,
+	}
+	if err := ur.db.Create(playerHistory).Error; err != nil {
+		return nil, err
+	}
+	return playerHistory, nil
+}
+
+func (ur *UserRepository) StoreMatchMMRCalculation(matchID uint, player1Delta int, player2Delta int, player3Delta int, player4Delta int) (*models.MMRCalculation, error) {
+	mmrCalculation := &models.MMRCalculation{
+		MatchID:                  matchID,
+		TeamOnePlayerOneMMRDelta: player1Delta,
+		TeamOnePlayerTwoMMRDelta: player2Delta,
+		TeamTwoPlayerOneMMRDelta: player3Delta,
+		TeamTwoPlayerTwoMMRDelta: player4Delta,
+	}
+	if err := ur.db.Create(mmrCalculation).Error; err != nil {
+		return nil, err
+	}
+	return mmrCalculation, nil
+}
+
+func (ur *UserRepository) GetLatestPlayerHistory(playerID uint) (*models.PlayerHistory, error) {
+	playerHistory := &models.PlayerHistory{}
+	if err := ur.db.Where("user_id = ?", playerID).Order("created_at desc").First(playerHistory).Error; err != nil {
+		return nil, err
+	}
+	return playerHistory, nil
+}
+
+func (ur *UserRepository) ClearPlayerHistories() {
+	ur.db.Exec("DELETE FROM player_histories")
 }

@@ -6,7 +6,6 @@ import (
 
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
-	"mmr/backend/db/models"
 )
 
 var DB *gorm.DB
@@ -27,10 +26,6 @@ func Init() {
 		panic("failed to connect to database")
 	}
 
-	migrateErr := db.AutoMigrate(&models.User{}, &models.Team{}, &models.Match{}, &models.PlayerHistory{}, &models.MMRCalculation{})
-	if migrateErr != nil {
-		panic("failed to migrate database")
-	}
 	// Assign the database connection to the global variable
 	DB = db
 }

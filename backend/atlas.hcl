@@ -14,7 +14,7 @@ variable "db_url" {
 
 env "gorm" {
   src = data.external_schema.gorm.url
-  dev = var.db_url
+  dev = "docker://postgres/15/dev?search_path=public"
   url = var.db_url
   migration {
     dir = "file://migrations"

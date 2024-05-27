@@ -68,6 +68,16 @@ func (ms MatchService) GetUser(userName string) *models.User {
 	return user
 }
 
+func (ms MatchService) GetUserByID(userID uint) *models.User {
+	userRepo := repos.NewUserRepository(database.DB)
+	user, err := userRepo.GetByID(userID)
+	if err != nil {
+		panic("Failed to find user")
+	}
+
+	return user
+}
+
 func (ms MatchService) GetPlayerMuAndSigma(userID uint) (Mu float64, Sigma float64) {
 	userRepo := repos.NewUserRepository(database.DB)
 	playerHistory, err := userRepo.GetLatestPlayerHistory(userID)
@@ -90,4 +100,12 @@ func (ms MatchService) GetMatches() []*models.Match {
 	}
 
 	return matches
+}
+
+func (ms MatchService) ClearAllMMRHistory() {
+	userRepo := repos.NewUserRepository(database.DB)
+	userRepo.ClearPlayerHistories()
+
+	matchRepo := repos.NewMatchRepository(database.DB)
+	matchRepo.ClearMMRCalculations()
 }

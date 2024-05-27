@@ -9,6 +9,7 @@ import (
 type IMatchRepository interface {
 	CreateMatch(match *models.Match) (*models.Match, error)
 	ListMatches() ([]*models.Match, error)
+	ClearMMRCalculations()
 }
 
 type MatchRepository struct {
@@ -34,6 +35,7 @@ func (mr *MatchRepository) ListMatches() ([]*models.Match, error) {
 		Preload("TeamOne.UserTwo").
 		Preload("TeamTwo.UserOne").
 		Preload("TeamTwo.UserTwo").
+		Order("created_at asc").
 		Find(&matches).Error
 
 	if err != nil {
@@ -41,4 +43,8 @@ func (mr *MatchRepository) ListMatches() ([]*models.Match, error) {
 	}
 
 	return matches, nil
+}
+
+func (mr *MatchRepository) ClearMMRCalculations() {
+	mr.db.Exec("DELETE FROM mmr_calculations")
 }

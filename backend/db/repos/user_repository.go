@@ -11,10 +11,12 @@ import (
 type IUserRepository interface {
 	ListUsers() ([]*models.User, error)
 	GetOrCreateByName(name string) (*models.User, error)
+	GetByID(id uint) (*models.User, error)
 	SaveUser(user *models.User) (*models.User, error)
 	StoreRanking(matchID uint, userID uint, mu float64, sigma float64, mmr int) (*models.PlayerHistory, error)
 	StoreMatchMMRCalculation(matchID uint, player1Delta int, player2Delta int, player3Delta int, player4Delta int) (*models.MMRCalculation, error)
 	GetLatestPlayerHistory(playerID uint) (*models.PlayerHistory, error)
+	ClearPlayerHistories()
 }
 
 type UserRepository struct {
@@ -49,6 +51,14 @@ func (ur *UserRepository) GetOrCreateByName(name string) (*models.User, error) {
 	}
 
 	return user, nil // Return the found user
+}
+
+func (ur *UserRepository) GetByID(id uint) (*models.User, error) {
+	user := &models.User{}
+	if err := ur.db.Where("id = ?", id).First(user).Error; err != nil {
+		return nil, err
+	}
+	return user, nil
 }
 
 func (ur *UserRepository) SaveUser(user *models.User) (*models.User, error) {
@@ -92,4 +102,8 @@ func (ur *UserRepository) GetLatestPlayerHistory(playerID uint) (*models.PlayerH
 		return nil, err
 	}
 	return playerHistory, nil
+}
+
+func (ur *UserRepository) ClearPlayerHistories() {
+	ur.db.Exec("DELETE FROM player_histories")
 }

@@ -125,7 +125,3 @@ func (m MatchController) createPlayer(matchService *services.MatchService, user 
 	Mu, Sigma := matchService.GetPlayerMuAndSigma(user.ID)
 	return mmr.CreateNewPlayer(user.Name, Mu, Sigma)
 }
-
-func (m MatchController) calculateMMR(mu float64, sigma float64) int {
-	return int(mu - 3*sigma)
-}

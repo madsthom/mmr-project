@@ -29,8 +29,13 @@ func NewRouter() *gin.Engine {
 			leaderboard := new(controllers.LeaderboardController)
 			s.GET("/leaderboard", leaderboard.GetLeaderboard)
 		}
-
+		a := v1.Group("/admin")
+		{
+			admin := new(controllers.AdminController)
+			a.POST("/recalculate", admin.RecalculateMatches)
+		}
 	}
+
 	router.GET("/swagger", func(ctx *gin.Context) {
 		ctx.Redirect(http.StatusPermanentRedirect, "/swagger/index.html")
 	})

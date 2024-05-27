@@ -1,11 +1,12 @@
 import { createServerClient } from '@supabase/ssr';
-import { type Handle, redirect } from '@sveltejs/kit';
+import { redirect, type Handle } from '@sveltejs/kit';
 import { sequence } from '@sveltejs/kit/hooks';
 
 import {
-  PUBLIC_SUPABASE_URL,
   PUBLIC_SUPABASE_ANON_KEY,
+  PUBLIC_SUPABASE_URL,
 } from '$env/static/public';
+import { createApiClient } from '$lib/server/api/apiClient';
 
 const supabase: Handle = async ({ event, resolve }) => {
   /**
@@ -86,4 +87,10 @@ const authGuard: Handle = async ({ event, resolve }) => {
   return resolve(event);
 };
 
-export const handle: Handle = sequence(supabase, authGuard);
+const apiCliented: Handle = async ({ event, resolve }) => {
+  event.locals.apiClient = createApiClient(event.locals.session!.access_token);
+
+  return resolve(event);
+};
+
+export const handle: Handle = sequence(supabase, authGuard, apiCliented);

@@ -1,5 +1,5 @@
 import { apiClient } from '$lib/server/api/apiClient';
-import { fail } from '@sveltejs/kit';
+import { fail, redirect } from '@sveltejs/kit';
 import { superValidate } from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';
 import type { Actions, PageServerLoad } from './$types';
@@ -33,11 +33,12 @@ export const actions: Actions = {
 
     try {
       await apiClient.mmrApi.mmrMatchesPost({ match: form.data });
-      return { form };
     } catch (error) {
       return fail(500, {
         error,
       });
     }
+
+    throw redirect(303, '/');
   },
 };

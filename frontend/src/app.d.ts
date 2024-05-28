@@ -2,7 +2,7 @@
 // for information about these interfaces
 
 import type { createApiClient } from '$lib/server/api/apiClient';
-import type { Session, SupabaseClient, User } from '@supabase/supabase-js';
+import type { Session, SupabaseClient } from '@supabase/supabase-js';
 
 type ApiClient = ReturnType<typeof createApiClient>;
 
@@ -13,10 +13,8 @@ declare global {
       supabase: SupabaseClient;
       safeGetSession: () => Promise<{
         session: Session | null;
-        user: User | null;
       }>;
       session: Session | null;
-      user: User | null;
       apiClient: ApiClient;
     }
     // interface PageData {}

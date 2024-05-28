@@ -3,82 +3,92 @@ import { redirect, type Handle } from '@sveltejs/kit';
 import { sequence } from '@sveltejs/kit/hooks';
 
 import {
+  SUPERTOKENS_API_BASE_PATH,
+  SUPERTOKENS_API_DOMAIN,
+  SUPERTOKENS_API_KEY,
+  SUPERTOKENS_CONNECTION_URI,
+  SUPERTOKENS_WEBSITE_DOMAIN,
+} from '$env/static/private';
+import {
   PUBLIC_SUPABASE_ANON_KEY,
   PUBLIC_SUPABASE_URL,
 } from '$env/static/public';
 import { createApiClient } from '$lib/server/api/apiClient';
 
-const supabase: Handle = async ({ event, resolve }) => {
-  /**
-   * Creates a Supabase client specific to this server request.
-   *
-   * The Supabase client gets the Auth token from the request cookies.
-   */
-  event.locals.supabase = createServerClient(
-    PUBLIC_SUPABASE_URL,
-    PUBLIC_SUPABASE_ANON_KEY,
-    {
-      cookies: {
-        get: (key) => event.cookies.get(key),
-        /**
-         * SvelteKit's cookies API requires `path` to be explicitly set in
-         * the cookie options. Setting `path` to `/` replicates previous/
-         * standard behavior.
-         */
-        set: (key, value, options) => {
-          event.cookies.set(key, value, { ...options, path: '/' });
-        },
-        remove: (key, options) => {
-          event.cookies.delete(key, { ...options, path: '/' });
-        },
-      },
+import SuperTokens from 'supertokens-node';
+import Passwordless from 'supertokens-node/recipe/passwordless';
+import Session from 'supertokens-node/recipe/session';
+
+SuperTokens.init({
+  supertokens: {
+    connectionURI: SUPERTOKENS_CONNECTION_URI,
+    apiKey: SUPERTOKENS_API_KEY,
+  },
+  appInfo: {
+    appName: 'MMR Project',
+    websiteDomain: SUPERTOKENS_WEBSITE_DOMAIN,
+    apiDomain: SUPERTOKENS_API_DOMAIN,
+    apiBasePath: SUPERTOKENS_API_BASE_PATH,
+  },
+  recipeList: [
+    Session.init(), // Initializes session features
+    Passwordless.init({
+      contactMethod: 'EMAIL',
+      flowType: 'MAGIC_LINK',
+    }), // Initializes passwordless signin
+  ],
+});
+
+export const handle = (async ({ event, resolve }) => {
+  try {
+    const accessToken = event.cookies.get(authCookieNames.access) ?? '';
+    const antiCsrfToken = event.cookies.get(authCookieNames.csrf);
+    const session = await Session.getSessionWithoutRequestResponse(
+      accessToken,
+      antiCsrfToken
+    );
+    const userId = session.getUserId();
+
+    event.locals.user = { id: userId };
+    return resolve(event);
+  } catch (error) {
+    if (!Session.Error.isErrorFromSuperTokens(error)) {
+      return new Response('An unexpected error occurred', { status: 500 });
     }
-  );
 
-  /**
-   * Unlike `supabase.auth.getSession()`, which returns the session _without_
-   * validating the JWT, this function also calls `getUser()` to validate the
-   * JWT before returning the session.
-   */
-  event.locals.safeGetSession = async () => {
-    const {
-      data: { session },
-    } = await event.locals.supabase.auth.getSession();
-    if (!session) {
-      return { session: null };
+    const userNeedsSessionRefresh =
+      error.type === Session.Error.TRY_REFRESH_TOKEN;
+
+    const requestAllowed =
+      publicPages.includes(
+        event.url.pathname as (typeof publicPages)[number]
+      ) ||
+      (userNeedsSessionRefresh &&
+        event.url.pathname === commonRoutes.refreshSession);
+
+    if (requestAllowed) {
+      event.locals.user = {};
+      return resolve(event);
     }
 
-    return { session };
-  };
+    const { url } = event;
+    const basePath = userNeedsSessionRefresh
+      ? commonRoutes.refreshSession
+      : commonRoutes.login;
+    const returnUrl = encodeURI(`${url.pathname}${url.search}`);
+    const redirectUrl = `${basePath}?returnUrl=${returnUrl}`;
 
-  return resolve(event, {
-    filterSerializedResponseHeaders(name) {
-      /**
-       * Supabase libraries use the `content-range` and `x-supabase-api-version`
-       * headers, so we need to tell SvelteKit to pass it through.
-       */
-      return name === 'content-range' || name === 'x-supabase-api-version';
-    },
-  });
-};
-
-const authGuard: Handle = async ({ event, resolve }) => {
-  const { session } = await event.locals.safeGetSession();
-  event.locals.session = session;
-
-  const isNonAuthedPathname =
-    event.url.pathname.startsWith('/auth') ||
-    event.url.pathname.startsWith('/login');
-  if (!event.locals.session && !isNonAuthedPathname) {
-    return redirect(303, '/login');
+    // Redirect the user to the proper auth page. Delete their tokens if they don't need to attempt a token refresh.
+    const headers = userNeedsSessionRefresh
+      ? new Headers()
+      : createHeadersFromTokens({});
+    headers.set('Location', redirectUrl);
+    return new Response(null, {
+      status: userNeedsSessionRefresh ? 307 : 303,
+      headers,
+    });
   }
-
-  if (event.locals.session && isNonAuthedPathname) {
-    return redirect(303, '/');
-  }
-
-  return resolve(event);
-};
+}) satisfies Handle;
 
 const apiCliented: Handle = async ({ event, resolve }) => {
   if (event.locals.session != null) {

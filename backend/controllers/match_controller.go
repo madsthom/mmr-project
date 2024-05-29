@@ -31,7 +31,19 @@ func (m MatchController) SubmitMatch(c *gin.Context) {
 	err := c.BindJSON(&json)
 
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	// A match should have 4 unique players across 2 teams
+	players := make(map[string]bool)
+	players[json.Team1.Member1] = true
+	players[json.Team1.Member2] = true
+	players[json.Team2.Member1] = true
+	players[json.Team2.Member2] = true
+
+	if len(players) < 4 {
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": "Each player must be unique"})
 		return
 	}
 

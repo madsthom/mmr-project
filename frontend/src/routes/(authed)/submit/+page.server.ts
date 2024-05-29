@@ -1,4 +1,3 @@
-import { apiClient } from '$lib/server/api/apiClient';
 import { fail, redirect } from '@sveltejs/kit';
 import { superValidate } from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';
@@ -23,6 +22,7 @@ export const load: PageServerLoad = async ({ url }) => {
 
 export const actions: Actions = {
   default: async (event) => {
+    const apiClient = event.locals.apiClient;
     const form = await superValidate(event, zod(matchSchema));
 
     if (!form.valid) {

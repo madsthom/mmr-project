@@ -1,8 +1,7 @@
-import { apiClient } from '$lib/server/api/apiClient';
 import { fail } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
 
-export const load: PageServerLoad = async () => {
+export const load: PageServerLoad = async ({ locals: { apiClient } }) => {
   try {
     const entries = await apiClient.leaderboardApi.statsLeaderboardGet();
     const matches = await apiClient.mmrApi.mmrMatchesGet();

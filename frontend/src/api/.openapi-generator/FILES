@@ -1,5 +1,6 @@
-apis/DefaultApi.ts
+apis/AdminApi.ts
 apis/LeaderboardApi.ts
+apis/MatchesApi.ts
 apis/index.ts
 index.ts
 models/ReposLeaderboardEntry.ts

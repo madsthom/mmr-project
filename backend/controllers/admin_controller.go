@@ -17,6 +17,7 @@ type AdminController struct{}
 //
 //	@Summary		Recalculate matches
 //	@Description	Start recalculating matches
+//	@Tags 			Admin
 //	@Accept			json
 //	@Produce		json
 //	@Success		200	{string}	string	"recalculation done"

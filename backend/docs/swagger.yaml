@@ -62,6 +62,8 @@ paths:
           schema:
             type: string
       summary: Recalculate matches
+      tags:
+      - Admin
   /mmr/matches:
     get:
       description: Get all matches
@@ -84,6 +86,8 @@ paths:
               $ref: '#/definitions/view.MatchDetails'
             type: array
       summary: Get matches
+      tags:
+      - Matches
     post:
       consumes:
       - application/json
@@ -103,6 +107,8 @@ paths:
           schema:
             type: string
       summary: Submit a match
+      tags:
+      - Matches
   /stats/leaderboard:
     get:
       consumes:

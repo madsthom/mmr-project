@@ -24,6 +24,9 @@ const docTemplate = `{
                 "produces": [
                     "application/json"
                 ],
+                "tags": [
+                    "Admin"
+                ],
                 "summary": "Recalculate matches",
                 "responses": {
                     "200": {
@@ -40,6 +43,9 @@ const docTemplate = `{
                 "description": "Get all matches",
                 "produces": [
                     "application/json"
+                ],
+                "tags": [
+                    "Matches"
                 ],
                 "summary": "Get matches",
                 "parameters": [
@@ -75,6 +81,9 @@ const docTemplate = `{
                 ],
                 "produces": [
                     "application/json"
+                ],
+                "tags": [
+                    "Matches"
                 ],
                 "summary": "Submit a match",
                 "parameters": [

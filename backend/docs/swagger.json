@@ -13,6 +13,9 @@
                 "produces": [
                     "application/json"
                 ],
+                "tags": [
+                    "Admin"
+                ],
                 "summary": "Recalculate matches",
                 "responses": {
                     "200": {
@@ -29,6 +32,9 @@
                 "description": "Get all matches",
                 "produces": [
                     "application/json"
+                ],
+                "tags": [
+                    "Matches"
                 ],
                 "summary": "Get matches",
                 "parameters": [
@@ -64,6 +70,9 @@
                 ],
                 "produces": [
                     "application/json"
+                ],
+                "tags": [
+                    "Matches"
                 ],
                 "summary": "Submit a match",
                 "parameters": [

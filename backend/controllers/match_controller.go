@@ -20,6 +20,7 @@ type MatchController struct{}
 //
 //	@Summary		Submit a match
 //	@Description	Submit a match for MMR calculation
+//	@Tags 			Matches
 //	@Accept			json
 //	@Produce		json
 //	@Param			match	body		view.Match	true	"Match object"
@@ -101,10 +102,11 @@ func (m MatchController) SubmitMatch(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": fmt.Sprintf("Match submitted: %v", json)})
 }
 
-// GetMatches
+// GetMatches godoc
 //
 //	@Summary		Get matches
 //	@Description	Get all matches
+//	@Tags 			Matches
 //	@Param			limit	query	int	false	"Limit"
 //	@Param			offset	query	int	false	"Offset"
 //	@Produce		json

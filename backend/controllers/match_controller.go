@@ -7,6 +7,7 @@ import (
 	view "mmr/backend/models"
 	services "mmr/backend/services"
 	"net/http"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 )
@@ -104,13 +105,28 @@ func (m MatchController) SubmitMatch(c *gin.Context) {
 //
 //	@Summary		Get matches
 //	@Description	Get all matches
+//	@Param			limit	query	int	false	"Limit"
+//	@Param			offset	query	int	false	"Offset"
 //	@Produce		json
 //	@Success		200	{object}	[]view.MatchDetails
 //	@Router			/mmr/matches [get]
 func (m MatchController) GetMatches(c *gin.Context) {
 	matchService := new(services.MatchService)
 
-	matchesResult := matchService.GetMatches()
+	limitString := c.DefaultQuery("limit", "100")
+	limit, err := strconv.Atoi(limitString)
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	offsetString := c.DefaultQuery("offset", "0")
+	offset, err := strconv.Atoi(offsetString)
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	matchesResult := matchService.GetMatches(limit, offset)
 
 	var matches []view.MatchDetails
 	for _, value := range matchesResult {

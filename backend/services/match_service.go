@@ -91,9 +91,9 @@ func (ms MatchService) GetPlayerMuAndSigma(userID uint) (Mu float64, Sigma float
 	return playerHistory.Mu, playerHistory.Sigma
 }
 
-func (ms MatchService) GetMatches() []*models.Match {
+func (ms MatchService) GetMatches(limit int, offset int) []*models.Match {
 	matchRepo := repos.NewMatchRepository(database.DB)
-	matches, err := matchRepo.ListMatches()
+	matches, err := matchRepo.ListMatches(limit, offset)
 
 	if err != nil {
 		panic("Failed to get matches")

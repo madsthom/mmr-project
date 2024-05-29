@@ -8,7 +8,7 @@ import (
 
 type IMatchRepository interface {
 	CreateMatch(match *models.Match) (*models.Match, error)
-	ListMatches() ([]*models.Match, error)
+	ListMatches(limit int, offset int) ([]*models.Match, error)
 	ClearMMRCalculations()
 }
 
@@ -27,7 +27,7 @@ func (mr *MatchRepository) CreateMatch(match *models.Match) (*models.Match, erro
 	return match, nil
 }
 
-func (mr *MatchRepository) ListMatches() ([]*models.Match, error) {
+func (mr *MatchRepository) ListMatches(limit int, offset int) ([]*models.Match, error) {
 	var matches []*models.Match
 
 	err := mr.db.Model(&models.Match{}).
@@ -36,6 +36,8 @@ func (mr *MatchRepository) ListMatches() ([]*models.Match, error) {
 		Preload("TeamTwo.UserOne").
 		Preload("TeamTwo.UserTwo").
 		Order("created_at asc").
+		Limit(limit).
+		Offset(offset).
 		Find(&matches).Error
 
 	if err != nil {

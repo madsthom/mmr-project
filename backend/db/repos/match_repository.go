@@ -9,7 +9,7 @@ import (
 
 type IMatchRepository interface {
 	CreateMatch(match *models.Match) (*models.Match, error)
-	ListMatches(limit int, offset int, orderBy *clause.OrderByColumn) ([]*models.Match, error)
+	ListMatches(limit int, offset int, orderBy *clause.OrderByColumn, includeMmrCalculations bool) ([]*models.Match, error)
 	ClearMMRCalculations()
 }
 
@@ -28,18 +28,24 @@ func (mr *MatchRepository) CreateMatch(match *models.Match) (*models.Match, erro
 	return match, nil
 }
 
-func (mr *MatchRepository) ListMatches(limit int, offset int, orderBy *clause.OrderByColumn) ([]*models.Match, error) {
+func (mr *MatchRepository) ListMatches(limit int, offset int, orderBy *clause.OrderByColumn, includeMmrCalculations bool) ([]*models.Match, error) {
 	var matches []*models.Match
 
 	if orderBy == nil {
 		orderBy = &clause.OrderByColumn{Column: clause.Column{Name: "created_at"}, Desc: false}
 	}
 
-	err := mr.db.Model(&models.Match{}).
+	query := mr.db.Model(&models.Match{}).
 		Preload("TeamOne.UserOne").
 		Preload("TeamOne.UserTwo").
 		Preload("TeamTwo.UserOne").
-		Preload("TeamTwo.UserTwo").
+		Preload("TeamTwo.UserTwo")
+
+	if includeMmrCalculations {
+		query = query.Preload("MMRCalculations")
+	}
+
+	err := query.
 		Order(*orderBy).
 		Limit(limit).
 		Offset(offset).

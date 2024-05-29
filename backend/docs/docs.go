@@ -178,11 +178,37 @@ const docTemplate = `{
                 "date": {
                     "type": "string"
                 },
+                "mmrCalculations": {
+                    "$ref": "#/definitions/view.MatchMMRCalculationDetails"
+                },
                 "team1": {
                     "$ref": "#/definitions/view.MatchTeam"
                 },
                 "team2": {
                     "$ref": "#/definitions/view.MatchTeam"
+                }
+            }
+        },
+        "view.MatchMMRCalculationDetails": {
+            "type": "object",
+            "required": [
+                "team1Player1MMRDelta",
+                "team1Player2MMRDelta",
+                "team2Player1MMRDelta",
+                "team2Player2MMRDelta"
+            ],
+            "properties": {
+                "team1Player1MMRDelta": {
+                    "type": "integer"
+                },
+                "team1Player2MMRDelta": {
+                    "type": "integer"
+                },
+                "team2Player1MMRDelta": {
+                    "type": "integer"
+                },
+                "team2Player2MMRDelta": {
+                    "type": "integer"
                 }
             }
         },

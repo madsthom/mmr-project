@@ -6,6 +6,7 @@ index.ts
 models/ReposLeaderboardEntry.ts
 models/ViewMatch.ts
 models/ViewMatchDetails.ts
+models/ViewMatchMMRCalculationDetails.ts
 models/ViewMatchTeam.ts
 models/index.ts
 runtime.ts

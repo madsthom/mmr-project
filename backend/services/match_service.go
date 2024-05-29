@@ -92,9 +92,9 @@ func (ms MatchService) GetPlayerMuAndSigma(userID uint) (Mu float64, Sigma float
 	return playerHistory.Mu, playerHistory.Sigma
 }
 
-func (ms MatchService) GetMatches(limit int, offset int, orderByCreatedAtDesc bool) []*models.Match {
+func (ms MatchService) GetMatches(limit int, offset int, orderByCreatedAtDesc bool, includeMmrCalculations bool) []*models.Match {
 	matchRepo := repos.NewMatchRepository(database.DB)
-	matches, err := matchRepo.ListMatches(limit, offset, &clause.OrderByColumn{Column: clause.Column{Name: "created_at"}, Desc: orderByCreatedAtDesc})
+	matches, err := matchRepo.ListMatches(limit, offset, &clause.OrderByColumn{Column: clause.Column{Name: "created_at"}, Desc: orderByCreatedAtDesc}, includeMmrCalculations)
 
 	if err != nil {
 		panic("Failed to get matches")

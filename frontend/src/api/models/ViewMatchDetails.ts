@@ -13,6 +13,12 @@
  */
 
 import { mapValues } from '../runtime';
+import type { ViewMatchMMRCalculationDetails } from './ViewMatchMMRCalculationDetails';
+import {
+    ViewMatchMMRCalculationDetailsFromJSON,
+    ViewMatchMMRCalculationDetailsFromJSONTyped,
+    ViewMatchMMRCalculationDetailsToJSON,
+} from './ViewMatchMMRCalculationDetails';
 import type { ViewMatchTeam } from './ViewMatchTeam';
 import {
     ViewMatchTeamFromJSON,
@@ -32,6 +38,12 @@ export interface ViewMatchDetails {
      * @memberof ViewMatchDetails
      */
     date: string;
+    /**
+     * 
+     * @type {ViewMatchMMRCalculationDetails}
+     * @memberof ViewMatchDetails
+     */
+    mmrCalculations?: ViewMatchMMRCalculationDetails;
     /**
      * 
      * @type {ViewMatchTeam}
@@ -67,6 +79,7 @@ export function ViewMatchDetailsFromJSONTyped(json: any, ignoreDiscriminator: bo
     return {
         
         'date': json['date'],
+        'mmrCalculations': json['mmrCalculations'] == null ? undefined : ViewMatchMMRCalculationDetailsFromJSON(json['mmrCalculations']),
         'team1': ViewMatchTeamFromJSON(json['team1']),
         'team2': ViewMatchTeamFromJSON(json['team2']),
     };
@@ -79,6 +92,7 @@ export function ViewMatchDetailsToJSON(value?: ViewMatchDetails | null): any {
     return {
         
         'date': value['date'],
+        'mmrCalculations': ViewMatchMMRCalculationDetailsToJSON(value['mmrCalculations']),
         'team1': ViewMatchTeamToJSON(value['team1']),
         'team2': ViewMatchTeamToJSON(value['team2']),
     };

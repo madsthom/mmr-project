@@ -29,7 +29,7 @@ func (m AdminController) RecalculateMatches(c *gin.Context) {
 	var currentOffset = 0
 	var limit = 200
 	for {
-		matches := matchService.GetMatches(limit, currentOffset, false)
+		matches := matchService.GetMatches(limit, currentOffset, false, false)
 
 		for _, match := range matches {
 			dbTeam1 := match.TeamOne

@@ -140,7 +140,7 @@ func (m MatchController) GetMatches(c *gin.Context) {
 		return
 	}
 
-	matchesResult := matchService.GetMatches(limit, offset, true)
+	matchesResult := matchService.GetMatches(limit, offset, true, true)
 
 	var matches []view.MatchDetails
 	for _, value := range matchesResult {

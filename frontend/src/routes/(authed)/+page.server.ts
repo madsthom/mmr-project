@@ -9,8 +9,6 @@ export const load: PageServerLoad = async ({ locals: { apiClient } }) => {
       offset: 0,
     });
 
-    console.log({ matches });
-
     return {
       leaderboardEntries: entries.toSorted(
         (a, b) => (b.mmr ?? 0) - (a.mmr ?? 0)

@@ -13,6 +13,7 @@
         view="sign_in"
         redirectTo={`${data.url}/auth/callback`}
         appearance={{ theme: ThemeSupa, style: { input: 'color: #fff' } }}
+        magicLink={true}
       />
     </div>
   </div>

@@ -120,5 +120,5 @@ func (ur *UserRepository) ListPlayerHistory(playerID uint) ([]*models.PlayerHist
 }
 
 func (ur *UserRepository) ClearPlayerHistories() {
-	ur.db.Exec("DELETE FROM player_histories")
+	ur.db.Exec("TRUNCATE TABLE player_histories RESTART IDENTITY;")
 }

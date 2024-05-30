@@ -59,5 +59,5 @@ func (mr *MatchRepository) ListMatches(limit int, offset int, orderBy *clause.Or
 }
 
 func (mr *MatchRepository) ClearMMRCalculations() {
-	mr.db.Exec("DELETE FROM mmr_calculations")
+	mr.db.Exec("TRUNCATE TABLE mmr_calculations RESTART IDENTITY;")
 }

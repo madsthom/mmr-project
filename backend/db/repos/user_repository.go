@@ -1,6 +1,7 @@
 package repos
 
 import (
+	"database/sql"
 	"errors"
 	"mmr/backend/db/models"
 
@@ -12,6 +13,7 @@ type IUserRepository interface {
 	ListUsers() ([]*models.User, error)
 	GetOrCreateByName(name string) (*models.User, error)
 	GetByID(id uint) (*models.User, error)
+	SearchUsers(query string) ([]*models.User, error)
 	SaveUser(user *models.User) (*models.User, error)
 	StoreRanking(matchID uint, userID uint, mu float64, sigma float64, mmr int) (*models.PlayerHistory, error)
 	StoreMatchMMRCalculation(matchID uint, player1Delta int, player2Delta int, player3Delta int, player4Delta int) (*models.MMRCalculation, error)
@@ -60,6 +62,17 @@ func (ur *UserRepository) GetByID(id uint) (*models.User, error) {
 		return nil, err
 	}
 	return user, nil
+}
+
+func (ur *UserRepository) SearchUsers(query string) ([]*models.User, error) {
+	var users []*models.User
+	err := ur.db.
+		Where("name ilike @query OR display_name ilike @query", sql.Named("query", "%"+query+"%")).
+		Find(&users).Error
+	if err != nil {
+		return nil, err
+	}
+	return users, nil
 }
 
 func (ur *UserRepository) SaveUser(user *models.User) (*models.User, error) {

@@ -6,7 +6,7 @@ import "gorm.io/gorm"
 type User struct {
 	gorm.Model
 	Name        string `gorm:"unique"`
-	DisplayName string
+	DisplayName *string
 	MMR         int
 	Mu          float64
 	Sigma       float64

@@ -107,6 +107,38 @@ const docTemplate = `{
                 }
             }
         },
+        "/search": {
+            "get": {
+                "description": "Searches users by name",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Users"
+                ],
+                "summary": "Search users",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Name to search for",
+                        "name": "query",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/view.UserDetails"
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/stats/leaderboard": {
             "get": {
                 "description": "Get leaderboard stats including wins, loses, and MMR of users",
@@ -127,6 +159,53 @@ const docTemplate = `{
                             "type": "array",
                             "items": {
                                 "$ref": "#/definitions/repos.LeaderboardEntry"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/stats/player-history/{userId}": {
+            "get": {
+                "description": "Get player history including MMR and date",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Statistics"
+                ],
+                "summary": "Get player history",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "User ID",
+                        "name": "userId",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Start date",
+                        "name": "start",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "End date",
+                        "name": "end",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/view.PlayerHistoryDetails"
                             }
                         }
                     }
@@ -234,6 +313,47 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "score": {
+                    "type": "integer"
+                }
+            }
+        },
+        "view.PlayerHistoryDetails": {
+            "type": "object",
+            "required": [
+                "date",
+                "mmr",
+                "name",
+                "userId"
+            ],
+            "properties": {
+                "date": {
+                    "type": "string"
+                },
+                "mmr": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "userId": {
+                    "type": "integer"
+                }
+            }
+        },
+        "view.UserDetails": {
+            "type": "object",
+            "required": [
+                "name",
+                "userId"
+            ],
+            "properties": {
+                "displayName": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "userId": {
                     "type": "integer"
                 }
             }

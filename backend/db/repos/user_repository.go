@@ -111,7 +111,7 @@ func (ur *UserRepository) ListPlayerHistory(playerID uint) ([]*models.PlayerHist
 		Preload("User").
 		Joins("Match").
 		Where("user_id = ?", playerID).
-		Order("\"Match\".created_at desc").
+		Order("\"Match\".created_at asc").
 		Find(&playerHistories).Error
 	if err != nil {
 		return nil, err

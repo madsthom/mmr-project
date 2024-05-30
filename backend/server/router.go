@@ -27,8 +27,9 @@ func NewRouter() *gin.Engine {
 		}
 		s := v1.Group("/stats", middleware.RequireAuth)
 		{
-			leaderboard := new(controllers.LeaderboardController)
-			s.GET("/leaderboard", leaderboard.GetLeaderboard)
+			stats := new(controllers.StatsController)
+			s.GET("/leaderboard", stats.GetLeaderboard)
+			s.GET("/player-history/:userId", stats.GetPlayerHistory)
 		}
 		a := v1.Group("/admin", middleware.RequireAdminAuth)
 		{

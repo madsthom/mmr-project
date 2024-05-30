@@ -66,6 +66,11 @@ func (sc StatsController) GetPlayerHistory(c *gin.Context) {
 		return
 	}
 
+	if len(entries) == 0 {
+		c.JSON(http.StatusOK, []view.PlayerHistoryDetails{})
+		return
+	}
+
 	// Create list of view.PlayerHistoryDetails objects
 	var playerHistory []view.PlayerHistoryDetails
 	for _, entry := range entries {

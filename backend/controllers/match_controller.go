@@ -142,6 +142,11 @@ func (m MatchController) GetMatches(c *gin.Context) {
 
 	matchesResult := matchService.GetMatches(limit, offset, true, true)
 
+	if len(matchesResult) == 0 {
+		c.JSON(http.StatusOK, []view.MatchDetails{})
+		return
+	}
+
 	var matches []view.MatchDetails
 	for _, value := range matchesResult {
 		match := view.MatchDetailsViewFromModel(*value)

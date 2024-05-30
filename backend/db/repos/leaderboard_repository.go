@@ -63,6 +63,10 @@ func (lr *LeaderboardRepository) GetLeaderboard() ([]*LeaderboardEntry, error) {
 			Loses: int(teamCounts.Losing),
 		}
 
+		if entry.Wins+entry.Loses < 10 {
+			entry.MMR = 0
+		}
+
 		// Append the entry to the results slice
 		results = append(results, entry)
 	}

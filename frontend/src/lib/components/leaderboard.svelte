@@ -25,7 +25,9 @@
             <Table.Cell>{name}</Table.Cell>
             <Table.Cell>{wins}</Table.Cell>
             <Table.Cell>{loses}</Table.Cell>
-            <Table.Cell class="text-right">{mmr}</Table.Cell>
+            <Table.Cell class="text-right"
+              >{mmr != 0 ? mmr : 'No enough matches'}</Table.Cell
+            >
           </Table.Row>
         {/each}
       </Table.Body>

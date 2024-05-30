@@ -39,3 +39,14 @@ func RequireAuth(c *gin.Context) {
 
 	c.Next()
 }
+
+func RequireAdminAuth(c *gin.Context) {
+	apiKey := c.GetHeader("X-API-KEY")
+
+	if apiKey == "" || apiKey != os.Getenv("ADMIN_SECRET") {
+		c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
+		return
+	}
+
+	c.Next()
+}

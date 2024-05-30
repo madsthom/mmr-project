@@ -30,7 +30,7 @@ func NewRouter() *gin.Engine {
 			leaderboard := new(controllers.LeaderboardController)
 			s.GET("/leaderboard", leaderboard.GetLeaderboard)
 		}
-		a := v1.Group("/admin", middleware.RequireAuth)
+		a := v1.Group("/admin", middleware.RequireAdminAuth)
 		{
 			admin := new(controllers.AdminController)
 			a.POST("/recalculate", admin.RecalculateMatches)

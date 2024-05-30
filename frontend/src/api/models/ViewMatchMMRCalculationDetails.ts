@@ -13,6 +13,13 @@
  */
 
 import { mapValues } from '../runtime';
+import type { ViewMatchMMRCalculationTeam } from './ViewMatchMMRCalculationTeam';
+import {
+    ViewMatchMMRCalculationTeamFromJSON,
+    ViewMatchMMRCalculationTeamFromJSONTyped,
+    ViewMatchMMRCalculationTeamToJSON,
+} from './ViewMatchMMRCalculationTeam';
+
 /**
  * 
  * @export
@@ -21,38 +28,24 @@ import { mapValues } from '../runtime';
 export interface ViewMatchMMRCalculationDetails {
     /**
      * 
-     * @type {number}
+     * @type {ViewMatchMMRCalculationTeam}
      * @memberof ViewMatchMMRCalculationDetails
      */
-    team1Player1MMRDelta: number;
+    team1: ViewMatchMMRCalculationTeam;
     /**
      * 
-     * @type {number}
+     * @type {ViewMatchMMRCalculationTeam}
      * @memberof ViewMatchMMRCalculationDetails
      */
-    team1Player2MMRDelta: number;
-    /**
-     * 
-     * @type {number}
-     * @memberof ViewMatchMMRCalculationDetails
-     */
-    team2Player1MMRDelta: number;
-    /**
-     * 
-     * @type {number}
-     * @memberof ViewMatchMMRCalculationDetails
-     */
-    team2Player2MMRDelta: number;
+    team2: ViewMatchMMRCalculationTeam;
 }
 
 /**
  * Check if a given object implements the ViewMatchMMRCalculationDetails interface.
  */
 export function instanceOfViewMatchMMRCalculationDetails(value: object): boolean {
-    if (!('team1Player1MMRDelta' in value)) return false;
-    if (!('team1Player2MMRDelta' in value)) return false;
-    if (!('team2Player1MMRDelta' in value)) return false;
-    if (!('team2Player2MMRDelta' in value)) return false;
+    if (!('team1' in value)) return false;
+    if (!('team2' in value)) return false;
     return true;
 }
 
@@ -66,10 +59,8 @@ export function ViewMatchMMRCalculationDetailsFromJSONTyped(json: any, ignoreDis
     }
     return {
         
-        'team1Player1MMRDelta': json['team1Player1MMRDelta'],
-        'team1Player2MMRDelta': json['team1Player2MMRDelta'],
-        'team2Player1MMRDelta': json['team2Player1MMRDelta'],
-        'team2Player2MMRDelta': json['team2Player2MMRDelta'],
+        'team1': ViewMatchMMRCalculationTeamFromJSON(json['team1']),
+        'team2': ViewMatchMMRCalculationTeamFromJSON(json['team2']),
     };
 }
 
@@ -79,10 +70,8 @@ export function ViewMatchMMRCalculationDetailsToJSON(value?: ViewMatchMMRCalcula
     }
     return {
         
-        'team1Player1MMRDelta': value['team1Player1MMRDelta'],
-        'team1Player2MMRDelta': value['team1Player2MMRDelta'],
-        'team2Player1MMRDelta': value['team2Player1MMRDelta'],
-        'team2Player2MMRDelta': value['team2Player2MMRDelta'],
+        'team1': ViewMatchMMRCalculationTeamToJSON(value['team1']),
+        'team2': ViewMatchMMRCalculationTeamToJSON(value['team2']),
     };
 }
 

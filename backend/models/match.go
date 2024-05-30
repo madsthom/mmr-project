@@ -24,10 +24,13 @@ type MatchTeam struct {
 }
 
 type MatchMMRCalculationDetails struct {
-	Team1Player1MMRDelta int `json:"team1Player1MMRDelta" binding:"required"`
-	Team1Player2MMRDelta int `json:"team1Player2MMRDelta" binding:"required"`
-	Team2Player1MMRDelta int `json:"team2Player1MMRDelta" binding:"required"`
-	Team2Player2MMRDelta int `json:"team2Player2MMRDelta" binding:"required"`
+	Team1 MatchMMRCalculationTeam `json:"team1" binding:"required"`
+	Team2 MatchMMRCalculationTeam `json:"team2" binding:"required"`
+}
+
+type MatchMMRCalculationTeam struct {
+	Player1MMRDelta int `json:"player1MMRDelta" binding:"required"`
+	Player2MMRDelta int `json:"player2MMRDelta" binding:"required"`
 }
 
 func MatchTeamViewFromModel(team models.Team) MatchTeam {
@@ -44,10 +47,14 @@ func MatchDetailsViewFromModel(match models.Match) MatchDetails {
 		Team2: MatchTeamViewFromModel(match.TeamTwo),
 		Date:  match.CreatedAt,
 		MMRCalculations: &MatchMMRCalculationDetails{
-			Team1Player1MMRDelta: match.MMRCalculations.TeamOnePlayerOneMMRDelta,
-			Team1Player2MMRDelta: match.MMRCalculations.TeamOnePlayerTwoMMRDelta,
-			Team2Player1MMRDelta: match.MMRCalculations.TeamTwoPlayerOneMMRDelta,
-			Team2Player2MMRDelta: match.MMRCalculations.TeamTwoPlayerTwoMMRDelta,
+			Team1: MatchMMRCalculationTeam{
+				Player1MMRDelta: match.MMRCalculations.TeamOnePlayerOneMMRDelta,
+				Player2MMRDelta: match.MMRCalculations.TeamOnePlayerTwoMMRDelta,
+			},
+			Team2: MatchMMRCalculationTeam{
+				Player1MMRDelta: match.MMRCalculations.TeamTwoPlayerOneMMRDelta,
+				Player2MMRDelta: match.MMRCalculations.TeamTwoPlayerTwoMMRDelta,
+			},
 		},
 	}
 }

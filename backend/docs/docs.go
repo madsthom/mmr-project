@@ -192,22 +192,29 @@ const docTemplate = `{
         "view.MatchMMRCalculationDetails": {
             "type": "object",
             "required": [
-                "team1Player1MMRDelta",
-                "team1Player2MMRDelta",
-                "team2Player1MMRDelta",
-                "team2Player2MMRDelta"
+                "team1",
+                "team2"
             ],
             "properties": {
-                "team1Player1MMRDelta": {
+                "team1": {
+                    "$ref": "#/definitions/view.MatchMMRCalculationTeam"
+                },
+                "team2": {
+                    "$ref": "#/definitions/view.MatchMMRCalculationTeam"
+                }
+            }
+        },
+        "view.MatchMMRCalculationTeam": {
+            "type": "object",
+            "required": [
+                "player1MMRDelta",
+                "player2MMRDelta"
+            ],
+            "properties": {
+                "player1MMRDelta": {
                     "type": "integer"
                 },
-                "team1Player2MMRDelta": {
-                    "type": "integer"
-                },
-                "team2Player1MMRDelta": {
-                    "type": "integer"
-                },
-                "team2Player2MMRDelta": {
+                "player2MMRDelta": {
                     "type": "integer"
                 }
             }

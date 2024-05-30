@@ -1,6 +1,6 @@
 <script lang="ts">
   import Leaderboard from '$lib/components/leaderboard.svelte';
-  import MatchCard from '$lib/components/match-card.svelte';
+  import { MatchCard } from '$lib/components/match-card';
   import PageTitle from '$lib/components/page-title.svelte';
   import type { PageData } from './$types';
 

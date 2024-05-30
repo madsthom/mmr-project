@@ -34,10 +34,11 @@ type Team struct {
 
 type Match struct {
 	gorm.Model
-	TeamOneID uint
-	TeamOne   Team `gorm:"foreignKey:TeamOneID"`
-	TeamTwoID uint
-	TeamTwo   Team `gorm:"foreignKey:TeamTwoID"`
+	TeamOneID       uint
+	TeamOne         Team `gorm:"foreignKey:TeamOneID"`
+	TeamTwoID       uint
+	TeamTwo         Team            `gorm:"foreignKey:TeamTwoID"`
+	MMRCalculations *MMRCalculation `gorm:"foreignKey:MatchID"`
 }
 
 type MMRCalculation struct {

@@ -1,10 +1,13 @@
-apis/DefaultApi.ts
+apis/AdminApi.ts
 apis/LeaderboardApi.ts
+apis/MatchesApi.ts
 apis/index.ts
 index.ts
 models/ReposLeaderboardEntry.ts
 models/ViewMatch.ts
 models/ViewMatchDetails.ts
+models/ViewMatchMMRCalculationDetails.ts
+models/ViewMatchMMRCalculationTeam.ts
 models/ViewMatchTeam.ts
 models/index.ts
 runtime.ts

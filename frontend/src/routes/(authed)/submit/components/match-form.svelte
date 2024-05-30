@@ -1,7 +1,7 @@
 <script lang="ts">
   import { goto } from '$app/navigation';
   import LoadingOverlay from '$lib/components/loading-overlay.svelte';
-  import MatchCard from '$lib/components/match-card.svelte';
+  import { MatchCard } from '$lib/components/match-card';
   import { Button } from '$lib/components/ui/button';
   import * as Form from '$lib/components/ui/form';
   import { fade } from 'svelte/transition';

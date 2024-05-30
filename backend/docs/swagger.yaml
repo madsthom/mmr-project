@@ -24,6 +24,8 @@ definitions:
     properties:
       date:
         type: string
+      mmrCalculations:
+        $ref: '#/definitions/view.MatchMMRCalculationDetails'
       team1:
         $ref: '#/definitions/view.MatchTeam'
       team2:
@@ -32,6 +34,26 @@ definitions:
     - date
     - team1
     - team2
+    type: object
+  view.MatchMMRCalculationDetails:
+    properties:
+      team1:
+        $ref: '#/definitions/view.MatchMMRCalculationTeam'
+      team2:
+        $ref: '#/definitions/view.MatchMMRCalculationTeam'
+    required:
+    - team1
+    - team2
+    type: object
+  view.MatchMMRCalculationTeam:
+    properties:
+      player1MMRDelta:
+        type: integer
+      player2MMRDelta:
+        type: integer
+    required:
+    - player1MMRDelta
+    - player2MMRDelta
     type: object
   view.MatchTeam:
     properties:
@@ -49,9 +71,33 @@ definitions:
 info:
   contact: {}
 paths:
+  /admin/recalculate:
+    post:
+      consumes:
+      - application/json
+      description: Start recalculating matches
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: recalculation done
+          schema:
+            type: string
+      summary: Recalculate matches
+      tags:
+      - Admin
   /mmr/matches:
     get:
       description: Get all matches
+      parameters:
+      - description: Limit
+        in: query
+        name: limit
+        type: integer
+      - description: Offset
+        in: query
+        name: offset
+        type: integer
       produces:
       - application/json
       responses:
@@ -62,6 +108,8 @@ paths:
               $ref: '#/definitions/view.MatchDetails'
             type: array
       summary: Get matches
+      tags:
+      - Matches
     post:
       consumes:
       - application/json
@@ -81,6 +129,8 @@ paths:
           schema:
             type: string
       summary: Submit a match
+      tags:
+      - Matches
   /stats/leaderboard:
     get:
       consumes:

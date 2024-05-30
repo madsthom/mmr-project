@@ -7,6 +7,7 @@ import (
 	view "mmr/backend/models"
 	services "mmr/backend/services"
 	"net/http"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 )
@@ -19,6 +20,7 @@ type MatchController struct{}
 //
 //	@Summary		Submit a match
 //	@Description	Submit a match for MMR calculation
+//	@Tags 			Matches
 //	@Accept			json
 //	@Produce		json
 //	@Param			match	body		view.Match	true	"Match object"
@@ -29,7 +31,19 @@ func (m MatchController) SubmitMatch(c *gin.Context) {
 	err := c.BindJSON(&json)
 
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	// A match should have 4 unique players across 2 teams
+	players := make(map[string]bool)
+	players[json.Team1.Member1] = true
+	players[json.Team1.Member2] = true
+	players[json.Team2.Member1] = true
+	players[json.Team2.Member2] = true
+
+	if len(players) < 4 {
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": "Each player must be unique"})
 		return
 	}
 
@@ -100,17 +114,33 @@ func (m MatchController) SubmitMatch(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": fmt.Sprintf("Match submitted: %v", json)})
 }
 
-// GetMatches
+// GetMatches godoc
 //
 //	@Summary		Get matches
 //	@Description	Get all matches
+//	@Tags 			Matches
+//	@Param			limit	query	int	false	"Limit"
+//	@Param			offset	query	int	false	"Offset"
 //	@Produce		json
 //	@Success		200	{object}	[]view.MatchDetails
 //	@Router			/mmr/matches [get]
 func (m MatchController) GetMatches(c *gin.Context) {
 	matchService := new(services.MatchService)
 
-	matchesResult := matchService.GetMatches()
+	limitString := c.DefaultQuery("limit", "100")
+	limit, err := strconv.Atoi(limitString)
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	offsetString := c.DefaultQuery("offset", "0")
+	offset, err := strconv.Atoi(offsetString)
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	matchesResult := matchService.GetMatches(limit, offset, true, true)
 
 	var matches []view.MatchDetails
 	for _, value := range matchesResult {

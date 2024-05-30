@@ -1,0 +1,47 @@
+# TODO: Ensure this is run before fly.yml
+name: Atlas CI
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    paths:
+      - "backend/migrations/*"
+jobs:
+  lint:
+    services:
+      # Spin up a postgres:15 container to be used as the dev-database for analysis.
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_DB: dev
+          POSTGRES_PASSWORD: pass
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-start-period 10s
+          --health-timeout 5s
+          --health-retries 5
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: ariga/setup-atlas@v0
+      - uses: ariga/atlas-action/migrate/lint@v1
+        with:
+          dir: "file://backend/migrations"
+          dev-url: postgres://postgres:pass@localhost:5432/dev?sslmode=disable
+          env: gorm
+  deploy:
+    runs-on: ubuntu-latest
+    needs: lint
+    steps:
+      - uses: actions/checkout@v3
+      - uses: ariga/setup-atlas@v0
+      - name: Deploy Atlas Migrations
+        uses: ariga/atlas-action/migrate/apply@v1
+        with:
+          url: ${{ secrets.DATABASE_URL }}
+          dir: "file://backend/migrations"
+          env: gorm

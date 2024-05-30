@@ -13,7 +13,11 @@
         view="sign_in"
         redirectTo={`${data.url}/auth/callback`}
         appearance={{ theme: ThemeSupa, style: { input: 'color: #fff' } }}
-        magicLink={true}
+        magicLink={false}
+        providers={['azure']}
+        providerScopes={{
+          azure: 'openid profile email',
+        }}
       />
     </div>
   </div>

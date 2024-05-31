@@ -29,7 +29,8 @@ jobs:
       - uses: ariga/setup-atlas@v0
       - uses: ariga/atlas-action/migrate/lint@v1
         with:
-          dir: "file://backend/migrations"
+          working-directory: ./backend
+          dir: "file://migrations"
           dev-url: postgres://postgres:pass@localhost:5432/dev?sslmode=disable
           env: gorm
           dir-name: "mmr-project"

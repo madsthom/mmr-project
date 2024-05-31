@@ -32,9 +32,11 @@ jobs:
       - uses: ariga/setup-atlas@v0
       - uses: ariga/atlas-action/migrate/lint@v1
         with:
-          dir: "file://backend/migrations"
+          working-directory: ./backend
+          dir: "file://migrations"
           dev-url: postgres://postgres:pass@localhost:5432/dev?sslmode=disable
           env: gorm
+          dir-name: "mmr-project"
   migrations_apply:
     name: Migrate database
     runs-on: ubuntu-latest
@@ -45,8 +47,9 @@ jobs:
       - name: Apply Atlas Migrations
         uses: ariga/atlas-action/migrate/apply@v1
         with:
+          working-directory: ./backend
           url: ${{ secrets.DATABASE_URL }}
-          dir: "file://backend/migrations"
+          dir: "file://migrations"
           env: gorm
   deploy:
     name: Deploy app

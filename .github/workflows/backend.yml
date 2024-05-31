@@ -30,13 +30,12 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - uses: ariga/setup-atlas@v0
-      - uses: ariga/atlas-action/migrate/lint@v1
-        with:
-          working-directory: ./backend
-          dir: "file://migrations"
-          dev-url: postgres://postgres:pass@localhost:5432/dev?sslmode=disable
-          env: gorm
-          dir-name: "mmr-project"
+      - run: atlas version
+        name: Check Atlas CLI version
+        working-directory: ./backend
+      - run: atlas migrate lint --env gorm --git-base main
+        name: Lint
+        working-directory: ./backend
   migrations_apply:
     name: Migrate database
     runs-on: ubuntu-latest
@@ -44,13 +43,12 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - uses: ariga/setup-atlas@v0
-      - name: Apply Atlas Migrations
-        uses: ariga/atlas-action/migrate/apply@v1
-        with:
-          working-directory: ./backend
-          url: ${{ secrets.DATABASE_URL }}
-          dir: "file://migrations"
-          env: gorm
+      - run: atlas version
+        name: Check Atlas CLI version
+        working-directory: ./backend
+      - run: atlas migrate apply --env gorm --revisions-schema public --allow-dirty --url ${{ secrets.DATABASE_URL }}
+        name: Apply migrations
+        working-directory: ./backend
   deploy:
     name: Deploy app
     runs-on: ubuntu-latest

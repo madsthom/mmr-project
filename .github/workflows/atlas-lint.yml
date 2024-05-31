@@ -27,10 +27,9 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - uses: ariga/setup-atlas@v0
-      - uses: ariga/atlas-action/migrate/lint@v1
-        with:
-          working-directory: ./backend
-          dir: "file://migrations"
-          dev-url: postgres://postgres:pass@localhost:5432/dev?sslmode=disable
-          env: gorm
-          dir-name: "mmr-project"
+      - run: atlas version
+        name: Check Atlas CLI version
+        working-directory: ./backend
+      - run: atlas migrate lint --env gorm --git-base main
+        name: Lint
+        working-directory: ./backend

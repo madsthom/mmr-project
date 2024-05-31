@@ -1,14 +1,16 @@
-# TODO: Ensure this is run before fly.yml
-name: Atlas CI
+name: Deploy backend
 on:
   push:
     branches:
       - main
-  pull_request:
     paths:
-      - "backend/migrations/*"
+      - "backend/**/*"
+
+concurrency:
+  group: deploy-group # optional: ensure only one action runs at a time
+
 jobs:
-  lint:
+  migrations_lint:
     services:
       # Spin up a postgres:15 container to be used as the dev-database for analysis.
       postgres:
@@ -33,15 +35,27 @@ jobs:
           dir: "file://backend/migrations"
           dev-url: postgres://postgres:pass@localhost:5432/dev?sslmode=disable
           env: gorm
-  deploy:
+  migrations_apply:
+    name: Migrate database
     runs-on: ubuntu-latest
-    needs: lint
+    needs: migrations_lint
     steps:
       - uses: actions/checkout@v3
       - uses: ariga/setup-atlas@v0
-      - name: Deploy Atlas Migrations
+      - name: Apply Atlas Migrations
         uses: ariga/atlas-action/migrate/apply@v1
         with:
           url: ${{ secrets.DATABASE_URL }}
           dir: "file://backend/migrations"
           env: gorm
+  deploy:
+    name: Deploy app
+    runs-on: ubuntu-latest
+    needs: migrations_apply
+    steps:
+      - uses: actions/checkout@v4
+      - uses: superfly/flyctl-actions/setup-flyctl@master
+      - run: flyctl deploy --remote-only
+        working-directory: ./backend
+        env:
+          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}

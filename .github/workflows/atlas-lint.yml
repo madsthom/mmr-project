@@ -32,3 +32,4 @@ jobs:
           dir: "file://backend/migrations"
           dev-url: postgres://postgres:pass@localhost:5432/dev?sslmode=disable
           env: gorm
+          dir-name: "mmr-project"

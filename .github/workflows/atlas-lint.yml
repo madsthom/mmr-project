@@ -26,10 +26,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
+      - run: |
+          git fetch --no-tags --depth=1 origin main
       - uses: ariga/setup-atlas@v0
       - run: atlas version
         name: Check Atlas CLI version
         working-directory: ./backend
-      - run: atlas migrate lint --env gorm --git-base main
+      - run: |
+          atlas migrate lint --env gorm --git-base origin/main
         name: Lint
         working-directory: ./backend

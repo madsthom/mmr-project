@@ -2,6 +2,9 @@
   import Leaderboard from '$lib/components/leaderboard.svelte';
   import { MatchCard } from '$lib/components/match-card';
   import PageTitle from '$lib/components/page-title.svelte';
+  import Label from '$lib/components/ui/label/label.svelte';
+  import { Checkbox } from 'bits-ui';
+  import { Check, Minus } from 'lucide-svelte';
   import type { PageData } from './$types';
 
   export let data: PageData;
@@ -16,11 +19,25 @@
 
   <div class="flex">
     <h2 class="flex-1 text-4xl">Recent Matches</h2>
-    <div class="self-center">
-      <label
+    <div class="flex items-center space-x-3 self-center">
+      <Label id="show-mmr-label" for="show-mmr">MMR:</Label>
+      <Checkbox.Root
+        bind:checked={showMmr}
+        id="show-mmr"
+        class="border-muted bg-primary active:scale-98 data-[state=unchecked]:border-border-input data-[state=unchecked]:hover:border-dark-40 peer inline-flex size-[25px] items-center justify-center rounded-md border transition-all duration-150 ease-in-out data-[state=unchecked]:bg-white"
+      >
+        <Checkbox.Indicator let:isChecked let:isIndeterminate>
+          {#if isChecked}
+            <Check class="text-primary-foreground size-[15px] font-bold" />
+          {:else if isIndeterminate}
+            <Minus class="size-[15px] font-bold" />
+          {/if}
+        </Checkbox.Indicator>
+      </Checkbox.Root>
+      <!-- <label
         >MMR:&nbsp;
         <input type="checkbox" class="rounded-sm" bind:checked={showMmr} />
-      </label>
+      </label> -->
     </div>
   </div>
   <div class="flex flex-1 flex-col items-stretch gap-2">

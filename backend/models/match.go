@@ -43,18 +43,25 @@ func MatchTeamViewFromModel(team models.Team) MatchTeam {
 
 func MatchDetailsViewFromModel(match models.Match) MatchDetails {
 	return MatchDetails{
-		Team1: MatchTeamViewFromModel(match.TeamOne),
-		Team2: MatchTeamViewFromModel(match.TeamTwo),
-		Date:  match.CreatedAt,
-		MMRCalculations: &MatchMMRCalculationDetails{
-			Team1: MatchMMRCalculationTeam{
-				Player1MMRDelta: match.MMRCalculations.TeamOnePlayerOneMMRDelta,
-				Player2MMRDelta: match.MMRCalculations.TeamOnePlayerTwoMMRDelta,
-			},
-			Team2: MatchMMRCalculationTeam{
-				Player1MMRDelta: match.MMRCalculations.TeamTwoPlayerOneMMRDelta,
-				Player2MMRDelta: match.MMRCalculations.TeamTwoPlayerTwoMMRDelta,
-			},
+		Team1:           MatchTeamViewFromModel(match.TeamOne),
+		Team2:           MatchTeamViewFromModel(match.TeamTwo),
+		Date:            match.CreatedAt,
+		MMRCalculations: MatchMMRCalculationDetailsFromModel(match.MMRCalculations),
+	}
+}
+
+func MatchMMRCalculationDetailsFromModel(calculation *models.MMRCalculation) *MatchMMRCalculationDetails {
+	if calculation == nil {
+		return nil
+	}
+	return &MatchMMRCalculationDetails{
+		Team1: MatchMMRCalculationTeam{
+			Player1MMRDelta: calculation.TeamOnePlayerOneMMRDelta,
+			Player2MMRDelta: calculation.TeamOnePlayerTwoMMRDelta,
+		},
+		Team2: MatchMMRCalculationTeam{
+			Player1MMRDelta: calculation.TeamTwoPlayerOneMMRDelta,
+			Player2MMRDelta: calculation.TeamTwoPlayerTwoMMRDelta,
 		},
 	}
 }

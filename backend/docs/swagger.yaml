@@ -68,6 +68,34 @@ definitions:
     - member2
     - score
     type: object
+  view.PlayerHistoryDetails:
+    properties:
+      date:
+        type: string
+      mmr:
+        type: integer
+      name:
+        type: string
+      userId:
+        type: integer
+    required:
+    - date
+    - mmr
+    - name
+    - userId
+    type: object
+  view.UserDetails:
+    properties:
+      displayName:
+        type: string
+      name:
+        type: string
+      userId:
+        type: integer
+    required:
+    - name
+    - userId
+    type: object
 info:
   contact: {}
 paths:
@@ -131,6 +159,27 @@ paths:
       summary: Submit a match
       tags:
       - Matches
+  /search:
+    get:
+      description: Searches users by name
+      parameters:
+      - description: Name to search for
+        in: query
+        name: query
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/view.UserDetails'
+            type: array
+      summary: Search users
+      tags:
+      - Users
   /stats/leaderboard:
     get:
       consumes:
@@ -148,4 +197,35 @@ paths:
       summary: Get leaderboard stats
       tags:
       - Leaderboard
+  /stats/player-history/{userId}:
+    get:
+      consumes:
+      - application/json
+      description: Get player history including MMR and date
+      parameters:
+      - description: User ID
+        in: path
+        name: userId
+        required: true
+        type: integer
+      - description: Start date
+        in: query
+        name: start
+        type: string
+      - description: End date
+        in: query
+        name: end
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/view.PlayerHistoryDetails'
+            type: array
+      summary: Get player history
+      tags:
+      - Statistics
 swagger: "2.0"

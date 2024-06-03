@@ -25,6 +25,11 @@ import {
     ViewMatchDetailsToJSON,
 } from '../models/index';
 
+export interface MmrMatchesGetRequest {
+    limit?: number;
+    offset?: number;
+}
+
 export interface MmrMatchesPostRequest {
     match: ViewMatch;
 }
@@ -32,14 +37,22 @@ export interface MmrMatchesPostRequest {
 /**
  * 
  */
-export class DefaultApi extends runtime.BaseAPI {
+export class MatchesApi extends runtime.BaseAPI {
 
     /**
      * Get all matches
      * Get matches
      */
-    async mmrMatchesGetRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<ViewMatchDetails>>> {
+    async mmrMatchesGetRaw(requestParameters: MmrMatchesGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<ViewMatchDetails>>> {
         const queryParameters: any = {};
+
+        if (requestParameters['limit'] != null) {
+            queryParameters['limit'] = requestParameters['limit'];
+        }
+
+        if (requestParameters['offset'] != null) {
+            queryParameters['offset'] = requestParameters['offset'];
+        }
 
         const headerParameters: runtime.HTTPHeaders = {};
 
@@ -57,8 +70,8 @@ export class DefaultApi extends runtime.BaseAPI {
      * Get all matches
      * Get matches
      */
-    async mmrMatchesGet(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<ViewMatchDetails>> {
-        const response = await this.mmrMatchesGetRaw(initOverrides);
+    async mmrMatchesGet(requestParameters: MmrMatchesGetRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<ViewMatchDetails>> {
+        const response = await this.mmrMatchesGetRaw(requestParameters, initOverrides);
         return await response.value();
     }
 

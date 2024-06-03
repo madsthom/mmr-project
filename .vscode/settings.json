@@ -1,4 +1,9 @@
 {
-  "conventionalCommits.scopes": ["frontend", "backend", "repo"],
+  "conventionalCommits.scopes": [
+    "frontend",
+    "backend",
+    "repo",
+    "full-stack"
+  ],
   "editor.tabSize": 2
 }

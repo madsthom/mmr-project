@@ -1,11 +1,16 @@
 import { env } from '$env/dynamic/private';
-import { Configuration, DefaultApi, LeaderboardApi } from '../../../api';
+import { Configuration, LeaderboardApi, MatchesApi } from '../../../api';
 
-const configuration = new Configuration({
-  basePath: env.API_BASE_PATH,
-});
+export const createConfiguration = (token: string) =>
+  new Configuration({
+    basePath: env.API_BASE_PATH,
+    headers: { Authorization: `Bearer ${token}` },
+  });
 
-export const apiClient = {
-  mmrApi: new DefaultApi(configuration),
-  leaderboardApi: new LeaderboardApi(configuration),
+export const createApiClient = (token: string) => {
+  const configuration = createConfiguration(token);
+  return {
+    leaderboardApi: new LeaderboardApi(configuration),
+    mmrApi: new MatchesApi(configuration),
+  };
 };

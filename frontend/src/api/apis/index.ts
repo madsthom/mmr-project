@@ -1,4 +1,5 @@
 /* tslint:disable */
 /* eslint-disable */
-export * from './DefaultApi';
+export * from './AdminApi';
 export * from './LeaderboardApi';
+export * from './MatchesApi';

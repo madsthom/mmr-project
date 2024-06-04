@@ -165,7 +165,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/stats/player-history/{userId}": {
+        "/stats/player-history": {
             "get": {
                 "description": "Get player history including MMR and date",
                 "consumes": [
@@ -183,8 +183,7 @@ const docTemplate = `{
                         "type": "integer",
                         "description": "User ID",
                         "name": "userId",
-                        "in": "path",
-                        "required": true
+                        "in": "query"
                     },
                     {
                         "type": "string",

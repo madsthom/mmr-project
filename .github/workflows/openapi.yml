@@ -1,0 +1,27 @@
+name: OpenAPI Validation
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    paths:
+      - "backend/controllers/*"
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - run: |
+          git fetch --no-tags --depth=1 origin main
+      - uses: yegorrybchenko/go-swag-action@v0.1
+        with:
+          command: init
+          swagWersion: 1.16.3
+          equalToGoPath: backend/docs/docs.go
+          equalToGoOriginPath: backend/example_test/docs/docs.go
+      - run: |
+          npm run generate-api
+        name: Generate frontend code
+        working-directory: ./frontend
+      - run: |
+          git diff --exit-code

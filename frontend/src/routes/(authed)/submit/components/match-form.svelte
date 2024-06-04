@@ -6,6 +6,7 @@
   import { Button } from '$lib/components/ui/button';
   import * as Form from '$lib/components/ui/form';
   import { isPresent } from '$lib/util/isPresent';
+  import { onMount } from 'svelte';
   import { fade } from 'svelte/transition';
   import {
     superForm,
@@ -22,23 +23,35 @@
   export let data: SuperValidated<Infer<MatchSchema>>;
   export let users: ViewUserDetails[];
 
+  const PLAYER_1_LOCAL_STORAGE_KEY = 'player1Id';
+  const LATEST_PLAYERS_LOCAL_STORAGE_KEY = 'latestPlayers';
+
   const localLatestStoragePlayers = browser
-    ? window.localStorage.getItem('latestPlayers')?.split(',')
+    ? window.localStorage.getItem(LATEST_PLAYERS_LOCAL_STORAGE_KEY)?.split(',')
     : null;
 
   const latestPlayerIds =
-    localLatestStoragePlayers
-      ?.map((playerId) => parseInt(playerId))
-      .filter((playerId) => !isNaN(playerId)) ?? [];
+    localLatestStoragePlayers?.map((playerId) => parseInt(playerId)) ?? [];
+
+  const localPlayer1IdString = browser
+    ? window.localStorage.getItem(PLAYER_1_LOCAL_STORAGE_KEY)
+    : null;
+
+  const localPlayer1Id = localPlayer1IdString
+    ? parseInt(localPlayer1IdString)
+    : null;
+
+  const player1Id =
+    localPlayer1Id != null && !isNaN(localPlayer1Id) ? localPlayer1Id : null;
 
   const form = superForm(data, {
     validators: zodClient(matchSchema),
     dataType: 'json',
     delayMs: 500,
     onSubmit: (data) => {
-      // Fetch players entered into form
+      const enteredPlayer1 = data.formData.get('team1.member1');
       const enteredPlayerIds = [
-        data.formData.get('team1.member1'),
+        enteredPlayer1,
         data.formData.get('team1.member2'),
         data.formData.get('team2.member1'),
         data.formData.get('team2.member2'),
@@ -58,8 +71,14 @@
         ...latestPlayerIds.filter((id) => !enteredPlayerIds.includes(id)),
       ].slice(0, 10);
       if (browser) {
+        if (enteredPlayer1 != null && typeof enteredPlayer1 === 'string') {
+          window.localStorage.setItem(
+            PLAYER_1_LOCAL_STORAGE_KEY,
+            enteredPlayer1
+          );
+        }
         window.localStorage.setItem(
-          'latestPlayers',
+          LATEST_PLAYERS_LOCAL_STORAGE_KEY,
           newLatestPlayerIds.join(',')
         );
       }
@@ -67,6 +86,10 @@
   });
 
   const { form: formData, enhance, submitting } = form;
+
+  onMount(() => {
+    $formData.team1.member1 = player1Id ?? $formData.team1.member1;
+  });
 
   let loosingTeam: 'team1' | 'team2' | null = null;
   $: loosingTeam =

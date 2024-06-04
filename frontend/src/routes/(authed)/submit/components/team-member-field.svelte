@@ -96,8 +96,12 @@
           <p>Unknown</p>
         {/if}
       </div>
-      <Button class="h-6 w-6 rounded p-1 text-sm" on:click={resetValue}>
-        <X class="h-5 w-5" />
+      <Button
+        class="-mr-1 h-7 w-7 rounded p-1 text-sm"
+        on:click={resetValue}
+        variant="ghost"
+      >
+        <X class="h-full w-full" />
       </Button>
     </div>
   {/if}

@@ -33,6 +33,7 @@ func NewRouter() *gin.Engine {
 		{
 			users := new(controllers.UsersController)
 			u.GET("", users.ListUsers)
+			u.POST("", users.CreateUser)
 			u.GET("/search", users.SearchUsers)
 		}
 		a := v1.Group("/admin", middleware.RequireAdminAuth)

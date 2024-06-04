@@ -26,7 +26,7 @@ type MatchController struct{}
 //	@Router			/v1/mmr/matches [post]
 func (m MatchController) SubmitMatch(c *gin.Context) {
 	var json view.Match
-	err := c.BindJSON(&json)
+	err := c.ShouldBind(&json)
 
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -124,7 +124,7 @@ func (m MatchController) SubmitMatch(c *gin.Context) {
 //	@Router			/v2/mmr/matches [post]
 func (m MatchController) SubmitMatchV2(c *gin.Context) {
 	var json view.MatchV2
-	err := c.BindJSON(&json)
+	err := c.ShouldBind(&json)
 
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": err.Error()})

@@ -12,6 +12,8 @@ import (
 type IUserRepository interface {
 	ListUsers() ([]*models.User, error)
 	GetOrCreateByName(name string) (*models.User, error)
+	GetByName(name string) (*models.User, error)
+	CreateByName(name string, displayName *string) (*models.User, error)
 	GetByID(id uint) (*models.User, error)
 	SearchUsers(query string) ([]*models.User, error)
 	SaveUser(user *models.User) (*models.User, error)
@@ -40,20 +42,31 @@ func (ur *UserRepository) ListUsers() ([]*models.User, error) {
 
 func (ur *UserRepository) GetOrCreateByName(name string) (*models.User, error) {
 	// Attempt to find an existing user by name
-	user := &models.User{}
-	if err := ur.db.Where("name = ?", name).First(user).Error; err != nil {
-		// User not found in the database, let's create a new user
+	user, err := ur.GetByName(name)
+
+	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			newUser := &models.User{Name: name, MMR: 0, Mu: trueskill.DefaultMu, Sigma: trueskill.DefaultSigma}
-			if err := ur.db.Create(newUser).Error; err != nil {
-				return nil, err // Return error if unable to create user
-			}
-			return newUser, nil // Return the newly created user
+			return ur.CreateByName(name, nil)
 		}
 		return nil, err // Return other errors encountered during database operation
 	}
 
 	return user, nil // Return the found user
+}
+
+func (ur *UserRepository) GetByName(name string) (*models.User, error) {
+	// Attempt to find an existing user by name
+	user := &models.User{}
+	err := ur.db.Where("name = ?", name).First(user).Error
+	return user, err
+}
+
+func (ur *UserRepository) CreateByName(name string, displayName *string) (*models.User, error) {
+	newUser := &models.User{Name: name, DisplayName: displayName, MMR: 0, Mu: trueskill.DefaultMu, Sigma: trueskill.DefaultSigma}
+	if err := ur.db.Create(newUser).Error; err != nil {
+		return nil, err
+	}
+	return newUser, nil
 }
 
 func (ur *UserRepository) GetByID(id uint) (*models.User, error) {

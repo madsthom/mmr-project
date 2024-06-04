@@ -3,7 +3,9 @@ import type { PageServerLoad } from './$types';
 
 export const load: PageServerLoad = async ({ locals: { apiClient } }) => {
   try {
-    const statistics = await apiClient.statisticsApi.v1StatsPlayerHistoryGet();
+    const statistics = (
+      await apiClient.statisticsApi.v1StatsPlayerHistoryGet()
+    ).toSorted((a, b) => a.name.localeCompare(b.name));
 
     return {
       statistics,

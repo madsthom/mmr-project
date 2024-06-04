@@ -12,13 +12,11 @@
   export let data: PageData;
 
   const chartData: ChartTabularData =
-    data.statistics
-      ?.toSorted((a, b) => a.name.localeCompare(b.name))
-      .map((stat) => ({
-        player: stat.name,
-        date: stat.date,
-        rating: stat.mmr,
-      })) ?? [];
+    data.statistics?.map((stat) => ({
+      player: stat.name,
+      date: stat.date,
+      rating: stat.mmr,
+    })) ?? [];
 
   const options: LineChartOptions = {
     theme: 'g100',

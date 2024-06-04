@@ -51,7 +51,7 @@ func (sc StatsController) GetLeaderboard(c *gin.Context) {
 //	@Accept			json
 //	@Produce		json
 //	@Success		200	{array}	view.PlayerHistoryDetails
-//	@Router			/stats/player-history/{userId} [get]
+//	@Router			/stats/player-history [get]
 func (sc StatsController) GetPlayerHistory(c *gin.Context) {
 	// Initialize user repository
 	userRepo := repos.NewUserRepository(database.DB)

@@ -34,7 +34,7 @@
 </script>
 
 <div class="flex flex-col gap-2">
-  {label}
+  <h4>{label}</h4>
   {#if userId == null}
     <Input bind:value={filter} placeholder="Filter..." autofocus />
     {#if filter.length === 0 && latestPlayers.length > 0}

@@ -20,10 +20,10 @@ jobs:
       uses: actions/setup-go@v4
 
     - name: Build
-      run: go build -v ./backend/...
+      run: go build -v ./...
 
     - name: Test
-      run: go test -v ./backend/test/... -race -coverprofile=coverage.out -covermode=atomic
+      run: go test -v ./... -race -coverprofile=coverage.out -covermode=atomic
       
     - name: Upload coverage to Codecov
       uses: codecov/codecov-action@v3

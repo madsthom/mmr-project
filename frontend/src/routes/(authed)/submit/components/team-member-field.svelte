@@ -79,11 +79,9 @@
           {/each}
         </ul>
       {:else}
-        <div>
-          <p>No users found</p>
-          <Button on:click={() => onCreateUser(filter)} variant="link">
-            Create new user with name: {filter}
-          </Button>
+        <div class="flex flex-col items-start gap-1">
+          <p class="text-sm">No users found</p>
+          <Button on:click={() => onCreateUser(filter)}>Add new user</Button>
         </div>
       {/if}
     {/if}

@@ -6,3 +6,5 @@ export * from './ViewMatchDetails';
 export * from './ViewMatchMMRCalculationDetails';
 export * from './ViewMatchMMRCalculationTeam';
 export * from './ViewMatchTeam';
+export * from './ViewPlayerHistoryDetails';
+export * from './ViewUserDetails';

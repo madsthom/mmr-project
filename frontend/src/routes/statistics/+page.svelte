@@ -1,28 +1,22 @@
 <script lang="ts">
   import PageTitle from '$lib/components/page-title.svelte';
   import {
-    LineChart,
-    ScaleTypes,
-    type ChartTabularData,
-    type LineChartOptions,
+      LineChart,
+      ScaleTypes,
+      type ChartTabularData,
+      type LineChartOptions,
   } from '@carbon/charts-svelte';
   import '@carbon/charts-svelte/styles.css';
+  import type { PageData } from './$types';
 
-  const data: ChartTabularData = [
-    {
-      player: 'thj',
-      date: '2021-01-01',
-      rating: 1000,
-    },
-    {
-      player: 'thj',
-      date: '2021-01-02',
-      rating: 1010,
-    },
-    { player: 'bhs', date: '2021-01-02', rating: 1100 },
-    { player: 'bhs', date: '2021-01-05', rating: 1090 },
-    { player: 'bhs', date: '2021-01-06', rating: 1095 },
-  ];
+  export let data: PageData;
+
+  const chartData: ChartTabularData = data.statistics?.map(stat => ({
+    player: stat.name,
+    date: stat.date,
+    rating: stat.mmr
+  })) ?? []
+  
   const options: LineChartOptions = {
     theme: 'g100',
     curve: 'curveMonotoneX',
@@ -47,4 +41,6 @@
 </script>
 
 <PageTitle>Statistics</PageTitle>
-<LineChart {data} {options} />
+<div class="container px-16">
+  <LineChart data={chartData} {options} />
+</div>

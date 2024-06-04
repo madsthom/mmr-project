@@ -57,10 +57,22 @@ func (sc StatsController) GetPlayerHistory(c *gin.Context) {
 	userRepo := repos.NewUserRepository(database.DB)
 
 	// Parse user ID from request as uint
-	userID, err := strconv.ParseUint(c.Param("userId"), 10, 64)
+	// If no user ID is provided, default to nil which will fetch all user histories
+	var userId *uint = nil
+	userIdParam := c.Param("userId")
+
+	if userIdParam != "" {
+		userIdParsed, err := strconv.ParseUint(userIdParam, 10, 64)
+		if err != nil {
+			c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": "Invalid user ID"})
+			return
+		}
+		userIdUint := uint(userIdParsed) // Convert userIdParsed to uint
+		userId = &userIdUint
+	}
 
 	// Fetch user history
-	entries, err := userRepo.ListPlayerHistory(uint(userID))
+	entries, err := userRepo.ListPlayerHistory(userId)
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch player history"})
 		return

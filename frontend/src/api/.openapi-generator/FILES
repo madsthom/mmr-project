@@ -1,6 +1,8 @@
 apis/AdminApi.ts
 apis/LeaderboardApi.ts
 apis/MatchesApi.ts
+apis/StatisticsApi.ts
+apis/UsersApi.ts
 apis/index.ts
 index.ts
 models/ReposLeaderboardEntry.ts
@@ -9,5 +11,7 @@ models/ViewMatchDetails.ts
 models/ViewMatchMMRCalculationDetails.ts
 models/ViewMatchMMRCalculationTeam.ts
 models/ViewMatchTeam.ts
+models/ViewPlayerHistoryDetails.ts
+models/ViewUserDetails.ts
 models/index.ts
 runtime.ts

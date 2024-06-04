@@ -45,7 +45,7 @@ func (sc StatsController) GetLeaderboard(c *gin.Context) {
 //	@Summary		Get player history
 //	@Description	Get player history including MMR and date
 //	@Tags 			Statistics
-//	@Param			userId	path	int	true	"User ID"
+//	@Param			userId	query	int	false	"User ID"
 //	@Param			start	query	string	false	"Start date"
 //	@Param			end		query	string	false	"End date"
 //	@Accept			json
@@ -59,7 +59,7 @@ func (sc StatsController) GetPlayerHistory(c *gin.Context) {
 	// Parse user ID from request as uint
 	// If no user ID is provided, default to nil which will fetch all user histories
 	var userId *uint = nil
-	userIdParam := c.Param("userId")
+	userIdParam := c.Query("userId")
 
 	if userIdParam != "" {
 		userIdParsed, err := strconv.ParseUint(userIdParam, 10, 64)

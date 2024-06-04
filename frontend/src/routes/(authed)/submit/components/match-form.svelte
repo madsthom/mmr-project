@@ -1,9 +1,11 @@
 <script lang="ts">
+  import { browser } from '$app/environment';
   import { goto } from '$app/navigation';
   import LoadingOverlay from '$lib/components/loading-overlay.svelte';
   import { MatchCard } from '$lib/components/match-card';
   import { Button } from '$lib/components/ui/button';
   import * as Form from '$lib/components/ui/form';
+  import { isPresent } from '$lib/util/isPresent';
   import { fade } from 'svelte/transition';
   import {
     superForm,
@@ -11,16 +13,61 @@
     type SuperValidated,
   } from 'sveltekit-superforms';
   import { zodClient } from 'sveltekit-superforms/adapters';
+  import type { ViewUserDetails } from '../../../../api';
   import type { MatchSchema } from '../match-schema';
   import { matchSchema } from '../match-schema';
   import MatchFormField from './match-form-field.svelte';
+  import TeamMemberField from './team-member-field.svelte';
 
   export let data: SuperValidated<Infer<MatchSchema>>;
+  export let users: ViewUserDetails[];
+
+  const localLatestStoragePlayers = browser
+    ? window.localStorage.getItem('latestPlayers')?.split(',') ?? [
+        '1',
+        '3',
+        '32',
+      ]
+    : null;
+
+  const latestPlayerIds =
+    localLatestStoragePlayers
+      ?.map((playerId) => parseInt(playerId))
+      .filter((playerId) => !isNaN(playerId)) ?? [];
 
   const form = superForm(data, {
     validators: zodClient(matchSchema),
     dataType: 'json',
     delayMs: 500,
+    onSubmit: (data) => {
+      // Fetch players entered into form
+      const enteredPlayerIds = [
+        data.formData.get('team1.member1'),
+        data.formData.get('team1.member2'),
+        data.formData.get('team2.member1'),
+        data.formData.get('team2.member2'),
+      ]
+        .filter(isPresent)
+        .map((id) => {
+          if (typeof id === 'string') {
+            const parsedInt = parseInt(id);
+            return isNaN(parsedInt) ? null : parsedInt;
+          }
+          return null;
+        })
+        .filter(isPresent);
+
+      const newLatestPlayerIds = [
+        ...enteredPlayerIds,
+        ...latestPlayerIds.filter((id) => !enteredPlayerIds.includes(id)),
+      ].slice(0, 10);
+      if (browser) {
+        window.localStorage.setItem(
+          'latestPlayers',
+          newLatestPlayerIds.join(',')
+        );
+      }
+    },
   });
 
   const { form: formData, enhance, submitting } = form;
@@ -50,49 +97,89 @@
     $formData.team2.score !== -1;
 
   $: allInitialsFilled =
-    $formData.team1.member1 != '' &&
-    $formData.team1.member2 != '' &&
-    $formData.team2.member1 != '' &&
-    $formData.team2.member2 != '';
+    $formData.team1.member1 != null &&
+    $formData.team1.member2 != null &&
+    $formData.team2.member1 != null &&
+    $formData.team2.member2 != null;
+
+  $: filledTeam1 =
+    $formData.team1.member1 != null && $formData.team1.member2 != null;
+
+  $: currentMatchUsers = [
+    $formData.team1.member1,
+    $formData.team1.member2,
+    $formData.team2.member1,
+    $formData.team2.member2,
+  ];
+
+  $: availableUsers = users.filter(
+    (user) => !currentMatchUsers.includes(user.userId)
+  );
 </script>
 
 <form method="post" use:enhance>
   <div class="flex flex-col gap-2">
-    <div id="players-step" class="flex flex-row gap-4">
-      <div class="flex flex-1 flex-col">
+    <input
+      type="hidden"
+      name="team1.member1"
+      bind:value={$formData.team1.member1}
+    />
+    <input
+      type="hidden"
+      name="team1.member2"
+      bind:value={$formData.team1.member2}
+    />
+    <input
+      type="hidden"
+      name="team2.member1"
+      bind:value={$formData.team2.member1}
+    />
+    <input
+      type="hidden"
+      name="team2.member2"
+      bind:value={$formData.team2.member2}
+    />
+    <div class="flex gap-3">
+      <div id="team1-step" class="flex flex-1 flex-col gap-4">
         <h3 class="mb-2 text-center text-2xl">Team 1</h3>
-        <MatchFormField
-          {form}
+        <TeamMemberField
+          bind:userId={$formData.team1.member1}
           label="You"
-          name="team1.member1"
-          bind:value={$formData.team1.member1}
-          placeholder="Enter initials"
+          {users}
+          {availableUsers}
+          {latestPlayerIds}
         />
-        <MatchFormField
-          {form}
-          label="Your teammate"
-          name="team1.member2"
-          bind:value={$formData.team1.member2}
-          placeholder="Enter initials"
-        />
+        {#if $formData.team1.member1 != null || $formData.team1.member2 != null}
+          <TeamMemberField
+            bind:userId={$formData.team1.member2}
+            label="Your teammate"
+            {users}
+            {availableUsers}
+            {latestPlayerIds}
+          />
+        {/if}
       </div>
       <div class="flex-s bg-border min-h-full w-px"></div>
-      <div class="flex-1">
+      <div id="team2-step" class="flex flex-1 flex-col gap-4">
         <h3 class="mb-2 text-center text-2xl">Team 2</h3>
-        <MatchFormField
-          {form}
-          label="Opponent 1"
-          name="team2.member1"
-          bind:value={$formData.team2.member1}
-          placeholder="Enter initials"
-        />
-        <MatchFormField
-          {form}
-          label="Opponent 2"
-          name="team2.member2"
-          bind:value={$formData.team2.member2}
-          placeholder="Enter initials"
-        />
+        {#if filledTeam1 || $formData.team2.member1 != null}
+          <TeamMemberField
+            bind:userId={$formData.team2.member1}
+            label="Opponent 1"
+            {users}
+            {availableUsers}
+            {latestPlayerIds}
+          />
+        {/if}
+        {#if $formData.team2.member1 != null || $formData.team2.member2 != null}
+          <TeamMemberField
+            bind:userId={$formData.team2.member2}
+            label="Opponent 2"
+            {users}
+            {availableUsers}
+            {latestPlayerIds}
+          />
+        {/if}
       </div>
     </div>
     {#if allInitialsFilled}
@@ -140,7 +227,7 @@
     {#if isMatchCardVisible}
       <div id="submit-step" class="flex flex-col gap-4" transition:fade>
         <h2 class="text-center text-4xl">Submit?</h2>
-        <MatchCard match={$formData} />
+        <MatchCard match={$formData} {users} />
         <Form.Button>Submit the match</Form.Button>
       </div>
     {/if}

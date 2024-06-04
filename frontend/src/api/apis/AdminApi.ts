@@ -24,13 +24,13 @@ export class AdminApi extends runtime.BaseAPI {
      * Start recalculating matches
      * Recalculate matches
      */
-    async adminRecalculatePostRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<string>> {
+    async v1AdminRecalculatePostRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<string>> {
         const queryParameters: any = {};
 
         const headerParameters: runtime.HTTPHeaders = {};
 
         const response = await this.request({
-            path: `/admin/recalculate`,
+            path: `/v1/admin/recalculate`,
             method: 'POST',
             headers: headerParameters,
             query: queryParameters,
@@ -47,8 +47,8 @@ export class AdminApi extends runtime.BaseAPI {
      * Start recalculating matches
      * Recalculate matches
      */
-    async adminRecalculatePost(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<string> {
-        const response = await this.adminRecalculatePostRaw(initOverrides);
+    async v1AdminRecalculatePost(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<string> {
+        const response = await this.v1AdminRecalculatePostRaw(initOverrides);
         return await response.value();
     }
 

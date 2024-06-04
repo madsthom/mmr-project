@@ -10,7 +10,78 @@ import (
 
 type UsersController struct{}
 
-//	@BasePath	/api/v1/users
+// ListUsers godoc
+//
+//	@Summary		List users
+//	@Description	Lists all users
+//	@Tags 			Users
+//	@Produce		json
+//	@Success		200	{object}	[]view.UserDetails
+//	@Router			/v1/users [get]
+func (uc UsersController) ListUsers(c *gin.Context) {
+	// Initialize user repository
+	userRepo := repos.NewUserRepository(database.DB)
+
+	// Fetch all users
+	users, err := userRepo.ListUsers()
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch users"})
+		return
+	}
+
+	if len(users) == 0 {
+		c.JSON(http.StatusOK, []view.UserDetails{})
+		return
+	}
+
+	var userDetails []view.UserDetails
+
+	for _, user := range users {
+		userDetails = append(userDetails, view.UserDetailsViewFromModel(*user))
+	}
+
+	c.JSON(http.StatusOK, userDetails)
+}
+
+// CreateUser godoc
+//
+//	@Summary		Create user
+//	@Description	Creates a new user
+//	@Tags 			Users
+//	@Param			user	body	view.CreateUser	true	"User data"
+//	@Accept			json
+//	@Produce		json
+//	@Success		200	{object}	view.UserDetails
+//	@Router			/v1/users [post]
+func (uc UsersController) CreateUser(c *gin.Context) {
+	var json view.CreateUser
+	err := c.ShouldBind(&json)
+
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	// Initialize user repository
+	userRepo := repos.NewUserRepository(database.DB)
+
+	// Check if user already exists
+	_, err = userRepo.GetByName(json.Name)
+	if err == nil {
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": "User already exists"})
+		return
+	}
+
+	// Create user
+	user, err := userRepo.CreateByName(json.Name, json.DisplayName)
+
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Failed to create user"})
+		return
+	}
+
+	c.JSON(http.StatusOK, view.UserDetailsViewFromModel(*user))
+}
 
 // SearchUsers godoc
 //
@@ -20,7 +91,7 @@ type UsersController struct{}
 //	@Param			query	query	string	true	"Name to search for"
 //	@Produce		json
 //	@Success		200	{object}	[]view.UserDetails
-//	@Router			/search [get]
+//	@Router			/v1/users/search [get]
 func (uc UsersController) SearchUsers(c *gin.Context) {
 	// Initialize user repository
 	userRepo := repos.NewUserRepository(database.DB)

@@ -15,7 +15,7 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
-        "/admin/recalculate": {
+        "/v1/admin/recalculate": {
             "post": {
                 "description": "Start recalculating matches",
                 "consumes": [
@@ -38,7 +38,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/mmr/matches": {
+        "/v1/mmr/matches": {
             "get": {
                 "description": "Get all matches",
                 "produces": [
@@ -107,39 +107,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/search": {
-            "get": {
-                "description": "Searches users by name",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Users"
-                ],
-                "summary": "Search users",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Name to search for",
-                        "name": "query",
-                        "in": "query",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/view.UserDetails"
-                            }
-                        }
-                    }
-                }
-            }
-        },
-        "/stats/leaderboard": {
+        "/v1/stats/leaderboard": {
             "get": {
                 "description": "Get leaderboard stats including wins, loses, and MMR of users",
                 "consumes": [
@@ -165,7 +133,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/stats/player-history": {
+        "/v1/stats/player-history": {
             "get": {
                 "description": "Get player history including MMR and date",
                 "consumes": [
@@ -210,6 +178,162 @@ const docTemplate = `{
                     }
                 }
             }
+        },
+        "/v1/users": {
+            "get": {
+                "description": "Lists all users",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Users"
+                ],
+                "summary": "List users",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/view.UserDetails"
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "Creates a new user",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Users"
+                ],
+                "summary": "Create user",
+                "parameters": [
+                    {
+                        "description": "User data",
+                        "name": "user",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/view.CreateUser"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/view.UserDetails"
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/users/search": {
+            "get": {
+                "description": "Searches users by name",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Users"
+                ],
+                "summary": "Search users",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Name to search for",
+                        "name": "query",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/view.UserDetails"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/v2/mmr/matches": {
+            "get": {
+                "description": "Get all matches",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Matches"
+                ],
+                "summary": "Get matches",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Limit",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Offset",
+                        "name": "offset",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/view.MatchDetailsV2"
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "Submit a match for MMR calculation",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Matches"
+                ],
+                "summary": "Submit a match",
+                "parameters": [
+                    {
+                        "description": "Match object",
+                        "name": "match",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/view.MatchV2"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "match submitted",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
         }
     },
     "definitions": {
@@ -227,6 +351,20 @@ const docTemplate = `{
                 },
                 "wins": {
                     "type": "integer"
+                }
+            }
+        },
+        "view.CreateUser": {
+            "type": "object",
+            "required": [
+                "name"
+            ],
+            "properties": {
+                "displayName": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
                 }
             }
         },
@@ -264,6 +402,28 @@ const docTemplate = `{
                 },
                 "team2": {
                     "$ref": "#/definitions/view.MatchTeam"
+                }
+            }
+        },
+        "view.MatchDetailsV2": {
+            "type": "object",
+            "required": [
+                "date",
+                "team1",
+                "team2"
+            ],
+            "properties": {
+                "date": {
+                    "type": "string"
+                },
+                "mmrCalculations": {
+                    "$ref": "#/definitions/view.MatchMMRCalculationDetails"
+                },
+                "team1": {
+                    "$ref": "#/definitions/view.MatchTeamV2"
+                },
+                "team2": {
+                    "$ref": "#/definitions/view.MatchTeamV2"
                 }
             }
         },
@@ -316,6 +476,40 @@ const docTemplate = `{
                 }
             }
         },
+        "view.MatchTeamV2": {
+            "type": "object",
+            "required": [
+                "member1",
+                "member2",
+                "score"
+            ],
+            "properties": {
+                "member1": {
+                    "type": "integer"
+                },
+                "member2": {
+                    "type": "integer"
+                },
+                "score": {
+                    "type": "integer"
+                }
+            }
+        },
+        "view.MatchV2": {
+            "type": "object",
+            "required": [
+                "team1",
+                "team2"
+            ],
+            "properties": {
+                "team1": {
+                    "$ref": "#/definitions/view.MatchTeamV2"
+                },
+                "team2": {
+                    "$ref": "#/definitions/view.MatchTeamV2"
+                }
+            }
+        },
         "view.PlayerHistoryDetails": {
             "type": "object",
             "required": [
@@ -364,7 +558,7 @@ const docTemplate = `{
 var SwaggerInfo = &swag.Spec{
 	Version:          "",
 	Host:             "",
-	BasePath:         "",
+	BasePath:         "/api",
 	Schemes:          []string{},
 	Title:            "",
 	Description:      "",

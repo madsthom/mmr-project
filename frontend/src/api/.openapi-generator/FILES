@@ -6,11 +6,15 @@ apis/UsersApi.ts
 apis/index.ts
 index.ts
 models/ReposLeaderboardEntry.ts
+models/ViewCreateUser.ts
 models/ViewMatch.ts
 models/ViewMatchDetails.ts
+models/ViewMatchDetailsV2.ts
 models/ViewMatchMMRCalculationDetails.ts
 models/ViewMatchMMRCalculationTeam.ts
 models/ViewMatchTeam.ts
+models/ViewMatchTeamV2.ts
+models/ViewMatchV2.ts
 models/ViewPlayerHistoryDetails.ts
 models/ViewUserDetails.ts
 models/index.ts

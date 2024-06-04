@@ -11,8 +11,6 @@ import (
 
 type AdminController struct{}
 
-//	@BasePath	/api/v1
-
 // RecalculateMatches godoc
 //
 //	@Summary		Recalculate matches
@@ -21,7 +19,7 @@ type AdminController struct{}
 //	@Accept			json
 //	@Produce		json
 //	@Success		200	{string}	string	"recalculation done"
-//	@Router			/admin/recalculate [post]
+//	@Router			/v1/admin/recalculate [post]
 func (m AdminController) RecalculateMatches(c *gin.Context) {
 	matchService := new(services.MatchService)
 

@@ -2,7 +2,6 @@ package server
 
 import (
 	"mmr/backend/controllers"
-	"mmr/backend/docs"
 	"mmr/backend/middleware"
 	"net/http"
 
@@ -16,7 +15,6 @@ func NewRouter() *gin.Engine {
 	router.Use(gin.Logger())
 	router.Use(gin.Recovery())
 
-	docs.SwaggerInfo.BasePath = "/api/v1"
 	v1 := router.Group("/api/v1")
 	{
 		mg := v1.Group("/mmr", middleware.RequireAuth)
@@ -34,12 +32,24 @@ func NewRouter() *gin.Engine {
 		u := v1.Group("/users")
 		{
 			users := new(controllers.UsersController)
+			u.GET("", users.ListUsers)
+			u.POST("", users.CreateUser)
 			u.GET("/search", users.SearchUsers)
 		}
 		a := v1.Group("/admin", middleware.RequireAdminAuth)
 		{
 			admin := new(controllers.AdminController)
 			a.POST("/recalculate", admin.RecalculateMatches)
+		}
+	}
+
+	v2 := router.Group("/api/v2")
+	{
+		mg := v2.Group("/mmr", middleware.RequireAuth)
+		{
+			match := new(controllers.MatchController)
+			mg.GET("/matches", match.GetMatchesV2)
+			mg.POST("/matches", match.SubmitMatchV2)
 		}
 	}
 

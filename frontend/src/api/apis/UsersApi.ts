@@ -15,14 +15,21 @@
 
 import * as runtime from '../runtime';
 import type {
+  ViewCreateUser,
   ViewUserDetails,
 } from '../models/index';
 import {
+    ViewCreateUserFromJSON,
+    ViewCreateUserToJSON,
     ViewUserDetailsFromJSON,
     ViewUserDetailsToJSON,
 } from '../models/index';
 
-export interface SearchGetRequest {
+export interface V1UsersPostRequest {
+    user: ViewCreateUser;
+}
+
+export interface V1UsersSearchGetRequest {
     query: string;
 }
 
@@ -32,14 +39,80 @@ export interface SearchGetRequest {
 export class UsersApi extends runtime.BaseAPI {
 
     /**
+     * Lists all users
+     * List users
+     */
+    async v1UsersGetRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<ViewUserDetails>>> {
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        const response = await this.request({
+            path: `/v1/users`,
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => jsonValue.map(ViewUserDetailsFromJSON));
+    }
+
+    /**
+     * Lists all users
+     * List users
+     */
+    async v1UsersGet(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<ViewUserDetails>> {
+        const response = await this.v1UsersGetRaw(initOverrides);
+        return await response.value();
+    }
+
+    /**
+     * Creates a new user
+     * Create user
+     */
+    async v1UsersPostRaw(requestParameters: V1UsersPostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<ViewUserDetails>> {
+        if (requestParameters['user'] == null) {
+            throw new runtime.RequiredError(
+                'user',
+                'Required parameter "user" was null or undefined when calling v1UsersPost().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        headerParameters['Content-Type'] = 'application/json';
+
+        const response = await this.request({
+            path: `/v1/users`,
+            method: 'POST',
+            headers: headerParameters,
+            query: queryParameters,
+            body: ViewCreateUserToJSON(requestParameters['user']),
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => ViewUserDetailsFromJSON(jsonValue));
+    }
+
+    /**
+     * Creates a new user
+     * Create user
+     */
+    async v1UsersPost(requestParameters: V1UsersPostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<ViewUserDetails> {
+        const response = await this.v1UsersPostRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
      * Searches users by name
      * Search users
      */
-    async searchGetRaw(requestParameters: SearchGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<ViewUserDetails>>> {
+    async v1UsersSearchGetRaw(requestParameters: V1UsersSearchGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<ViewUserDetails>>> {
         if (requestParameters['query'] == null) {
             throw new runtime.RequiredError(
                 'query',
-                'Required parameter "query" was null or undefined when calling searchGet().'
+                'Required parameter "query" was null or undefined when calling v1UsersSearchGet().'
             );
         }
 
@@ -52,7 +125,7 @@ export class UsersApi extends runtime.BaseAPI {
         const headerParameters: runtime.HTTPHeaders = {};
 
         const response = await this.request({
-            path: `/search`,
+            path: `/v1/users/search`,
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
@@ -65,8 +138,8 @@ export class UsersApi extends runtime.BaseAPI {
      * Searches users by name
      * Search users
      */
-    async searchGet(requestParameters: SearchGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<ViewUserDetails>> {
-        const response = await this.searchGetRaw(requestParameters, initOverrides);
+    async v1UsersSearchGet(requestParameters: V1UsersSearchGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<ViewUserDetails>> {
+        const response = await this.v1UsersSearchGetRaw(requestParameters, initOverrides);
         return await response.value();
     }
 

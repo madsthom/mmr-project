@@ -22,7 +22,7 @@ import {
     ViewPlayerHistoryDetailsToJSON,
 } from '../models/index';
 
-export interface StatsPlayerHistoryGetRequest {
+export interface V1StatsPlayerHistoryGetRequest {
     userId?: number;
     start?: string;
     end?: string;
@@ -37,7 +37,7 @@ export class StatisticsApi extends runtime.BaseAPI {
      * Get player history including MMR and date
      * Get player history
      */
-    async statsPlayerHistoryGetRaw(requestParameters: StatsPlayerHistoryGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<ViewPlayerHistoryDetails>>> {
+    async v1StatsPlayerHistoryGetRaw(requestParameters: V1StatsPlayerHistoryGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<ViewPlayerHistoryDetails>>> {
         const queryParameters: any = {};
 
         if (requestParameters['userId'] != null) {
@@ -55,7 +55,7 @@ export class StatisticsApi extends runtime.BaseAPI {
         const headerParameters: runtime.HTTPHeaders = {};
 
         const response = await this.request({
-            path: `/stats/player-history`,
+            path: `/v1/stats/player-history`,
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
@@ -68,8 +68,8 @@ export class StatisticsApi extends runtime.BaseAPI {
      * Get player history including MMR and date
      * Get player history
      */
-    async statsPlayerHistoryGet(requestParameters: StatsPlayerHistoryGetRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<ViewPlayerHistoryDetails>> {
-        const response = await this.statsPlayerHistoryGetRaw(requestParameters, initOverrides);
+    async v1StatsPlayerHistoryGet(requestParameters: V1StatsPlayerHistoryGetRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<ViewPlayerHistoryDetails>> {
+        const response = await this.v1StatsPlayerHistoryGetRaw(requestParameters, initOverrides);
         return await response.value();
     }
 

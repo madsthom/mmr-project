@@ -1,3 +1,4 @@
+basePath: /api
 definitions:
   repos.LeaderboardEntry:
     properties:
@@ -9,6 +10,15 @@ definitions:
         type: string
       wins:
         type: integer
+    type: object
+  view.CreateUser:
+    properties:
+      displayName:
+        type: string
+      name:
+        type: string
+    required:
+    - name
     type: object
   view.Match:
     properties:
@@ -30,6 +40,21 @@ definitions:
         $ref: '#/definitions/view.MatchTeam'
       team2:
         $ref: '#/definitions/view.MatchTeam'
+    required:
+    - date
+    - team1
+    - team2
+    type: object
+  view.MatchDetailsV2:
+    properties:
+      date:
+        type: string
+      mmrCalculations:
+        $ref: '#/definitions/view.MatchMMRCalculationDetails'
+      team1:
+        $ref: '#/definitions/view.MatchTeamV2'
+      team2:
+        $ref: '#/definitions/view.MatchTeamV2'
     required:
     - date
     - team1
@@ -68,6 +93,29 @@ definitions:
     - member2
     - score
     type: object
+  view.MatchTeamV2:
+    properties:
+      member1:
+        type: integer
+      member2:
+        type: integer
+      score:
+        type: integer
+    required:
+    - member1
+    - member2
+    - score
+    type: object
+  view.MatchV2:
+    properties:
+      team1:
+        $ref: '#/definitions/view.MatchTeamV2'
+      team2:
+        $ref: '#/definitions/view.MatchTeamV2'
+    required:
+    - team1
+    - team2
+    type: object
   view.PlayerHistoryDetails:
     properties:
       date:
@@ -99,7 +147,7 @@ definitions:
 info:
   contact: {}
 paths:
-  /admin/recalculate:
+  /v1/admin/recalculate:
     post:
       consumes:
       - application/json
@@ -114,7 +162,7 @@ paths:
       summary: Recalculate matches
       tags:
       - Admin
-  /mmr/matches:
+  /v1/mmr/matches:
     get:
       description: Get all matches
       parameters:
@@ -159,28 +207,7 @@ paths:
       summary: Submit a match
       tags:
       - Matches
-  /search:
-    get:
-      description: Searches users by name
-      parameters:
-      - description: Name to search for
-        in: query
-        name: query
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            items:
-              $ref: '#/definitions/view.UserDetails'
-            type: array
-      summary: Search users
-      tags:
-      - Users
-  /stats/leaderboard:
+  /v1/stats/leaderboard:
     get:
       consumes:
       - application/json
@@ -197,7 +224,7 @@ paths:
       summary: Get leaderboard stats
       tags:
       - Leaderboard
-  /stats/player-history:
+  /v1/stats/player-history:
     get:
       consumes:
       - application/json
@@ -227,4 +254,106 @@ paths:
       summary: Get player history
       tags:
       - Statistics
+  /v1/users:
+    get:
+      description: Lists all users
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/view.UserDetails'
+            type: array
+      summary: List users
+      tags:
+      - Users
+    post:
+      consumes:
+      - application/json
+      description: Creates a new user
+      parameters:
+      - description: User data
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/view.CreateUser'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/view.UserDetails'
+      summary: Create user
+      tags:
+      - Users
+  /v1/users/search:
+    get:
+      description: Searches users by name
+      parameters:
+      - description: Name to search for
+        in: query
+        name: query
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/view.UserDetails'
+            type: array
+      summary: Search users
+      tags:
+      - Users
+  /v2/mmr/matches:
+    get:
+      description: Get all matches
+      parameters:
+      - description: Limit
+        in: query
+        name: limit
+        type: integer
+      - description: Offset
+        in: query
+        name: offset
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/view.MatchDetailsV2'
+            type: array
+      summary: Get matches
+      tags:
+      - Matches
+    post:
+      consumes:
+      - application/json
+      description: Submit a match for MMR calculation
+      parameters:
+      - description: Match object
+        in: body
+        name: match
+        required: true
+        schema:
+          $ref: '#/definitions/view.MatchV2'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: match submitted
+          schema:
+            type: string
+      summary: Submit a match
+      tags:
+      - Matches
 swagger: "2.0"

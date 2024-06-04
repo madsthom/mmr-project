@@ -23,11 +23,7 @@
   export let users: ViewUserDetails[];
 
   const localLatestStoragePlayers = browser
-    ? window.localStorage.getItem('latestPlayers')?.split(',') ?? [
-        '1',
-        '3',
-        '32',
-      ]
+    ? window.localStorage.getItem('latestPlayers')?.split(',')
     : null;
 
   const latestPlayerIds =

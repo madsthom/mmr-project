@@ -11,6 +11,15 @@ definitions:
       wins:
         type: integer
     type: object
+  view.CreateUser:
+    properties:
+      displayName:
+        type: string
+      name:
+        type: string
+    required:
+    - name
+    type: object
   view.Match:
     properties:
       team1:
@@ -259,6 +268,27 @@ paths:
               $ref: '#/definitions/view.UserDetails'
             type: array
       summary: List users
+      tags:
+      - Users
+    post:
+      consumes:
+      - application/json
+      description: Creates a new user
+      parameters:
+      - description: User data
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/view.CreateUser'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/view.UserDetails'
+      summary: Create user
       tags:
       - Users
   /v1/users/search:

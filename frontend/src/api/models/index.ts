@@ -1,6 +1,7 @@
 /* tslint:disable */
 /* eslint-disable */
 export * from './ReposLeaderboardEntry';
+export * from './ViewCreateUser';
 export * from './ViewMatch';
 export * from './ViewMatchDetails';
 export * from './ViewMatchDetailsV2';

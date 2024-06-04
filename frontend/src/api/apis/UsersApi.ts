@@ -15,12 +15,19 @@
 
 import * as runtime from '../runtime';
 import type {
+  ViewCreateUser,
   ViewUserDetails,
 } from '../models/index';
 import {
+    ViewCreateUserFromJSON,
+    ViewCreateUserToJSON,
     ViewUserDetailsFromJSON,
     ViewUserDetailsToJSON,
 } from '../models/index';
+
+export interface V1UsersPostRequest {
+    user: ViewCreateUser;
+}
 
 export interface V1UsersSearchGetRequest {
     query: string;
@@ -56,6 +63,44 @@ export class UsersApi extends runtime.BaseAPI {
      */
     async v1UsersGet(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<ViewUserDetails>> {
         const response = await this.v1UsersGetRaw(initOverrides);
+        return await response.value();
+    }
+
+    /**
+     * Creates a new user
+     * Create user
+     */
+    async v1UsersPostRaw(requestParameters: V1UsersPostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<ViewUserDetails>> {
+        if (requestParameters['user'] == null) {
+            throw new runtime.RequiredError(
+                'user',
+                'Required parameter "user" was null or undefined when calling v1UsersPost().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        headerParameters['Content-Type'] = 'application/json';
+
+        const response = await this.request({
+            path: `/v1/users`,
+            method: 'POST',
+            headers: headerParameters,
+            query: queryParameters,
+            body: ViewCreateUserToJSON(requestParameters['user']),
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => ViewUserDetailsFromJSON(jsonValue));
+    }
+
+    /**
+     * Creates a new user
+     * Create user
+     */
+    async v1UsersPost(requestParameters: V1UsersPostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<ViewUserDetails> {
+        const response = await this.v1UsersPostRaw(requestParameters, initOverrides);
         return await response.value();
     }
 

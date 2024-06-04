@@ -6,6 +6,7 @@ apis/UsersApi.ts
 apis/index.ts
 index.ts
 models/ReposLeaderboardEntry.ts
+models/ViewCreateUser.ts
 models/ViewMatch.ts
 models/ViewMatchDetails.ts
 models/ViewMatchDetailsV2.ts

@@ -3,8 +3,8 @@ import type { PageServerLoad } from './$types';
 
 export const load: PageServerLoad = async ({ locals: { apiClient } }) => {
   try {
-    const entries = await apiClient.leaderboardApi.statsLeaderboardGet();
-    const matches = await apiClient.mmrApi.mmrMatchesGet({
+    const entries = await apiClient.leaderboardApi.v1StatsLeaderboardGet();
+    const matches = await apiClient.mmrApi.v1MmrMatchesGet({
       limit: 5,
       offset: 0,
     });

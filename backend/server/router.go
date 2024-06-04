@@ -27,7 +27,7 @@ func NewRouter() *gin.Engine {
 		{
 			stats := new(controllers.StatsController)
 			s.GET("/leaderboard", stats.GetLeaderboard)
-			s.GET("/player-history/:userId", stats.GetPlayerHistory)
+			s.GET("/player-history", stats.GetPlayerHistory)
 		}
 		u := v1.Group("/users")
 		{

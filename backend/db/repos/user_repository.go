@@ -20,7 +20,7 @@ type IUserRepository interface {
 	StoreRanking(matchID uint, userID uint, mu float64, sigma float64, mmr int) (*models.PlayerHistory, error)
 	StoreMatchMMRCalculation(matchID uint, player1Delta int, player2Delta int, player3Delta int, player4Delta int) (*models.MMRCalculation, error)
 	GetLatestPlayerHistory(playerID uint) (*models.PlayerHistory, error)
-	ListPlayerHistory(playerID uint) ([]*models.PlayerHistory, error)
+	ListPlayerHistory(playerID *uint) ([]*models.PlayerHistory, error)
 	ClearPlayerHistories()
 }
 
@@ -131,14 +131,18 @@ func (ur *UserRepository) GetLatestPlayerHistory(playerID uint) (*models.PlayerH
 	return playerHistory, nil
 }
 
-func (ur *UserRepository) ListPlayerHistory(playerID uint) ([]*models.PlayerHistory, error) {
+func (ur *UserRepository) ListPlayerHistory(playerID *uint) ([]*models.PlayerHistory, error) {
 	var playerHistories []*models.PlayerHistory
-	err := ur.db.Model(&models.PlayerHistory{}).
+	query := ur.db.Model(&models.PlayerHistory{}).
 		Preload("User").
 		Joins("Match").
-		Where("user_id = ?", playerID).
-		Order("\"Match\".created_at asc").
-		Find(&playerHistories).Error
+		Order("\"Match\".created_at asc")
+
+	if playerID != nil {
+		query = query.Where("user_id = ?", *playerID)
+	}
+
+	err := query.Find(&playerHistories).Error
 	if err != nil {
 		return nil, err
 	}

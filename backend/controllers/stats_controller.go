@@ -43,22 +43,34 @@ func (sc StatsController) GetLeaderboard(c *gin.Context) {
 //	@Summary		Get player history
 //	@Description	Get player history including MMR and date
 //	@Tags 			Statistics
-//	@Param			userId	path	int	true	"User ID"
+//	@Param			userId	query	int	false	"User ID"
 //	@Param			start	query	string	false	"Start date"
 //	@Param			end		query	string	false	"End date"
 //	@Accept			json
 //	@Produce		json
 //	@Success		200	{array}	view.PlayerHistoryDetails
-//	@Router			/v1/stats/player-history/{userId} [get]
+//	@Router			/v1/stats/player-history [get]
 func (sc StatsController) GetPlayerHistory(c *gin.Context) {
 	// Initialize user repository
 	userRepo := repos.NewUserRepository(database.DB)
 
 	// Parse user ID from request as uint
-	userID, err := strconv.ParseUint(c.Param("userId"), 10, 64)
+	// If no user ID is provided, default to nil which will fetch all user histories
+	var userId *uint = nil
+	userIdParam := c.Query("userId")
+
+	if userIdParam != "" {
+		userIdParsed, err := strconv.ParseUint(userIdParam, 10, 64)
+		if err != nil {
+			c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": "Invalid user ID"})
+			return
+		}
+		userIdUint := uint(userIdParsed) // Convert userIdParsed to uint
+		userId = &userIdUint
+	}
 
 	// Fetch user history
-	entries, err := userRepo.ListPlayerHistory(uint(userID))
+	entries, err := userRepo.ListPlayerHistory(userId)
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch player history"})
 		return

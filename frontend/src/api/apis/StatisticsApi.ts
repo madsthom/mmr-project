@@ -22,8 +22,8 @@ import {
     ViewPlayerHistoryDetailsToJSON,
 } from '../models/index';
 
-export interface V1StatsPlayerHistoryUserIdGetRequest {
-    userId: number;
+export interface V1StatsPlayerHistoryGetRequest {
+    userId?: number;
     start?: string;
     end?: string;
 }
@@ -37,15 +37,12 @@ export class StatisticsApi extends runtime.BaseAPI {
      * Get player history including MMR and date
      * Get player history
      */
-    async v1StatsPlayerHistoryUserIdGetRaw(requestParameters: V1StatsPlayerHistoryUserIdGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<ViewPlayerHistoryDetails>>> {
-        if (requestParameters['userId'] == null) {
-            throw new runtime.RequiredError(
-                'userId',
-                'Required parameter "userId" was null or undefined when calling v1StatsPlayerHistoryUserIdGet().'
-            );
-        }
-
+    async v1StatsPlayerHistoryGetRaw(requestParameters: V1StatsPlayerHistoryGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<ViewPlayerHistoryDetails>>> {
         const queryParameters: any = {};
+
+        if (requestParameters['userId'] != null) {
+            queryParameters['userId'] = requestParameters['userId'];
+        }
 
         if (requestParameters['start'] != null) {
             queryParameters['start'] = requestParameters['start'];
@@ -58,7 +55,7 @@ export class StatisticsApi extends runtime.BaseAPI {
         const headerParameters: runtime.HTTPHeaders = {};
 
         const response = await this.request({
-            path: `/v1/stats/player-history/{userId}`.replace(`{${"userId"}}`, encodeURIComponent(String(requestParameters['userId']))),
+            path: `/v1/stats/player-history`,
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
@@ -71,8 +68,8 @@ export class StatisticsApi extends runtime.BaseAPI {
      * Get player history including MMR and date
      * Get player history
      */
-    async v1StatsPlayerHistoryUserIdGet(requestParameters: V1StatsPlayerHistoryUserIdGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<ViewPlayerHistoryDetails>> {
-        const response = await this.v1StatsPlayerHistoryUserIdGetRaw(requestParameters, initOverrides);
+    async v1StatsPlayerHistoryGet(requestParameters: V1StatsPlayerHistoryGetRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<ViewPlayerHistoryDetails>> {
+        const response = await this.v1StatsPlayerHistoryGetRaw(requestParameters, initOverrides);
         return await response.value();
     }
 

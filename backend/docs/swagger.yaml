@@ -224,16 +224,15 @@ paths:
       summary: Get leaderboard stats
       tags:
       - Leaderboard
-  /v1/stats/player-history/{userId}:
+  /v1/stats/player-history:
     get:
       consumes:
       - application/json
       description: Get player history including MMR and date
       parameters:
       - description: User ID
-        in: path
+        in: query
         name: userId
-        required: true
         type: integer
       - description: Start date
         in: query

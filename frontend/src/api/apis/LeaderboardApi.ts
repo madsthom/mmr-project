@@ -31,13 +31,13 @@ export class LeaderboardApi extends runtime.BaseAPI {
      * Get leaderboard stats including wins, loses, and MMR of users
      * Get leaderboard stats
      */
-    async statsLeaderboardGetRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<ReposLeaderboardEntry>>> {
+    async v1StatsLeaderboardGetRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<ReposLeaderboardEntry>>> {
         const queryParameters: any = {};
 
         const headerParameters: runtime.HTTPHeaders = {};
 
         const response = await this.request({
-            path: `/stats/leaderboard`,
+            path: `/v1/stats/leaderboard`,
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
@@ -50,8 +50,8 @@ export class LeaderboardApi extends runtime.BaseAPI {
      * Get leaderboard stats including wins, loses, and MMR of users
      * Get leaderboard stats
      */
-    async statsLeaderboardGet(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<ReposLeaderboardEntry>> {
-        const response = await this.statsLeaderboardGetRaw(initOverrides);
+    async v1StatsLeaderboardGet(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<ReposLeaderboardEntry>> {
+        const response = await this.v1StatsLeaderboardGetRaw(initOverrides);
         return await response.value();
     }
 

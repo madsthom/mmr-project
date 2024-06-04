@@ -18,8 +18,11 @@
 
   let filter = '';
 
-  $: filteredUsers = users.filter((u) =>
-    u.name.toLowerCase().includes(filter.toLowerCase())
+  $: filteredUsers = users.filter(
+    (u) =>
+      u.name.toLowerCase().includes(filter.toLowerCase()) ||
+      (u.displayName != null &&
+        u.displayName.toLowerCase().includes(filter.toLowerCase()))
   );
   $: user = users.find((u) => u.userId === userId);
   $: latestPlayers = latestPlayerIds

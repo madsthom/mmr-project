@@ -134,6 +134,30 @@
   $: availableUsers = users.filter(
     (user) => !currentMatchUsers.includes(user.userId)
   );
+
+  $: onCreateUser = (suggested: string, inputName: string) => {
+    const redirectToParams = [
+      $formData.team1.member1 != null
+        ? `player1_id=${$formData.team1.member1}`
+        : null,
+      $formData.team1.member2 != null
+        ? `player2_id=${$formData.team1.member2}`
+        : null,
+      $formData.team2.member1 != null
+        ? `player3_id=${$formData.team2.member1}`
+        : null,
+      $formData.team2.member2 != null
+        ? `player4_id=${$formData.team2.member2}`
+        : null,
+    ]
+      .filter(isPresent)
+      .join('&');
+    const redirectTo = `/submit?${redirectToParams}&${inputName}=`;
+    const nameParam = suggested !== '' ? `&name=${suggested}` : '';
+    goto(
+      `/users/new?redirect_to=${encodeURIComponent(redirectTo)}${nameParam}`
+    );
+  };
 </script>
 
 <form method="post" use:enhance>
@@ -167,6 +191,7 @@
           {users}
           {availableUsers}
           {latestPlayerIds}
+          onCreateUser={(suggested) => onCreateUser(suggested, 'player1_id')}
         />
         {#if $formData.team1.member1 != null || $formData.team1.member2 != null}
           <TeamMemberField
@@ -175,6 +200,7 @@
             {users}
             {availableUsers}
             {latestPlayerIds}
+            onCreateUser={(suggested) => onCreateUser(suggested, 'player2_id')}
           />
         {/if}
       </div>
@@ -188,6 +214,7 @@
             {users}
             {availableUsers}
             {latestPlayerIds}
+            onCreateUser={(suggested) => onCreateUser(suggested, 'player3_id')}
           />
         {/if}
         {#if $formData.team2.member1 != null || $formData.team2.member2 != null}
@@ -197,6 +224,7 @@
             {users}
             {availableUsers}
             {latestPlayerIds}
+            onCreateUser={(suggested) => onCreateUser(suggested, 'player4_id')}
           />
         {/if}
       </div>

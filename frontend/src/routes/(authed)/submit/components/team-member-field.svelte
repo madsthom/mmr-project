@@ -12,6 +12,8 @@
   export let latestPlayerIds: number[];
   export let availableUsers: ViewUserDetails[] = [];
 
+  export let onCreateUser: (suggested: string) => void;
+
   const resetValue = () => {
     userId = null;
   };
@@ -54,8 +56,9 @@
       </ul>
     {/if}
     {#if filter.length > 1}
-      <ul>
-        {#if filteredUsers.length > 0}{#each filteredUsers as user}
+      {#if filteredUsers.length > 0}
+        <ul>
+          {#each filteredUsers as user}
             <li>
               <button
                 class="border-input hover:border-primary focus-visible:ring-ring ring-offset-background flex w-full flex-col gap-1 rounded-md border px-3 py-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2"
@@ -74,10 +77,15 @@
               </button>
             </li>
           {/each}
-        {:else}
-          <li>No users found</li>
-        {/if}
-      </ul>
+        </ul>
+      {:else}
+        <div>
+          <p>No users found</p>
+          <Button on:click={() => onCreateUser(filter)} variant="link">
+            Create new user with name: {filter}
+          </Button>
+        </div>
+      {/if}
     {/if}
   {:else}
     <div

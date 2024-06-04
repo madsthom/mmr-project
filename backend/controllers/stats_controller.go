@@ -13,8 +13,6 @@ import (
 
 type StatsController struct{}
 
-//	@BasePath	/api/v1
-
 // GetLeaderboard godoc
 //
 //	@Summary		Get leaderboard stats
@@ -23,7 +21,7 @@ type StatsController struct{}
 //	@Accept			json
 //	@Produce		json
 //	@Success		200	{array}	repos.LeaderboardEntry
-//	@Router			/stats/leaderboard [get]
+//	@Router			/v1/stats/leaderboard [get]
 func (sc StatsController) GetLeaderboard(c *gin.Context) {
 	// Initialize leaderboard repository
 	leaderboardRepo := repos.NewLeaderboardRepository(database.DB)
@@ -51,7 +49,7 @@ func (sc StatsController) GetLeaderboard(c *gin.Context) {
 //	@Accept			json
 //	@Produce		json
 //	@Success		200	{array}	view.PlayerHistoryDetails
-//	@Router			/stats/player-history/{userId} [get]
+//	@Router			/v1/stats/player-history/{userId} [get]
 func (sc StatsController) GetPlayerHistory(c *gin.Context) {
 	// Initialize user repository
 	userRepo := repos.NewUserRepository(database.DB)

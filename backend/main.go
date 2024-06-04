@@ -10,6 +10,8 @@ import (
 	server "mmr/backend/server"
 )
 
+// @BasePath	/api
+
 func main() {
 	config.LoadEnv()
 	database.Init()

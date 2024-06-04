@@ -3,7 +3,7 @@ import type { PageServerLoad } from './$types';
 
 export const load: PageServerLoad = async ({ locals: { apiClient } }) => {
   try {
-    const statistics = await apiClient.statisticsApi.statsPlayerHistoryGet();
+    const statistics = await apiClient.statisticsApi.v1StatsPlayerHistoryGet();
 
     return {
       statistics,

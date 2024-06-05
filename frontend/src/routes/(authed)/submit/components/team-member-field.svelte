@@ -60,21 +60,7 @@
         <ul>
           {#each filteredUsers as user}
             <li>
-              <button
-                class="border-input hover:border-primary focus-visible:ring-ring ring-offset-background flex w-full flex-col gap-1 rounded-md border px-3 py-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2"
-                type="button"
-                on:click={() => {
-                  userId = user.userId;
-                  filter = '';
-                }}
-              >
-                <p>{user.displayName ?? user.name}</p>
-                <p class="text-xs">
-                  {#if user.displayName != null}
-                    {user.name}
-                  {/if}
-                </p>
-              </button>
+              <PlayerButton {user} on:click={() => selectUser(user)} />
             </li>
           {/each}
         </ul>
@@ -91,7 +77,7 @@
     >
       <div class="flex flex-1 flex-col gap-2">
         {#if user != null}
-          <p>
+          <p class="line-clamp-1 text-sm md:text-base">
             {user.displayName ?? user.name}
           </p>
           <p class="text-xs">

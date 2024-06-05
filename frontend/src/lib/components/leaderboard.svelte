@@ -6,8 +6,8 @@
   export let data: ReposLeaderboardEntry[];
 </script>
 
-<Card.Root class="">
-  <Card.Content>
+<Card.Root>
+  <Card.Content class="p-0 md:p-6">
     <Table.Root class="">
       <Table.Header>
         <Table.Row>
@@ -25,9 +25,7 @@
             <Table.Cell>{name}</Table.Cell>
             <Table.Cell>{wins}</Table.Cell>
             <Table.Cell>{loses}</Table.Cell>
-            <Table.Cell class="text-right"
-              >{mmr != 0 ? mmr : '🐣'}</Table.Cell
-            >
+            <Table.Cell class="text-right">{mmr != 0 ? mmr : '🐣'}</Table.Cell>
           </Table.Row>
         {/each}
       </Table.Body>

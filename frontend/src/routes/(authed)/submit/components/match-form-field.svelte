@@ -9,8 +9,6 @@
   export let value: string;
   export let label: string;
   export let placeholder = '';
-
-  const { form: formData } = form;
 </script>
 
 <Form.Field {form} {name}>

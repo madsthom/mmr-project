@@ -8,7 +8,7 @@
   import type { PageData } from './$types';
 
   export let data: PageData;
-  const { leaderboardEntries, recentMatches } = data;
+  const { leaderboardEntries, recentMatches, users } = data;
   let showMmr = false;
 </script>
 
@@ -42,7 +42,7 @@
   </div>
   <div class="flex flex-1 flex-col items-stretch gap-2">
     {#each recentMatches ?? [] as match}
-      <MatchCard {match} {showMmr} />
+      <MatchCard {users} {match} {showMmr} />
     {/each}
   </div>
 </div>

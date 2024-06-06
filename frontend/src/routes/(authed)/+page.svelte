@@ -14,11 +14,9 @@
 
 <div class="flex flex-col gap-4">
   <PageTitle>Trifork Foosball</PageTitle>
-  <h2 class="text-4xl">Leaderboard</h2>
-  <Leaderboard data={leaderboardEntries ?? []} />
 
   <div class="flex">
-    <h2 class="flex-1 text-4xl">Recent Matches</h2>
+    <h2 class="flex-1 text-2xl md:text-4xl">Recent Matches</h2>
     <div class="flex items-center space-x-3 self-center">
       <Label id="show-mmr-label" for="show-mmr">MMR:</Label>
       <Checkbox.Root
@@ -34,10 +32,6 @@
           {/if}
         </Checkbox.Indicator>
       </Checkbox.Root>
-      <!-- <label
-        >MMR:&nbsp;
-        <input type="checkbox" class="rounded-sm" bind:checked={showMmr} />
-      </label> -->
     </div>
   </div>
   <div class="flex flex-1 flex-col items-stretch gap-2">
@@ -45,4 +39,6 @@
       <MatchCard {users} {match} {showMmr} />
     {/each}
   </div>
+  <h2 class="text-2xl md:text-4xl">Leaderboard</h2>
+  <Leaderboard data={leaderboardEntries ?? []} />
 </div>

@@ -1,16 +1,20 @@
 <script lang="ts">
-  import type { ViewMatchDetails } from '../../../api';
+  import type { ViewMatchDetailsV2 } from '../../../api';
+  import type { MatchUser } from './match-user';
   import MmrDelta from './mmr-delta.svelte';
 
   export let match: Pick<
-    ViewMatchDetails,
+    ViewMatchDetailsV2,
     'mmrCalculations' | 'team1' | 'team2'
   >;
+  export let users: MatchUser[];
   export let showMmr = false;
   export let team: 'team1' | 'team2';
   export let member: 'member1' | 'member2';
 
-  let memberName = match[team][member];
+  let memberId = match[team][member];
+  let memberName =
+    users.find((user) => user.userId === memberId)?.name ?? 'Unknown';
   let delta = null;
   switch (member) {
     case 'member1':

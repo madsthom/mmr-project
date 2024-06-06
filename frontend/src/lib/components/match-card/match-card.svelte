@@ -1,11 +1,12 @@
 <script lang="ts">
   import * as Card from '$lib/components/ui/card';
-  import type { ViewMatchDetails } from '../../../api';
-  import MmrDelta from './mmr-delta.svelte';
+  import type { ViewMatchDetailsV2 } from '../../../api';
+  import type { MatchUser } from './match-user';
   import TeamMember from './team-member.svelte';
 
-  export let match: Omit<ViewMatchDetails, 'date'> & {
-    date: string | undefined;
+  export let users: MatchUser[];
+  export let match: Omit<ViewMatchDetailsV2, 'date'> & {
+    date?: string;
   };
 
   export let showMmr = false;
@@ -21,8 +22,8 @@
         {match.team1.score === 0 ? '🥚' : match.team1.score}
       </p>
       <div class="flex flex-1 flex-col">
-        <TeamMember {match} {showMmr} team="team1" member="member1" />
-        <TeamMember {match} {showMmr} team="team1" member="member2" />
+        <TeamMember {users} {match} {showMmr} team="team1" member="member1" />
+        <TeamMember {users} {match} {showMmr} team="team1" member="member2" />
       </div>
     </div>
     <div class="flex flex-col items-center">
@@ -41,8 +42,8 @@
       class:text-primary={match.team2.score === 10}
     >
       <div class="flex flex-1 flex-col items-end">
-        <TeamMember {match} {showMmr} team="team2" member="member1" />
-        <TeamMember {match} {showMmr} team="team2" member="member2" />
+        <TeamMember {users} {match} {showMmr} team="team2" member="member1" />
+        <TeamMember {users} {match} {showMmr} team="team2" member="member2" />
       </div>
       <p class="min-w-[2ch] text-right text-4xl font-extrabold">
         {match.team2.score === 0 ? '🥚' : match.team2.score}

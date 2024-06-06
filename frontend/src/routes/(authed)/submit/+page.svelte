@@ -8,5 +8,5 @@
 
 <div class="flex flex-col gap-8">
   <PageTitle>Submit match</PageTitle>
-  <MatchForm data={data.form} />
+  <MatchForm data={data.form} users={data.users} />
 </div>

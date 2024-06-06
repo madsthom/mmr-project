@@ -4,6 +4,7 @@ import {
   LeaderboardApi,
   MatchesApi,
   StatisticsApi,
+  UsersApi,
 } from '../../../api';
 
 export const createConfiguration = (token: string) =>
@@ -18,5 +19,6 @@ export const createApiClient = (token: string) => {
     leaderboardApi: new LeaderboardApi(configuration),
     mmrApi: new MatchesApi(configuration),
     statisticsApi: new StatisticsApi(configuration),
+    usersApi: new UsersApi(configuration),
   };
 };

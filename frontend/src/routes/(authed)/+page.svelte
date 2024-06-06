@@ -42,7 +42,7 @@
   </div>
   <div class="flex flex-1 flex-col items-stretch gap-2">
     {#each recentMatches ?? [] as match}
-      <MatchCard {users} {match} {showMmr} />
+      <MatchCard users={users ?? []} {match} {showMmr} />
     {/each}
   </div>
 </div>

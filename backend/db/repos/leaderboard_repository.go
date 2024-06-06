@@ -8,10 +8,13 @@ import (
 )
 
 type LeaderboardEntry struct {
-	Name  string `json:"name"`
-	MMR   int    `json:"mmr"`
-	Wins  int    `json:"wins"`
-	Loses int    `json:"loses"`
+	UserID        uint   `json:"userId"`
+	Name          string `json:"name"`
+	MMR           int    `json:"mmr"`
+	Wins          int    `json:"wins"`
+	Loses         int    `json:"loses"`
+	WinningStreak int    `json:"winningStreak"`
+	LosingStreak  int    `json:"losingStreak"`
 }
 
 // ILeaderboardRepository interface declaration
@@ -43,8 +46,10 @@ func (lr *LeaderboardRepository) GetLeaderboard() ([]*LeaderboardEntry, error) {
 	// Iterate over users and count the number of winning and losing teams they belong to
 	for _, user := range users {
 		var teamCounts struct {
-			Winning int64
-			Losing  int64
+			Winning       int64
+			Losing        int64
+			WinningStreak int64
+			LosingStreak  int64
 		}
 
 		// Count the number of winning and losing teams where the user is either UserOne or UserTwo
@@ -55,12 +60,35 @@ func (lr *LeaderboardRepository) GetLeaderboard() ([]*LeaderboardEntry, error) {
 			return nil, err
 		}
 
+		// Count number of rows created after the last time the user lost a game
+		lr.db.Model(&models.Team{}).
+			Where("(user_one_id = ? OR user_two_id = ?)", user.ID, user.ID).
+			Where("id > (SELECT MAX(id) from teams WHERE winner = false AND (user_one_id = ? OR user_two_id = ?))", user.ID, user.ID).
+			Count(&teamCounts.WinningStreak)
+
+		if teamCounts.Losing == 0 {
+			teamCounts.WinningStreak = teamCounts.Winning
+		}
+
+		// Count number of rows created after the last time the user won a game
+		lr.db.Model(&models.Team{}).
+			Where("(user_one_id = ? OR user_two_id = ?)", user.ID, user.ID).
+			Where("id > (SELECT MAX(id) from teams WHERE winner = true AND (user_one_id = ? OR user_two_id = ?))", user.ID, user.ID).
+			Count(&teamCounts.LosingStreak)
+
+		if teamCounts.Winning == 0 {
+			teamCounts.LosingStreak = teamCounts.Losing
+		}
+
 		// Create a new LeaderboardEntry object and populate it with the user's information and the counts of wins and losses
 		entry := &LeaderboardEntry{
-			Name:  user.Name,
-			MMR:   int(mmr.MapTrueSkillToMMR(user.Mu, user.Sigma)),
-			Wins:  int(teamCounts.Winning),
-			Loses: int(teamCounts.Losing),
+			UserID:        user.ID,
+			Name:          user.Name,
+			MMR:           int(mmr.MapTrueSkillToMMR(user.Mu, user.Sigma)),
+			Wins:          int(teamCounts.Winning),
+			Loses:         int(teamCounts.Losing),
+			WinningStreak: int(teamCounts.WinningStreak),
+			LosingStreak:  int(teamCounts.LosingStreak),
 		}
 
 		if entry.Wins+entry.Loses < 10 {

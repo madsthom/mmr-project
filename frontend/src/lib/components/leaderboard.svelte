@@ -42,7 +42,7 @@
             </Table.Cell>
             <Table.Cell class="text-right">
               {mmr != 0 ? mmr : '🐣'}
-              {#if mostRecentMMRChange != null}
+              {#if mostRecentMMRChange != null && mmr != 0}
                 <span
                   title="MMR change at last match"
                   class={'text-xs ' +

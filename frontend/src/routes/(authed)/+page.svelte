@@ -5,11 +5,11 @@
   import Label from '$lib/components/ui/label/label.svelte';
   import { Checkbox } from 'bits-ui';
   import { Check, Minus } from 'lucide-svelte';
+  import { showMmr } from '../../stores/show-mmr';
   import type { PageData } from './$types';
 
   export let data: PageData;
   const { leaderboardEntries, recentMatches, users } = data;
-  let showMmr = false;
 </script>
 
 <div class="flex flex-col gap-4">
@@ -20,7 +20,7 @@
     <div class="flex items-center space-x-3 self-center">
       <Label id="show-mmr-label" for="show-mmr">MMR:</Label>
       <Checkbox.Root
-        bind:checked={showMmr}
+        bind:checked={$showMmr}
         id="show-mmr"
         class="border-muted bg-primary active:scale-98 data-[state=unchecked]:border-border-input data-[state=unchecked]:hover:border-dark-40 peer inline-flex size-[25px] items-center justify-center rounded-md border transition-all duration-150 ease-in-out data-[state=unchecked]:bg-white"
       >
@@ -36,7 +36,7 @@
   </div>
   <div class="flex flex-1 flex-col items-stretch gap-2">
     {#each recentMatches ?? [] as match}
-      <MatchCard {users} {match} {showMmr} />
+      <MatchCard users={users ?? []} {match} showMmr={$showMmr} />
     {/each}
   </div>
   <h2 class="text-2xl md:text-4xl">Leaderboard</h2>

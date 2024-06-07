@@ -9,7 +9,7 @@
     date?: string;
   };
 
-  export let showMmr = false;
+  export let showMmr: boolean;
 </script>
 
 <Card.Root>

@@ -66,6 +66,7 @@ func (lr *LeaderboardRepository) GetLeaderboard() ([]*LeaderboardEntry, error) {
 			Where("id > (SELECT MAX(id) from teams WHERE winner = false AND (user_one_id = ? OR user_two_id = ?))", user.ID, user.ID).
 			Count(&teamCounts.WinningStreak)
 
+		// If the user has never lost a game, set the winning streak to the number of wins
 		if teamCounts.Losing == 0 {
 			teamCounts.WinningStreak = teamCounts.Winning
 		}
@@ -76,6 +77,7 @@ func (lr *LeaderboardRepository) GetLeaderboard() ([]*LeaderboardEntry, error) {
 			Where("id > (SELECT MAX(id) from teams WHERE winner = true AND (user_one_id = ? OR user_two_id = ?))", user.ID, user.ID).
 			Count(&teamCounts.LosingStreak)
 
+		// If the user has never won a game, set the losing streak to the number of losses
 		if teamCounts.Winning == 0 {
 			teamCounts.LosingStreak = teamCounts.Losing
 		}

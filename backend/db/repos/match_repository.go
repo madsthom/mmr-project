@@ -1,15 +1,17 @@
 package repos
 
 import (
-	"gorm.io/gorm/clause"
+	"database/sql"
 	"mmr/backend/db/models"
+
+	"gorm.io/gorm/clause"
 
 	"gorm.io/gorm"
 )
 
 type IMatchRepository interface {
 	CreateMatch(match *models.Match) (*models.Match, error)
-	ListMatches(limit int, offset int, orderBy *clause.OrderByColumn, includeMmrCalculations bool) ([]*models.Match, error)
+	ListMatches(limit int, offset int, orderBy *clause.OrderByColumn, includeMmrCalculations bool, userId *uint) ([]*models.Match, error)
 	ClearMMRCalculations()
 }
 
@@ -28,7 +30,7 @@ func (mr *MatchRepository) CreateMatch(match *models.Match) (*models.Match, erro
 	return match, nil
 }
 
-func (mr *MatchRepository) ListMatches(limit int, offset int, orderBy *clause.OrderByColumn, includeMmrCalculations bool) ([]*models.Match, error) {
+func (mr *MatchRepository) ListMatches(limit int, offset int, orderBy *clause.OrderByColumn, includeMmrCalculations bool, userId *uint) ([]*models.Match, error) {
 	var matches []*models.Match
 
 	if orderBy == nil {
@@ -43,6 +45,11 @@ func (mr *MatchRepository) ListMatches(limit int, offset int, orderBy *clause.Or
 
 	if includeMmrCalculations {
 		query = query.Preload("MMRCalculations")
+	}
+
+	if userId != nil {
+		// TODO this query is not working
+		query = query.Where("TeamOne.user_one_id = @userId OR TeamOne.user_two_id = @userId OR TeamTwo.user_one_id = @userId OR TeamTwo.user_two_id = @userId", sql.Named("userId", *userId))
 	}
 
 	err := query.

@@ -43,6 +43,7 @@ export interface V1MmrMatchesPostRequest {
 export interface V2MmrMatchesGetRequest {
     limit?: number;
     offset?: number;
+    userId?: number;
 }
 
 export interface V2MmrMatchesPostRequest {
@@ -145,6 +146,10 @@ export class MatchesApi extends runtime.BaseAPI {
 
         if (requestParameters['offset'] != null) {
             queryParameters['offset'] = requestParameters['offset'];
+        }
+
+        if (requestParameters['userId'] != null) {
+            queryParameters['userId'] = requestParameters['userId'];
         }
 
         const headerParameters: runtime.HTTPHeaders = {};

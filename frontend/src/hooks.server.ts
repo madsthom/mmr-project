@@ -77,7 +77,6 @@ const authGuard: Handle = async ({ event, resolve }) => {
     event.url.pathname.startsWith('/login') ||
     event.url.pathname.startsWith('/signup');
   if (!event.locals.session && !isNonAuthedPathname) {
-    console.log('redirecting to /login');
     return redirect(303, '/login');
   }
 

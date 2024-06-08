@@ -7,8 +7,8 @@
   const SHOW_STREAK_THRESHOLD = 3;
 </script>
 
-<Card.Root class="">
-  <Card.Content>
+<Card.Root>
+  <Card.Content class="p-0 md:p-6">
     <Table.Root class="">
       <Table.Header>
         <Table.Row>

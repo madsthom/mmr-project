@@ -30,6 +30,12 @@ export interface ReposLeaderboardEntry {
      * @type {number}
      * @memberof ReposLeaderboardEntry
      */
+    losingStreak?: number;
+    /**
+     * 
+     * @type {number}
+     * @memberof ReposLeaderboardEntry
+     */
     mmr?: number;
     /**
      * 
@@ -37,6 +43,18 @@ export interface ReposLeaderboardEntry {
      * @memberof ReposLeaderboardEntry
      */
     name?: string;
+    /**
+     * 
+     * @type {number}
+     * @memberof ReposLeaderboardEntry
+     */
+    userId?: number;
+    /**
+     * 
+     * @type {number}
+     * @memberof ReposLeaderboardEntry
+     */
+    winningStreak?: number;
     /**
      * 
      * @type {number}
@@ -63,8 +81,11 @@ export function ReposLeaderboardEntryFromJSONTyped(json: any, ignoreDiscriminato
     return {
         
         'loses': json['loses'] == null ? undefined : json['loses'],
+        'losingStreak': json['losingStreak'] == null ? undefined : json['losingStreak'],
         'mmr': json['mmr'] == null ? undefined : json['mmr'],
         'name': json['name'] == null ? undefined : json['name'],
+        'userId': json['userId'] == null ? undefined : json['userId'],
+        'winningStreak': json['winningStreak'] == null ? undefined : json['winningStreak'],
         'wins': json['wins'] == null ? undefined : json['wins'],
     };
 }
@@ -76,8 +97,11 @@ export function ReposLeaderboardEntryToJSON(value?: ReposLeaderboardEntry | null
     return {
         
         'loses': value['loses'],
+        'losingStreak': value['losingStreak'],
         'mmr': value['mmr'],
         'name': value['name'],
+        'userId': value['userId'],
+        'winningStreak': value['winningStreak'],
         'wins': value['wins'],
     };
 }

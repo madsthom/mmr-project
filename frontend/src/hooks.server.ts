@@ -48,6 +48,12 @@ const supabase: Handle = async ({ event, resolve }) => {
       return { session: null };
     }
 
+    // const { error } = await event.locals.supabase.auth.getUser();
+    // if (error) {
+    //   // JWT validation has failed
+    //   return { session: null };
+    // }
+
     return { session };
   };
 
@@ -68,8 +74,10 @@ const authGuard: Handle = async ({ event, resolve }) => {
 
   const isNonAuthedPathname =
     event.url.pathname.startsWith('/auth') ||
-    event.url.pathname.startsWith('/login');
+    event.url.pathname.startsWith('/login') ||
+    event.url.pathname.startsWith('/signup');
   if (!event.locals.session && !isNonAuthedPathname) {
+    console.log('redirecting to /login');
     return redirect(303, '/login');
   }
 

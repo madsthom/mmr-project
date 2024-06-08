@@ -1,4 +1,5 @@
 <script lang="ts">
+  import LoadingOverlay from '$lib/components/loading-overlay.svelte';
   import PageTitle from '$lib/components/page-title.svelte';
   import * as Form from '$lib/components/ui/form';
   import { Input } from '$lib/components/ui/input';
@@ -45,3 +46,5 @@
   </Form.Field>
   <Form.Button>Create user</Form.Button>
 </form>
+
+<LoadingOverlay isLoading={$submitting} />

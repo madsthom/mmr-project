@@ -107,6 +107,57 @@ const docTemplate = `{
                 }
             }
         },
+        "/v1/profile": {
+            "get": {
+                "description": "Get profile details of the authenticated user",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Profile"
+                ],
+                "summary": "Get profile",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/view.ProfileDetails"
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/profile/claim": {
+            "post": {
+                "description": "Claims a user by ID",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Profile"
+                ],
+                "summary": "Claim user",
+                "parameters": [
+                    {
+                        "description": "User to be claimed",
+                        "name": "user",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/view.ClaimUser"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/view.ProfileDetails"
+                        }
+                    }
+                }
+            }
+        },
         "/v1/stats/leaderboard": {
             "get": {
                 "description": "Get leaderboard stats including wins, loses, and MMR of users",
@@ -354,6 +405,17 @@ const docTemplate = `{
                 }
             }
         },
+        "view.ClaimUser": {
+            "type": "object",
+            "required": [
+                "userId"
+            ],
+            "properties": {
+                "userId": {
+                    "type": "integer"
+                }
+            }
+        },
         "view.CreateUser": {
             "type": "object",
             "required": [
@@ -528,6 +590,14 @@ const docTemplate = `{
                 "name": {
                     "type": "string"
                 },
+                "userId": {
+                    "type": "integer"
+                }
+            }
+        },
+        "view.ProfileDetails": {
+            "type": "object",
+            "properties": {
                 "userId": {
                     "type": "integer"
                 }

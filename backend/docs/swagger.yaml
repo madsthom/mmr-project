@@ -11,6 +11,13 @@ definitions:
       wins:
         type: integer
     type: object
+  view.ClaimUser:
+    properties:
+      userId:
+        type: integer
+    required:
+    - userId
+    type: object
   view.CreateUser:
     properties:
       displayName:
@@ -132,6 +139,11 @@ definitions:
     - name
     - userId
     type: object
+  view.ProfileDetails:
+    properties:
+      userId:
+        type: integer
+    type: object
   view.UserDetails:
     properties:
       displayName:
@@ -207,6 +219,39 @@ paths:
       summary: Submit a match
       tags:
       - Matches
+  /v1/profile:
+    get:
+      description: Get profile details of the authenticated user
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/view.ProfileDetails'
+      summary: Get profile
+      tags:
+      - Profile
+  /v1/profile/claim:
+    post:
+      description: Claims a user by ID
+      parameters:
+      - description: User to be claimed
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/view.ClaimUser'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/view.ProfileDetails'
+      summary: Claim user
+      tags:
+      - Profile
   /v1/stats/leaderboard:
     get:
       consumes:

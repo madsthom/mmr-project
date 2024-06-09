@@ -1,34 +1,21 @@
 <script lang="ts">
+  import LoadingOverlay from '$lib/components/loading-overlay.svelte';
   import Button from '$lib/components/ui/button/button.svelte';
   import * as Form from '$lib/components/ui/form';
   import Input from '$lib/components/ui/input/input.svelte';
   import { superForm } from 'sveltekit-superforms';
   import { zodClient } from 'sveltekit-superforms/adapters';
-  import { loginSchema, type LoginForm } from './schema.js';
+  import { signupSchema, type SignupForm } from './schema.js';
 
   export let data;
-  $: ({ supabase } = data);
 
-  async function signInWithAzure() {
-    await supabase.auth.signInWithOAuth({
-      provider: 'azure',
-      options: {
-        scopes: 'email',
-        redirectTo: new URL(
-          '/auth/callback',
-          window.location.origin
-        ).toString(),
-      },
-    });
-  }
-
-  const form = superForm<LoginForm>(data.form, {
-    validators: zodClient(loginSchema),
+  const form = superForm<SignupForm>(data.form, {
+    validators: zodClient(signupSchema),
     dataType: 'json',
     delayMs: 500,
   });
 
-  const { form: formData, enhance, message } = form;
+  const { form: formData, enhance, submitting } = form;
 </script>
 
 <form
@@ -60,12 +47,8 @@
     </Form.Control>
     <Form.FieldErrors />
   </Form.Field>
-  {#if $message}
-    <p class="text-red-500">{$message}</p>
-  {/if}
-  <Form.Button>Login</Form.Button>
-  <Button type="button" on:click={signInWithAzure} variant="secondary">
-    Sign in with Azure
-  </Button>
-  <Button href="/signup" variant="link">No user? Sign up here.</Button>
+  <Form.Button>Sign up</Form.Button>
+  <Button href="/login" variant="link">Already have a user? Login here.</Button>
 </form>
+
+<LoadingOverlay isLoading={$submitting} />

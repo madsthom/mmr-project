@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { Home, Plus, Shuffle } from 'lucide-svelte';
+  import { Home, Plus, Shuffle, User } from 'lucide-svelte';
   import NavbarNav from './navbar-nav.svelte';
 </script>
 
@@ -14,5 +14,6 @@
     </NavbarNav>
     <NavbarNav isPrimary path="/submit"><Plus /></NavbarNav>
     <NavbarNav path="/random"><Shuffle /></NavbarNav>
+    <NavbarNav path="/profile"><User /></NavbarNav>
   </div>
 </nav>

@@ -40,8 +40,6 @@
   "type": "module",
   "dependencies": {
     "@carbon/charts-svelte": "^1.16.1",
-    "@supabase/auth-ui-shared": "^0.1.8",
-    "@supabase/auth-ui-svelte": "^0.2.9",
     "@supabase/ssr": "^0.3.0",
     "@supabase/supabase-js": "^2.43.4",
     "bits-ui": "^0.21.7",

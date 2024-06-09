@@ -1,7 +1,7 @@
 <script lang="ts">
   import '../app.pcss';
 
-  import { goto, invalidate } from '$app/navigation';
+  import { invalidate, invalidateAll } from '$app/navigation';
   import { onMount } from 'svelte';
 
   export let data;
@@ -14,7 +14,7 @@
       }
 
       if (event === 'SIGNED_IN') {
-        goto('/', { invalidateAll: true });
+        invalidateAll();
       }
     });
 

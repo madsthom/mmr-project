@@ -1,7 +1,6 @@
 package controllers
 
 import (
-	"fmt"
 	database "mmr/backend/db"
 	"mmr/backend/db/repos"
 	view "mmr/backend/models"
@@ -28,7 +27,6 @@ func (sc StatsController) GetLeaderboard(c *gin.Context) {
 
 	// Fetch leaderboard entries
 	entries, err := leaderboardRepo.GetLeaderboard()
-	fmt.Println(entries)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch leaderboard entries"})
 		return

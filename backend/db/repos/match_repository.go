@@ -66,7 +66,7 @@ func (mr *MatchRepository) ClearMMRCalculations() {
 func (mr *MatchRepository) CheckExistingMatch(playerOneID uint, playerTwoID uint, playerThreeID uint, playerFourID uint, teamOneScore int, teamTwoScore int) bool {
 	// Check if match is within 10 minutes of another match
 	// This is to prevent spamming of matches
-	// It should not care about the order of players
+	// It does not care about the order of players or teams
 
 	var count int64
 

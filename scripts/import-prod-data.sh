@@ -15,7 +15,6 @@ tenantId=${4:-$AZURE_TENANT_ID}
 subscriptionId=${5:-$AZURE_SUBSCRIPTION_ID}
 username=${5:-$DB_USERNAME}
 
-az config set 
 # Login to Azure
 az login --tenant $tenantId
 

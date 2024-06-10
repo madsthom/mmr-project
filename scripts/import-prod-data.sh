@@ -13,7 +13,7 @@ resourceGroupName=${2:-$DB_RESOURCE_GROUP}
 databaseName=${3:-$DB_NAME}
 tenantId=${4:-$AZURE_TENANT_ID}
 subscriptionId=${5:-$AZURE_SUBSCRIPTION_ID}
-username=${5:-$DB_USERNAME}
+username=${6:-$DB_USERNAME}
 
 # Login to Azure
 az login --tenant $tenantId

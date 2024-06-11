@@ -16,7 +16,7 @@
     delayMs: 500,
   });
 
-  const { form: formData, enhance, submitting } = form;
+  const { form: formData, enhance, submitting, message } = form;
 </script>
 
 <form method="post" use:enhance class="flex flex-col gap-1">
@@ -45,6 +45,9 @@
     <Form.FieldErrors />
   </Form.Field>
   <Form.Button>Create user</Form.Button>
+  {#if $message}
+    <p class="text-red-500">{$message}</p>
+  {/if}
 </form>
 
 <LoadingOverlay isLoading={$submitting} />

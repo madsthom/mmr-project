@@ -1,7 +1,7 @@
 import { fail, redirect } from '@sveltejs/kit';
-import { superValidate } from 'sveltekit-superforms';
+import { message, superValidate, type ErrorStatus } from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';
-import type { ViewUserDetails } from '../../../api';
+import { ResponseError, type ViewUserDetails } from '../../../api';
 import type { Actions, PageServerLoad } from './$types';
 import { matchSchema } from './match-schema';
 
@@ -58,8 +58,14 @@ export const actions: Actions = {
     try {
       await apiClient.mmrApi.v2MmrMatchesPost({ match: form.data });
     } catch (error) {
+      if (error instanceof ResponseError) {
+        const errorResponse = await error.response.json();
+        return message(form, errorResponse.error, {
+          status: error.response.status as ErrorStatus,
+        });
+      }
       return fail(500, {
-        error,
+        form,
       });
     }
 

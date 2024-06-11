@@ -1,6 +1,7 @@
 import { fail, redirect } from '@sveltejs/kit';
-import { superValidate } from 'sveltekit-superforms';
+import { message, superValidate, type ErrorStatus } from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';
+import { ResponseError } from '../../../../api';
 import type { Actions, PageServerLoad } from './$types';
 import { createUserSchema } from './schema';
 
@@ -32,8 +33,14 @@ export const actions: Actions = {
 
       throw redirect(303, redirectTo != null ? redirectTo + user.userId : '/');
     } catch (error) {
+      if (error instanceof ResponseError) {
+        const errorResponse = await error.response.json();
+        return message(form, errorResponse.error, {
+          status: error.response.status as ErrorStatus,
+        });
+      }
       return fail(500, {
-        error,
+        form,
       });
     }
   },

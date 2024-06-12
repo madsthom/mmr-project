@@ -6,6 +6,7 @@ import (
 	"mmr/backend/db/repos"
 	view "mmr/backend/models"
 	"net/http"
+	"strconv"
 )
 
 type UsersController struct{}
@@ -118,4 +119,32 @@ func (uc UsersController) SearchUsers(c *gin.Context) {
 
 	// Return users as JSON response
 	c.JSON(http.StatusOK, userDetails)
+}
+
+// GetUser godoc
+//
+//	@Summary		Get user
+//	@Description	Get user by ID
+//	@Tags 			Users
+//	@Param			id	path	int	true	"User ID"
+//	@Produce		json
+//	@Success		200	{object}	view.UserDetails
+//	@Router			/v1/users/{id} [get]
+func (uc UsersController) GetUser(c *gin.Context) {
+	// Initialize user repository
+	userRepo := repos.NewUserRepository(database.DB)
+
+	// Parse user ID from request
+	userIdString := c.Param("id")
+	userId, err := strconv.ParseUint(userIdString, 10, 64)
+
+	// Fetch user by ID
+	user, err := userRepo.GetByID(uint(userId))
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch user"})
+		return
+	}
+
+	// Return user as JSON response
+	c.JSON(http.StatusOK, view.UserDetailsViewFromModel(*user))
 }

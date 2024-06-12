@@ -3,13 +3,22 @@
   import { MatchCard } from '$lib/components/match-card';
   import PageTitle from '$lib/components/page-title.svelte';
   import Label from '$lib/components/ui/label/label.svelte';
+  import UserStatsModal from '$lib/components/user-stats-modal.svelte';
   import { Checkbox } from 'bits-ui';
   import { Check, Minus } from 'lucide-svelte';
+  import type { ViewUserDetails } from '../../api';
   import { showMmr } from '../../stores/show-mmr';
   import type { PageData } from './$types';
 
   export let data: PageData;
   const { leaderboardEntries, recentMatches, users } = data;
+  let selectedUser: ViewUserDetails | null | undefined;
+  $: leaderboardEntry =
+    selectedUser != null
+      ? leaderboardEntries?.find(
+          (entry) => entry.userId === selectedUser!.userId
+        )
+      : null;
 </script>
 
 <div class="flex flex-col gap-4">
@@ -40,5 +49,24 @@
     {/each}
   </div>
   <h2 class="text-2xl md:text-4xl">Leaderboard</h2>
-  <Leaderboard data={leaderboardEntries ?? []} {users} />
+  <Leaderboard
+    data={leaderboardEntries ?? []}
+    {users}
+    onSelectedUser={(user) => {
+      selectedUser = user;
+    }}
+  />
 </div>
+
+{#if selectedUser != null}
+  <UserStatsModal
+    user={selectedUser}
+    {leaderboardEntry}
+    open={selectedUser != null}
+    onOpenChange={(open) => {
+      if (!open) {
+        selectedUser = null;
+      }
+    }}
+  />
+{/if}

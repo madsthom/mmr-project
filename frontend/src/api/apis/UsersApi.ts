@@ -25,6 +25,10 @@ import {
     ViewUserDetailsToJSON,
 } from '../models/index';
 
+export interface V1UsersIdGetRequest {
+    id: number;
+}
+
 export interface V1UsersPostRequest {
     user: ViewCreateUser;
 }
@@ -63,6 +67,41 @@ export class UsersApi extends runtime.BaseAPI {
      */
     async v1UsersGet(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<ViewUserDetails>> {
         const response = await this.v1UsersGetRaw(initOverrides);
+        return await response.value();
+    }
+
+    /**
+     * Get user by ID
+     * Get user
+     */
+    async v1UsersIdGetRaw(requestParameters: V1UsersIdGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<ViewUserDetails>> {
+        if (requestParameters['id'] == null) {
+            throw new runtime.RequiredError(
+                'id',
+                'Required parameter "id" was null or undefined when calling v1UsersIdGet().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        const response = await this.request({
+            path: `/v1/users/{id}`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id']))),
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => ViewUserDetailsFromJSON(jsonValue));
+    }
+
+    /**
+     * Get user by ID
+     * Get user
+     */
+    async v1UsersIdGet(requestParameters: V1UsersIdGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<ViewUserDetails> {
+        const response = await this.v1UsersIdGetRaw(requestParameters, initOverrides);
         return await response.value();
     }
 

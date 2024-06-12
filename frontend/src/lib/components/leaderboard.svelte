@@ -28,12 +28,21 @@
       </Table.Header>
       <Table.Body>
         {#each data as { userId, loses, name, wins, mmr, winningStreak, losingStreak }, idx}
+          {@const userDisplayName = users?.find(
+            (user) => user.userId == userId
+          )?.displayName}
           <Table.Row>
             <Table.Cell class="w-16 font-bold">{idx + 1}</Table.Cell>
-            <Table.Cell
-              title={users?.find((user) => user.userId == userId)
-                ?.displayName ?? undefined}>{name}</Table.Cell
-            >
+            <Table.Cell>
+              <div class="flex flex-col items-start">
+                {#if userDisplayName != null}
+                  <span class="hidden truncate sm:block">
+                    {userDisplayName}
+                  </span>
+                {/if}
+                <span class="block">{name}</span>
+              </div>
+            </Table.Cell>
             <Table.Cell>
               <div class="flex flex-row items-center gap-2">
                 {wins}

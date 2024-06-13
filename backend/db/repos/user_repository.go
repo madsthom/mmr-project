@@ -15,6 +15,7 @@ type IUserRepository interface {
 	GetByName(name string) (*models.User, error)
 	CreateByName(name string, displayName *string) (*models.User, error)
 	GetByID(id uint) (*models.User, error)
+	GetByIdentityUserId(identityUserId string) (*models.User, error)
 	SearchUsers(query string) ([]*models.User, error)
 	SaveUser(user *models.User) (*models.User, error)
 	StoreRanking(matchID uint, userID uint, mu float64, sigma float64, mmr int) (*models.PlayerHistory, error)
@@ -22,6 +23,7 @@ type IUserRepository interface {
 	GetLatestPlayerHistory(playerID uint) (*models.PlayerHistory, error)
 	ListPlayerHistory(playerID *uint) ([]*models.PlayerHistory, error)
 	ClearPlayerHistories()
+	ClaimUserByID(userID uint, identityUserID string) (*models.User, error)
 }
 
 type UserRepository struct {
@@ -72,6 +74,14 @@ func (ur *UserRepository) CreateByName(name string, displayName *string) (*model
 func (ur *UserRepository) GetByID(id uint) (*models.User, error) {
 	user := &models.User{}
 	if err := ur.db.Where("id = ?", id).First(user).Error; err != nil {
+		return nil, err
+	}
+	return user, nil
+}
+
+func (ur *UserRepository) GetByIdentityUserId(identityUserId string) (*models.User, error) {
+	user := &models.User{}
+	if err := ur.db.Where("identity_user_id = ?", identityUserId).First(user).Error; err != nil {
 		return nil, err
 	}
 	return user, nil
@@ -151,4 +161,18 @@ func (ur *UserRepository) ListPlayerHistory(playerID *uint) ([]*models.PlayerHis
 
 func (ur *UserRepository) ClearPlayerHistories() {
 	ur.db.Exec("TRUNCATE TABLE player_histories RESTART IDENTITY;")
+}
+
+func (ur *UserRepository) ClaimUserByID(userID uint, identityUserID string) (*models.User, error) {
+	user := &models.User{}
+	if err := ur.db.Where("id = ?", userID).First(user).Error; err != nil {
+		return nil, err
+	}
+
+	user.IdentityUserId = &identityUserID
+	if err := ur.db.Save(user).Error; err != nil {
+		return nil, err
+	}
+
+	return user, nil
 }

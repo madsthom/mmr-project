@@ -37,6 +37,20 @@ func RequireAuth(c *gin.Context) {
 		return
 	}
 
+	claims, ok := token.Claims.(jwt.MapClaims)
+	if !ok {
+		c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
+		return
+	}
+
+	sub := claims["sub"]
+	if sub == nil || sub == "" {
+		c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
+		return
+	}
+
+	c.Set("identityUserId", sub)
+
 	c.Next()
 }
 

@@ -61,6 +61,7 @@
 {#if selectedUser != null}
   <UserStatsModal
     user={selectedUser}
+    users={users ?? []}
     {leaderboardEntry}
     open={selectedUser != null}
     onOpenChange={(open) => {

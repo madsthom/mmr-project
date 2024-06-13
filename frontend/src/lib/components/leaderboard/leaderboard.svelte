@@ -1,11 +1,12 @@
 <script lang="ts">
   import * as Card from '$lib/components/ui/card';
   import * as Table from '$lib/components/ui/table';
-  import type { ReposLeaderboardEntry, ViewUserDetails } from '../../api';
-  export let data: ReposLeaderboardEntry[];
+  import { SHOW_STREAK_THRESHOLD } from '$lib/constants';
+  import type { ViewUserDetails } from '../../../api';
+  import type { LeaderboardEntry } from './leader-board-entry';
+  export let data: LeaderboardEntry[];
   export let users: ViewUserDetails[] | null | undefined;
-
-  const SHOW_STREAK_THRESHOLD = 3;
+  export let onSelectedUser: (user: ViewUserDetails) => void;
 </script>
 
 <Card.Root>
@@ -27,12 +28,21 @@
         </Table.Row>
       </Table.Header>
       <Table.Body>
-        {#each data as { userId, loses, name, wins, mmr, winningStreak, losingStreak }, idx}
+        {#each data as { userId, loses, name, wins, mmr, winningStreak, losingStreak, rank }}
           {@const userDisplayName = users?.find(
             (user) => user.userId == userId
           )?.displayName}
-          <Table.Row>
-            <Table.Cell class="w-16 font-bold">{idx + 1}</Table.Cell>
+          <Table.Row
+            class="cursor-pointer"
+            tabindex={0}
+            on:click={() => {
+              const user = users?.find((user) => user.userId == userId);
+              if (user) {
+                onSelectedUser(user);
+              }
+            }}
+          >
+            <Table.Cell class="w-16 font-bold">{rank}</Table.Cell>
             <Table.Cell>
               <div class="flex flex-col items-start">
                 {#if userDisplayName != null}

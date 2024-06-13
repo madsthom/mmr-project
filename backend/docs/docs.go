@@ -266,6 +266,35 @@ const docTemplate = `{
                 }
             }
         },
+        "/v1/users/{id}": {
+            "get": {
+                "description": "Get user by ID",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Users"
+                ],
+                "summary": "Get user",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "User ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/view.UserDetails"
+                        }
+                    }
+                }
+            }
+        },
         "/v2/mmr/matches": {
             "get": {
                 "description": "Get all matches",

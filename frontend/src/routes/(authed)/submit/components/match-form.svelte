@@ -154,7 +154,7 @@
     const redirectTo = `/submit?${redirectToParams}&${inputName}=`;
     const nameParam = suggested !== '' ? `&name=${suggested}` : '';
     goto(
-      `/users/new?redirect_to=${encodeURIComponent(redirectTo)}${nameParam}`
+      `/new-player?redirect_to=${encodeURIComponent(redirectTo)}${nameParam}`
     );
   };
 </script>

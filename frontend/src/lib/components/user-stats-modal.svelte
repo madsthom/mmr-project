@@ -1,0 +1,135 @@
+<script lang="ts">
+  import { Button } from '$lib/components/ui/button';
+  import * as Dialog from '$lib/components/ui/dialog';
+  import { LoaderCircle } from 'lucide-svelte';
+  import type { ViewMatchDetailsV2, ViewUserDetails } from '../../api';
+  import Kpi from './kpi.svelte';
+  import type { LeaderboardEntry } from './leaderboard/leader-board-entry';
+  import MatchCard from './match-card/match-card.svelte';
+  import * as Card from './ui/card';
+
+  export let user: ViewUserDetails;
+  export let users: ViewUserDetails[];
+  export let leaderboardEntry: LeaderboardEntry | null | undefined;
+  export let open: boolean;
+  export let onOpenChange: (open: boolean) => void;
+
+  const percentFormatter = new Intl.NumberFormat(undefined, {
+    style: 'percent',
+    maximumFractionDigits: 0,
+  });
+
+  type RecentMatchDownload =
+    | {
+        status: 'success';
+        userId: number;
+        match: ViewMatchDetailsV2;
+      }
+    | {
+        status: 'error';
+        userId: number;
+        error: string;
+      }
+    | {
+        status: 'loading';
+        userId: number;
+      };
+
+  let recentMatch: RecentMatchDownload = {
+    status: 'loading',
+    userId: user.userId,
+  };
+
+  const fetchRecentMatch = async (userId: number) => {
+    recentMatch = {
+      status: 'loading',
+      userId,
+    };
+    try {
+      const response = await fetch(`/api/recent-match?playerId=${userId}`);
+      if (response.ok) {
+        const data = await response.json();
+        recentMatch = {
+          status: 'success',
+          userId,
+          match: data.latestMatch,
+        };
+      } else {
+        recentMatch = {
+          status: 'error',
+          userId,
+          error: 'Unable to fetch recent match.',
+        };
+      }
+    } catch (error) {
+      recentMatch = {
+        status: 'error',
+        userId,
+        error: 'Unable to fetch recent match.',
+      };
+    }
+  };
+
+  // Fetch recent match every time user changes
+  $: if (user && user.userId) {
+    fetchRecentMatch(user.userId);
+  }
+</script>
+
+<Dialog.Root {open} {onOpenChange}>
+  <Dialog.Content>
+    <Dialog.Title class="flex gap-2">
+      {user.displayName ?? user.name}
+    </Dialog.Title>
+    <Dialog.Description class="flex flex-col gap-4">
+      {#if leaderboardEntry != null}
+        {@const totalGamesPlayed =
+          (leaderboardEntry.wins ?? 0) + (leaderboardEntry.loses ?? 0)}
+        <div class="grid grid-cols-[repeat(auto-fill,minmax(100px,1fr))] gap-2">
+          <Kpi title="Rank">{leaderboardEntry.rank}</Kpi>
+          <Kpi title="MMR">{leaderboardEntry.mmr}</Kpi>
+          <Kpi title="Win %">
+            {percentFormatter.format(
+              totalGamesPlayed > 0
+                ? (leaderboardEntry.wins ?? 0) / totalGamesPlayed
+                : 0
+            )}
+          </Kpi>
+          <Kpi title="# Wins" class="col-start-1"
+            >{leaderboardEntry.wins ?? 0}</Kpi
+          >
+          <Kpi title="# Losses">{leaderboardEntry.loses ?? 0}</Kpi>
+          <Kpi title="# Matches">{totalGamesPlayed}</Kpi>
+          <Kpi title="Streak">
+            {#if (leaderboardEntry.winningStreak ?? 0) > 0}🔥 {leaderboardEntry.winningStreak}{/if}
+            {#if (leaderboardEntry.losingStreak ?? 0) > 0}🌧️ {leaderboardEntry.losingStreak}{/if}
+          </Kpi>
+        </div>
+      {/if}
+      {#if users.length > 0}
+        <div class="flex flex-col gap-2">
+          <p class="text-base text-gray-300">Latest Match</p>
+          {#if recentMatch.status === 'loading'}
+            <Card.Root class="flex items-center gap-2 p-4">
+              <LoaderCircle class="text-muted-foreground animate-spin" />
+              <p class="text-muted-foreground text-base">
+                Fetching latest match...
+              </p>
+            </Card.Root>
+          {/if}
+          {#if recentMatch.status === 'error'}
+            <Card.Root class="flex items-center gap-2 p-4">
+              <p class="text-base text-red-500">
+                {recentMatch.error}
+              </p>
+            </Card.Root>
+          {/if}
+          {#if recentMatch.status === 'success'}
+            <MatchCard match={recentMatch.match} {users} showMmr />
+          {/if}
+        </div>
+      {/if}
+      <Button href={`/player/${user.userId}`}>More details</Button>
+    </Dialog.Description>
+  </Dialog.Content>
+</Dialog.Root>

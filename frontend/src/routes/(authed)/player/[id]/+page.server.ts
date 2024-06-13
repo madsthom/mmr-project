@@ -31,7 +31,7 @@ export const load: PageServerLoad = async ({
     return isOnTeam(winnerTeam, playerId);
   }).length;
   const lost = totalMatches - wins;
-  const winrate = totalMatches > 0 ? (wins / totalMatches) * 100 : 0;
+  const winrate = totalMatches > 0 ? wins / totalMatches : 0;
 
   return {
     playerId,

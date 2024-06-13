@@ -25,8 +25,11 @@
   <Kpi title="# Losses">
     {data.stats.lost}
   </Kpi>
-  <Kpi title="Win %">
-    {data.stats.winrate.toFixed(1)}
+  <Kpi title="Win rate">
+    {new Intl.NumberFormat(undefined, {
+      style: 'percent',
+      maximumFractionDigits: 1,
+    }).format(data.stats.winrate)}
   </Kpi>
 </div>
 

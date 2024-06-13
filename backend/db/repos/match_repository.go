@@ -1,7 +1,6 @@
 package repos
 
 import (
-	"database/sql"
 	"mmr/backend/db/models"
 
 	"gorm.io/gorm/clause"
@@ -48,8 +47,10 @@ func (mr *MatchRepository) ListMatches(limit int, offset int, orderBy *clause.Or
 	}
 
 	if userId != nil {
-		// TODO this query is not working
-		query = query.Where("TeamOne.user_one_id = @userId OR TeamOne.user_two_id = @userId OR TeamTwo.user_one_id = @userId OR TeamTwo.user_two_id = @userId", sql.Named("userId", *userId))
+		query.Joins("TeamOne", mr.db.Where((&models.Team{UserOneID: *userId})))
+		query.Joins("TeamOne", mr.db.Where((&models.Team{UserTwoID: *userId})))
+		query.Joins("TeamTwo", mr.db.Where((&models.Team{UserOneID: *userId})))
+		query.Joins("TeamTwo", mr.db.Where((&models.Team{UserTwoID: *userId})))
 	}
 
 	err := query.

@@ -17,8 +17,8 @@
     <Table.Root class="">
       <Table.Header>
         <Table.Row>
-          <Table.Head class="">#</Table.Head>
-          <Table.Head class="">Player</Table.Head>
+          <Table.Head class="w-[3ch]">#</Table.Head>
+          <Table.Head class="w-[230px]">Player</Table.Head>
           <Table.Head class="">
             <span class="sm:hidden">W</span>
             <span class="hidden sm:inline">Wins</span>
@@ -45,11 +45,11 @@
               }
             }}
           >
-            <Table.Cell class="w-16 font-bold">{rank}</Table.Cell>
-            <Table.Cell>
+            <Table.Cell class="max-w-[3ch] font-bold">{rank}</Table.Cell>
+            <Table.Cell class="max-w-[230px]">
               <div class="flex flex-col items-start">
                 {#if userDisplayName != null}
-                  <span class="hidden truncate sm:block">
+                  <span class="hidden w-full truncate sm:block">
                     {userDisplayName}
                   </span>
                 {/if}

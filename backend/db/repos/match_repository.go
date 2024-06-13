@@ -48,10 +48,10 @@ func (mr *MatchRepository) ListMatches(limit int, offset int, orderBy *clause.Or
 	}
 
 	if userId != nil {
-		query.Joins("TeamOne", mr.db.Where((&models.Team{UserOneID: *userId})))
-		query.Joins("TeamOne", mr.db.Where((&models.Team{UserTwoID: *userId})))
-		query.Joins("TeamTwo", mr.db.Where((&models.Team{UserOneID: *userId})))
-		query.Joins("TeamTwo", mr.db.Where((&models.Team{UserTwoID: *userId})))
+		query = query.
+			Joins("JOIN teams AS team_one ON matches.team_one_id = team_one.id").
+			Joins("JOIN teams AS team_two ON matches.team_two_id = team_two.id").
+			Where("team_one.user_one_id = @user OR team_one.user_two_id = @user OR team_two.user_one_id = @user OR team_two.user_two_id = @user", sql.Named("user", *userId))
 	}
 
 	err := query.

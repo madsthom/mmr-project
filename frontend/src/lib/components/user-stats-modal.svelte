@@ -11,12 +11,12 @@
 
   const percentFormatter = new Intl.NumberFormat(undefined, {
     style: 'percent',
-    minimumFractionDigits: 2,
+    maximumFractionDigits: 0,
   });
 
-  const isOnWinningStreak =
+  $: isOnWinningStreak =
     (leaderboardEntry?.winningStreak ?? 0) >= SHOW_STREAK_THRESHOLD;
-  const isOnLosingStreak =
+  $: isOnLosingStreak =
     (leaderboardEntry?.losingStreak ?? 0) >= SHOW_STREAK_THRESHOLD;
 </script>
 
@@ -36,17 +36,18 @@
           <p>Wins:</p>
           <p>
             {leaderboardEntry.wins}
-            {#if leaderboardEntry.winningStreak != null && isOnWinningStreak}
-              - streak: {leaderboardEntry.winningStreak}
-            {/if}
           </p>
           <p>Losses:</p>
           <p>
             {leaderboardEntry.loses}
-            {#if leaderboardEntry.losingStreak != null && isOnLosingStreak}
-              - streak: {leaderboardEntry.losingStreak}
-            {/if}
           </p>
+          {#if totalGamesPlayed > 0}
+            <p>Current streak:</p>
+            <p>
+              {#if (leaderboardEntry.winningStreak ?? 0) > 0}🔥 {leaderboardEntry.winningStreak}{/if}
+              {#if (leaderboardEntry.losingStreak ?? 0) > 0}🌧️ {leaderboardEntry.losingStreak}{/if}
+            </p>
+          {/if}
           <p>Total games played:</p>
           <p>{totalGamesPlayed}</p>
           <p>Win %:</p>

@@ -1,3 +1,4 @@
+import type { LeaderboardEntry } from '$lib/components/leaderboard/leader-board-entry';
 import { fail } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
 
@@ -12,11 +13,13 @@ export const load: PageServerLoad = async ({ locals: { apiClient } }) => {
       apiClient.usersApi.v1UsersGet(),
     ]);
 
+    const leaderboardEntries = entries
+      .toSorted((a, b) => (b.mmr ?? 0) - (a.mmr ?? 0))
+      .map<LeaderboardEntry>((entry, idx) => ({ ...entry, rank: idx + 1 }));
+
     return {
       users,
-      leaderboardEntries: entries.toSorted(
-        (a, b) => (b.mmr ?? 0) - (a.mmr ?? 0)
-      ),
+      leaderboardEntries,
       recentMatches: matches ?? [],
     };
   } catch (error) {

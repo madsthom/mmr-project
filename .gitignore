@@ -4,3 +4,4 @@ backend/db/foosball.db
 backend/.env.local
 backend/.env
 .DS_Store
+postgres_dump/

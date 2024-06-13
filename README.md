@@ -96,3 +96,13 @@ atlas migrate diff <name_of_migration> --env gorm
 ```
 
 This will create a new migration file in the `migrations` folder with the name `YYYYMMddHHmmss<name_of_migration>.sql` based on the changes you've made to the GORM models.
+
+### Import data from prod
+
+To import data from the prod database, you can run:
+
+```bash
+./scripts/import_data.sh <resource-group-name> <prod-server-name> <database-name> <tenant-id> <subscription-id> <username>
+```
+
+Username has to have access to the prod database.

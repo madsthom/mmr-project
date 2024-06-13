@@ -2,12 +2,13 @@ package services
 
 import (
 	"errors"
-	"github.com/mafredri/go-trueskill"
-	"gorm.io/gorm"
-	"gorm.io/gorm/clause"
 	database "mmr/backend/db"
 	"mmr/backend/db/models"
 	"mmr/backend/db/repos"
+
+	"github.com/mafredri/go-trueskill"
+	"gorm.io/gorm"
+	"gorm.io/gorm/clause"
 )
 
 type MatchService struct{}
@@ -92,9 +93,9 @@ func (ms MatchService) GetPlayerMuAndSigma(userID uint) (Mu float64, Sigma float
 	return playerHistory.Mu, playerHistory.Sigma
 }
 
-func (ms MatchService) GetMatches(limit int, offset int, orderByCreatedAtDesc bool, includeMmrCalculations bool) []*models.Match {
+func (ms MatchService) GetMatches(limit int, offset int, orderByCreatedAtDesc bool, includeMmrCalculations bool, userId *uint) []*models.Match {
 	matchRepo := repos.NewMatchRepository(database.DB)
-	matches, err := matchRepo.ListMatches(limit, offset, &clause.OrderByColumn{Column: clause.Column{Name: "created_at"}, Desc: orderByCreatedAtDesc}, includeMmrCalculations)
+	matches, err := matchRepo.ListMatches(limit, offset, &clause.OrderByColumn{Column: clause.Column{Name: "created_at"}, Desc: orderByCreatedAtDesc}, includeMmrCalculations, userId)
 
 	if err != nil {
 		panic("Failed to get matches")
@@ -109,4 +110,9 @@ func (ms MatchService) ClearAllMMRHistory() {
 
 	matchRepo := repos.NewMatchRepository(database.DB)
 	matchRepo.ClearMMRCalculations()
+}
+
+func (ms MatchService) CheckExistingMatch(playerOneID uint, playerTwoID uint, playerThreeID uint, playerFourID uint, teamOneScore int, teamTwoScore int) bool {
+	matchRepo := repos.NewMatchRepository(database.DB)
+	return matchRepo.CheckExistingMatch(playerOneID, playerTwoID, playerThreeID, playerFourID, teamOneScore, teamTwoScore)
 }

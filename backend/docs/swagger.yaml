@@ -4,10 +4,16 @@ definitions:
     properties:
       loses:
         type: integer
+      losingStreak:
+        type: integer
       mmr:
         type: integer
       name:
         type: string
+      userId:
+        type: integer
+      winningStreak:
+        type: integer
       wins:
         type: integer
     type: object
@@ -335,6 +341,25 @@ paths:
       summary: Create user
       tags:
       - Users
+  /v1/users/{id}:
+    get:
+      description: Get user by ID
+      parameters:
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/view.UserDetails'
+      summary: Get user
+      tags:
+      - Users
   /v1/users/search:
     get:
       description: Searches users by name
@@ -367,6 +392,10 @@ paths:
       - description: Offset
         in: query
         name: offset
+        type: integer
+      - description: User ID
+        in: query
+        name: userId
         type: integer
       produces:
       - application/json

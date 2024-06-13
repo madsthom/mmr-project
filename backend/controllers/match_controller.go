@@ -6,6 +6,7 @@ import (
 	"mmr/backend/mmr"
 	view "mmr/backend/models"
 	services "mmr/backend/services"
+	queryParser "mmr/backend/utils"
 	"net/http"
 	"strconv"
 
@@ -145,12 +146,19 @@ func (m MatchController) SubmitMatchV2(c *gin.Context) {
 
 	matchService := new(services.MatchService)
 
+	team1Score := *json.Team1.Score
+	team2Score := *json.Team2.Score
+
+	// Check if there is an existing match
+	if matchService.CheckExistingMatch(json.Team1.Member1, json.Team1.Member2, json.Team2.Member1, json.Team2.Member2, int(team1Score), int(team2Score)) {
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": "Match already exists"})
+		return
+	}
+
 	user1 := matchService.GetUserByID(json.Team1.Member1)
 	player1 := m.createPlayer(matchService, user1)
 	user2 := matchService.GetUserByID(json.Team1.Member2)
 	player2 := m.createPlayer(matchService, user2)
-	team1Score := *json.Team1.Score
-	team2Score := *json.Team2.Score
 
 	team1 := mmr.Team{
 		Players: []mmr.Player{player1, player2},
@@ -236,7 +244,7 @@ func (m MatchController) GetMatches(c *gin.Context) {
 		return
 	}
 
-	matchesResult := matchService.GetMatches(limit, offset, true, true)
+	matchesResult := matchService.GetMatches(limit, offset, true, true, nil)
 
 	if len(matchesResult) == 0 {
 		c.JSON(http.StatusOK, []view.MatchDetails{})
@@ -259,6 +267,7 @@ func (m MatchController) GetMatches(c *gin.Context) {
 //	@Tags 			Matches
 //	@Param			limit	query	int	false	"Limit"
 //	@Param			offset	query	int	false	"Offset"
+//	@Param			userId	query	int	false	"User ID"
 //	@Produce		json
 //	@Success		200	{object}	[]view.MatchDetailsV2
 //	@Router			/v2/mmr/matches [get]
@@ -277,8 +286,10 @@ func (m MatchController) GetMatchesV2(c *gin.Context) {
 		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
+	// If no user ID is provided, default to nil which will fetch matches for all users
+	userId := queryParser.GetNullableUintQueryValue(c, "userId")
 
-	matchesResult := matchService.GetMatches(limit, offset, true, true)
+	matchesResult := matchService.GetMatches(limit, offset, true, true, userId)
 
 	if len(matchesResult) == 0 {
 		c.JSON(http.StatusOK, []view.MatchDetailsV2{})

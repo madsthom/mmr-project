@@ -17,7 +17,6 @@
   import type { ViewUserDetails } from '../../../../api';
   import type { MatchSchema } from '../match-schema';
   import { matchSchema } from '../match-schema';
-  import MatchFormField from './match-form-field.svelte';
   import TeamMemberField from './team-member-field.svelte';
 
   export let data: SuperValidated<Infer<MatchSchema>>;
@@ -85,7 +84,7 @@
     },
   });
 
-  const { form: formData, enhance, submitting } = form;
+  const { form: formData, enhance, submitting, message } = form;
 
   onMount(() => {
     $formData.team1.member1 = player1Id ?? $formData.team1.member1;
@@ -155,7 +154,7 @@
     const redirectTo = `/submit?${redirectToParams}&${inputName}=`;
     const nameParam = suggested !== '' ? `&name=${suggested}` : '';
     goto(
-      `/users/new?redirect_to=${encodeURIComponent(redirectTo)}${nameParam}`
+      `/new-player?redirect_to=${encodeURIComponent(redirectTo)}${nameParam}`
     );
   };
 </script>
@@ -277,6 +276,9 @@
         <MatchCard match={$formData} {users} />
         <Form.Button>Submit the match</Form.Button>
       </div>
+    {/if}
+    {#if $message}
+      <p class="text-red-500">{$message}</p>
     {/if}
   </div>
 </form>

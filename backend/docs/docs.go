@@ -317,6 +317,35 @@ const docTemplate = `{
                 }
             }
         },
+        "/v1/users/{id}": {
+            "get": {
+                "description": "Get user by ID",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Users"
+                ],
+                "summary": "Get user",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "User ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/view.UserDetails"
+                        }
+                    }
+                }
+            }
+        },
         "/v2/mmr/matches": {
             "get": {
                 "description": "Get all matches",
@@ -338,6 +367,12 @@ const docTemplate = `{
                         "type": "integer",
                         "description": "Offset",
                         "name": "offset",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "User ID",
+                        "name": "userId",
                         "in": "query"
                     }
                 ],
@@ -394,11 +429,20 @@ const docTemplate = `{
                 "loses": {
                     "type": "integer"
                 },
+                "losingStreak": {
+                    "type": "integer"
+                },
                 "mmr": {
                     "type": "integer"
                 },
                 "name": {
                     "type": "string"
+                },
+                "userId": {
+                    "type": "integer"
+                },
+                "winningStreak": {
+                    "type": "integer"
                 },
                 "wins": {
                     "type": "integer"

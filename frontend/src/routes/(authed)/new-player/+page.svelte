@@ -6,21 +6,21 @@
   import { superForm } from 'sveltekit-superforms';
   import { zodClient } from 'sveltekit-superforms/adapters';
   import type { PageServerData } from './$types';
-  import { createUserSchema } from './schema';
+  import { createPlayerSchema } from './schema';
 
   export let data: PageServerData;
 
   const form = superForm(data.form, {
-    validators: zodClient(createUserSchema),
+    validators: zodClient(createPlayerSchema),
     dataType: 'json',
     delayMs: 500,
   });
 
-  const { form: formData, enhance, submitting } = form;
+  const { form: formData, enhance, submitting, message } = form;
 </script>
 
 <form method="post" use:enhance class="flex flex-col gap-1">
-  <PageTitle>Create user</PageTitle>
+  <PageTitle>Create player</PageTitle>
 
   <Form.Field {form} name="name">
     <Form.Control let:attrs>
@@ -28,7 +28,7 @@
       <Input
         {...attrs}
         bind:value={$formData.name}
-        placeholder="Enter user's initials"
+        placeholder="Enter player's initials"
       />
     </Form.Control>
     <Form.FieldErrors />
@@ -39,12 +39,15 @@
       <Input
         {...attrs}
         bind:value={$formData.displayName}
-        placeholder="Enter user's name"
+        placeholder="Enter player's name"
       />
     </Form.Control>
     <Form.FieldErrors />
   </Form.Field>
-  <Form.Button>Create user</Form.Button>
+  <Form.Button>Create player</Form.Button>
+  {#if $message}
+    <p class="text-red-500">{$message}</p>
+  {/if}
 </form>
 
 <LoadingOverlay isLoading={$submitting} />

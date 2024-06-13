@@ -1,21 +1,22 @@
 import { fail, redirect } from '@sveltejs/kit';
-import { superValidate } from 'sveltekit-superforms';
+import { message, superValidate, type ErrorStatus } from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';
+import { ResponseError } from '../../../api';
 import type { Actions, PageServerLoad } from './$types';
-import { createUserSchema } from './schema';
+import { createPlayerSchema } from './schema';
 
 export const load: PageServerLoad = async ({ url }) => {
   const name = url.searchParams.get('name') ?? '';
 
   return {
-    form: await superValidate(zod(createUserSchema), { defaults: { name } }),
+    form: await superValidate(zod(createPlayerSchema), { defaults: { name } }),
   };
 };
 
 export const actions: Actions = {
   default: async (event) => {
     const apiClient = event.locals.apiClient;
-    const form = await superValidate(event, zod(createUserSchema));
+    const form = await superValidate(event, zod(createPlayerSchema));
 
     const redirectTo = event.url.searchParams.get('redirect_to');
 
@@ -32,8 +33,14 @@ export const actions: Actions = {
 
       throw redirect(303, redirectTo != null ? redirectTo + user.userId : '/');
     } catch (error) {
+      if (error instanceof ResponseError) {
+        const errorResponse = await error.response.json();
+        return message(form, errorResponse.error, {
+          status: error.response.status as ErrorStatus,
+        });
+      }
       return fail(500, {
-        error,
+        form,
       });
     }
   },

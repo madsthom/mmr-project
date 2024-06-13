@@ -2,14 +2,15 @@ package repos
 
 import (
 	"database/sql"
+	"mmr/backend/db/models"
+
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
-	"mmr/backend/db/models"
 )
 
 type IMatchRepository interface {
 	CreateMatch(match *models.Match) (*models.Match, error)
-	ListMatches(limit int, offset int, orderBy *clause.OrderByColumn, includeMmrCalculations bool) ([]*models.Match, error)
+	ListMatches(limit int, offset int, orderBy *clause.OrderByColumn, includeMmrCalculations bool, userId *uint) ([]*models.Match, error)
 	ClearMMRCalculations()
 	CheckExistingMatch(playerOneID uint, playerTwoID uint, playerThreeID uint, playerFourID uint, teamOneScore int, teamTwoScore int) bool
 }
@@ -29,7 +30,7 @@ func (mr *MatchRepository) CreateMatch(match *models.Match) (*models.Match, erro
 	return match, nil
 }
 
-func (mr *MatchRepository) ListMatches(limit int, offset int, orderBy *clause.OrderByColumn, includeMmrCalculations bool) ([]*models.Match, error) {
+func (mr *MatchRepository) ListMatches(limit int, offset int, orderBy *clause.OrderByColumn, includeMmrCalculations bool, userId *uint) ([]*models.Match, error) {
 	var matches []*models.Match
 
 	if orderBy == nil {
@@ -44,6 +45,13 @@ func (mr *MatchRepository) ListMatches(limit int, offset int, orderBy *clause.Or
 
 	if includeMmrCalculations {
 		query = query.Preload("MMRCalculations")
+	}
+
+	if userId != nil {
+		query = query.
+			Joins("JOIN teams AS team_one ON matches.team_one_id = team_one.id").
+			Joins("JOIN teams AS team_two ON matches.team_two_id = team_two.id").
+			Where("team_one.user_one_id = @user OR team_one.user_two_id = @user OR team_two.user_one_id = @user OR team_two.user_two_id = @user", sql.Named("user", *userId))
 	}
 
 	err := query.

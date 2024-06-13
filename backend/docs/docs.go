@@ -349,11 +349,20 @@ const docTemplate = `{
                 "loses": {
                     "type": "integer"
                 },
+                "losingStreak": {
+                    "type": "integer"
+                },
                 "mmr": {
                     "type": "integer"
                 },
                 "name": {
                     "type": "string"
+                },
+                "userId": {
+                    "type": "integer"
+                },
+                "winningStreak": {
+                    "type": "integer"
                 },
                 "wins": {
                     "type": "integer"

@@ -40,5 +40,5 @@
     {/each}
   </div>
   <h2 class="text-2xl md:text-4xl">Leaderboard</h2>
-  <Leaderboard data={leaderboardEntries ?? []} />
+  <Leaderboard data={leaderboardEntries ?? []} {users} />
 </div>

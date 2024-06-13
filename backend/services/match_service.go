@@ -111,3 +111,8 @@ func (ms MatchService) ClearAllMMRHistory() {
 	matchRepo := repos.NewMatchRepository(database.DB)
 	matchRepo.ClearMMRCalculations()
 }
+
+func (ms MatchService) CheckExistingMatch(playerOneID uint, playerTwoID uint, playerThreeID uint, playerFourID uint, teamOneScore int, teamTwoScore int) bool {
+	matchRepo := repos.NewMatchRepository(database.DB)
+	return matchRepo.CheckExistingMatch(playerOneID, playerTwoID, playerThreeID, playerFourID, teamOneScore, teamTwoScore)
+}

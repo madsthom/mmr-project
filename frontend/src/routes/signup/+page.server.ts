@@ -1,18 +1,18 @@
 import { redirect } from '@sveltejs/kit';
 
-import { fail, message, superValidate } from 'sveltekit-superforms';
+import { fail, superValidate } from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';
 import type { Actions, PageServerLoad } from './$types';
-import { loginSchema } from './schema';
+import { signupSchema } from './schema';
 
 export const load: PageServerLoad = async () => {
-  const form = await superValidate(zod(loginSchema));
+  const form = await superValidate(zod(signupSchema));
   return { form };
 };
 
 export const actions: Actions = {
   default: async (event) => {
-    const form = await superValidate(event, zod(loginSchema));
+    const form = await superValidate(event, zod(signupSchema));
 
     if (!form.valid) {
       return fail(400, {
@@ -20,12 +20,10 @@ export const actions: Actions = {
       });
     }
 
-    const { error } = await event.locals.supabase.auth.signInWithPassword(
-      form.data
-    );
+    const { error } = await event.locals.supabase.auth.signUp(form.data);
     if (error) {
       console.error(error);
-      return message(form, 'Invalid credentials', { status: 400 });
+      return fail(400, { form });
     } else {
       return redirect(303, '/');
     }

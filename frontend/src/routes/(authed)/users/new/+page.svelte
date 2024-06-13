@@ -1,4 +1,5 @@
 <script lang="ts">
+  import LoadingOverlay from '$lib/components/loading-overlay.svelte';
   import PageTitle from '$lib/components/page-title.svelte';
   import * as Form from '$lib/components/ui/form';
   import { Input } from '$lib/components/ui/input';
@@ -15,7 +16,7 @@
     delayMs: 500,
   });
 
-  const { form: formData, enhance, submitting } = form;
+  const { form: formData, enhance, submitting, message } = form;
 </script>
 
 <form method="post" use:enhance class="flex flex-col gap-1">
@@ -44,4 +45,9 @@
     <Form.FieldErrors />
   </Form.Field>
   <Form.Button>Create user</Form.Button>
+  {#if $message}
+    <p class="text-red-500">{$message}</p>
+  {/if}
 </form>
+
+<LoadingOverlay isLoading={$submitting} />

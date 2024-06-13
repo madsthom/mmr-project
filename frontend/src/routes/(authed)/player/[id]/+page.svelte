@@ -16,13 +16,13 @@
 
 <div class="mt-6 grid grid-cols-[repeat(auto-fill,minmax(100px,1fr))] gap-2">
   <Kpi title="MMR">{data.mmrHistory[data.mmrHistory.length - 1].mmr}</Kpi>
-  <Kpi title="Total Matches">
+  <Kpi title="# Matches">
     {data.stats.totalMatches}
   </Kpi>
-  <Kpi title="Total Wins">
+  <Kpi title="# Wins">
     {data.stats.wins}
   </Kpi>
-  <Kpi title="Total Losses">
+  <Kpi title="# Losses">
     {data.stats.lost}
   </Kpi>
   <Kpi title="Win %">

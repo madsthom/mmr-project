@@ -33,6 +33,10 @@ export const load: PageServerLoad = async ({
   const lost = totalMatches - wins;
   const winrate = totalMatches > 0 ? wins / totalMatches : 0;
 
+  const msSinceLastMatch =
+    new Date(matches[0].date).getTime() - new Date().getTime();
+  const daysSinceLastMatch = millisecondsToDays(msSinceLastMatch);
+
   return {
     playerId,
     matches,
@@ -44,6 +48,7 @@ export const load: PageServerLoad = async ({
       wins,
       lost,
       winrate,
+      daysSinceLastMatch,
     },
   };
 };
@@ -51,3 +56,5 @@ export const load: PageServerLoad = async ({
 const isOnTeam = (team: ViewMatchTeamV2, playerId: number) => {
   return team.member1 === playerId || team.member2 === playerId;
 };
+
+const millisecondsToDays = (ms: number) => Math.round(ms / 1000 / 60 / 60 / 24);

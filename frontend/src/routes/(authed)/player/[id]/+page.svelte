@@ -31,6 +31,12 @@
       maximumFractionDigits: 1,
     }).format(data.stats.winrate)}
   </Kpi>
+  <Kpi title="Last match">
+    {new Intl.RelativeTimeFormat(undefined, {
+      style: 'narrow',
+      numeric: 'auto',
+    }).format(data.stats.daysSinceLastMatch, 'day')}
+  </Kpi>
 </div>
 
 <h2 class="-mb-6 mt-6 text-2xl md:text-4xl">Rating over time</h2>

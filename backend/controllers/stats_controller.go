@@ -5,8 +5,8 @@ import (
 	database "mmr/backend/db"
 	"mmr/backend/db/repos"
 	view "mmr/backend/models"
+	queryParser "mmr/backend/utils"
 	"net/http"
-	"strconv"
 
 	"github.com/gin-gonic/gin"
 )
@@ -54,20 +54,8 @@ func (sc StatsController) GetPlayerHistory(c *gin.Context) {
 	// Initialize user repository
 	userRepo := repos.NewUserRepository(database.DB)
 
-	// Parse user ID from request as uint
 	// If no user ID is provided, default to nil which will fetch all user histories
-	var userId *uint = nil
-	userIdParam := c.Query("userId")
-
-	if userIdParam != "" {
-		userIdParsed, err := strconv.ParseUint(userIdParam, 10, 64)
-		if err != nil {
-			c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": "Invalid user ID"})
-			return
-		}
-		userIdUint := uint(userIdParsed) // Convert userIdParsed to uint
-		userId = &userIdUint
-	}
+	userId := queryParser.GetNullableUintQueryValue(c, "userId")
 
 	// Fetch user history
 	entries, err := userRepo.ListPlayerHistory(userId)

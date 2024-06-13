@@ -1,5 +1,5 @@
 <script lang="ts">
-  import Leaderboard from '$lib/components/leaderboard.svelte';
+  import Leaderboard from '$lib/components/leaderboard';
   import { MatchCard } from '$lib/components/match-card';
   import PageTitle from '$lib/components/page-title.svelte';
   import Label from '$lib/components/ui/label/label.svelte';

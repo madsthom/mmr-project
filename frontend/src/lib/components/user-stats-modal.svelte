@@ -2,18 +2,15 @@
   import { Button } from '$lib/components/ui/button';
   import * as Dialog from '$lib/components/ui/dialog';
   import { LoaderCircle } from 'lucide-svelte';
-  import type {
-    ReposLeaderboardEntry,
-    ViewMatchDetailsV2,
-    ViewUserDetails,
-  } from '../../api';
+  import type { ViewMatchDetailsV2, ViewUserDetails } from '../../api';
   import Kpi from './kpi.svelte';
+  import type { LeaderboardEntry } from './leaderboard/leader-board-entry';
   import MatchCard from './match-card/match-card.svelte';
   import * as Card from './ui/card';
 
   export let user: ViewUserDetails;
   export let users: ViewUserDetails[];
-  export let leaderboardEntry: ReposLeaderboardEntry | null | undefined;
+  export let leaderboardEntry: LeaderboardEntry | null | undefined;
   export let open: boolean;
   export let onOpenChange: (open: boolean) => void;
 
@@ -89,13 +86,8 @@
         {@const totalGamesPlayed =
           (leaderboardEntry.wins ?? 0) + (leaderboardEntry.loses ?? 0)}
         <div class="grid grid-cols-[repeat(auto-fill,minmax(100px,1fr))] gap-2">
-          <Kpi title="# Wins">{leaderboardEntry.wins ?? 0}</Kpi>
-          <Kpi title="# Losses">{leaderboardEntry.loses ?? 0}</Kpi>
-          <Kpi title="# Matches">{totalGamesPlayed}</Kpi>
-          <Kpi title="Streak">
-            {#if (leaderboardEntry.winningStreak ?? 0) > 0}🔥 {leaderboardEntry.winningStreak}{/if}
-            {#if (leaderboardEntry.losingStreak ?? 0) > 0}🌧️ {leaderboardEntry.losingStreak}{/if}
-          </Kpi>
+          <Kpi title="Rank">{leaderboardEntry.rank}</Kpi>
+          <Kpi title="MMR">{leaderboardEntry.mmr}</Kpi>
           <Kpi title="Win %">
             {percentFormatter.format(
               totalGamesPlayed > 0
@@ -103,7 +95,15 @@
                 : 0
             )}
           </Kpi>
-          <Kpi title="MMR">{leaderboardEntry.mmr}</Kpi>
+          <Kpi title="# Wins" class="col-start-1"
+            >{leaderboardEntry.wins ?? 0}</Kpi
+          >
+          <Kpi title="# Losses">{leaderboardEntry.loses ?? 0}</Kpi>
+          <Kpi title="# Matches">{totalGamesPlayed}</Kpi>
+          <Kpi title="Streak">
+            {#if (leaderboardEntry.winningStreak ?? 0) > 0}🔥 {leaderboardEntry.winningStreak}{/if}
+            {#if (leaderboardEntry.losingStreak ?? 0) > 0}🌧️ {leaderboardEntry.losingStreak}{/if}
+          </Kpi>
         </div>
       {/if}
       {#if users.length > 0}

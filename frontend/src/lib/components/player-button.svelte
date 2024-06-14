@@ -1,0 +1,28 @@
+<script lang="ts">
+  import type { ViewUserDetails } from '$api';
+  import { cn } from '$lib/utils';
+  import type { HTMLAttributes } from 'svelte/elements';
+
+  export let user: ViewUserDetails;
+
+  let className: HTMLAttributes<HTMLButtonElement>['class'] = undefined;
+  export { className as class };
+</script>
+
+<button
+  class={cn(
+    'border-input hover:border-primary focus-visible:ring-ring ring-offset-background flex w-full flex-col gap-1 rounded-md border px-3 py-2 text-start focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2',
+    className
+  )}
+  type="button"
+  on:click
+>
+  <p class="line-clamp-1 text-sm md:text-base">
+    {user.displayName ?? user.name}
+  </p>
+  <p class="text-xs">
+    {#if user.displayName != null}
+      {user.name}
+    {/if}
+  </p>
+</button>

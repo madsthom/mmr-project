@@ -5,13 +5,37 @@
   import * as Card from '$lib/components/ui/card';
   import LineChart from '$lib/components/ui/line-chart/line-chart.svelte';
   import * as Table from '$lib/components/ui/table';
+  import { X } from 'lucide-svelte';
   import type { PageData } from './$types';
+  import Filter from './components/filter.svelte';
 
   export let data: PageData;
 
   const winRateFormatter = new Intl.NumberFormat(undefined, {
     style: 'percent',
     maximumFractionDigits: 0,
+  });
+
+  let filteredUsers: number[] = [];
+  $: matches = (data.matches ?? []).filter((match) => {
+    console.log(filteredUsers);
+    // If filteredUsers is empty, show all matches
+    if (filteredUsers.length === 0) {
+      return true;
+    }
+
+    // If filteredUsers is not empty, show only matches that contain all of the filtered users
+    const containsUser = filteredUsers.every(
+      (userId) =>
+        match.team1.member1 === userId ||
+        match.team1.member2 === userId ||
+        match.team2.member1 === userId ||
+        match.team2.member2 === userId
+    );
+
+    console.log({ containsUser, match });
+
+    return containsUser;
   });
 </script>
 
@@ -173,11 +197,45 @@
   {/if}
 
   {#if data.matches.length > 0}
-    <h2 class="my-6 text-2xl md:text-4xl">Matches</h2>
-    <div class="flex flex-1 flex-col items-stretch gap-2">
-      {#each data.matches ?? [] as match}
-        <MatchCard users={data.users ?? []} {match} showMmr />
-      {/each}
+    <div class="flex flex-col gap-3">
+      <h2 class="text-2xl md:text-4xl">Matches</h2>
+      <div class="flex flex-col space-y-2">
+        <Filter
+          users={data.users ?? []}
+          onSelectedUser={(filteredUserId) => {
+            filteredUsers = [...filteredUsers, filteredUserId];
+          }}
+        />
+        <div class="flex space-x-1">
+          {#each filteredUsers as filteredUser}
+            {@const user = data.users?.find((u) => u.userId === filteredUser)}
+            {#if user != null}
+              <div
+                class="bg-secondary text-secondary-foreground flex items-center space-x-2 rounded-md p-3"
+              >
+                <span>{user.displayName ?? user.name}</span>
+                <button
+                  on:click={() => {
+                    filteredUsers = filteredUsers.filter(
+                      (userId) => userId !== filteredUser
+                    );
+                  }}
+                >
+                  <X class="h-4 w-4" />
+                </button>
+              </div>
+            {/if}
+          {/each}
+        </div>
+      </div>
+      <div class="flex flex-1 flex-col items-stretch gap-2">
+        {#if matches.length === 0}
+          <p>No matches found</p>
+        {/if}
+        {#each matches as match (match.date)}
+          <MatchCard users={data.users ?? []} {match} showMmr />
+        {/each}
+      </div>
     </div>
   {/if}
 </div>

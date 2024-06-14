@@ -12,23 +12,15 @@
   export let team: 'team1' | 'team2';
   export let member: 'member1' | 'member2';
 
-  let memberId = match[team][member];
-  let memberName =
+  $: memberId = match[team][member];
+  $: memberName =
     users.find((user) => user.userId === memberId)?.name ?? 'Unknown';
-  let delta = null;
-  switch (member) {
-    case 'member1':
-      delta = match.mmrCalculations?.[team].player1MMRDelta;
-      break;
-    case 'member2':
-      delta = match.mmrCalculations?.[team].player2MMRDelta;
-      break;
-    default:
-      delta = null;
-      break;
-  }
+  $: delta =
+    member === 'member1'
+      ? match.mmrCalculations?.[team].player1MMRDelta
+      : match.mmrCalculations?.[team].player2MMRDelta;
 
-  let align = team === 'team1' ? 'left' : 'right';
+  $: align = team === 'team1' ? 'left' : 'right';
 </script>
 
 <p class="space-x-1">

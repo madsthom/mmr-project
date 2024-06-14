@@ -1,5 +1,6 @@
 import type { ViewMatchTeamV2 } from '../../../../api';
 import type { PageServerLoad } from './$types';
+import type { MemberLeaderboardEntry } from './types';
 
 export const load: PageServerLoad = async ({
   params,
@@ -42,6 +43,77 @@ export const load: PageServerLoad = async ({
     ? millisecondsToDays(msSinceLastMatch)
     : null;
 
+  const teammates = Object.entries(
+    matches
+      .map((match) => {
+        if (
+          match.team1.member1 === playerId ||
+          match.team1.member2 === playerId
+        ) {
+          return match.team1;
+        }
+
+        return match.team2;
+      })
+      .reduce<Record<number, MemberLeaderboardEntry>>((acc, team) => {
+        const isWin = team.score === 10;
+        acc[team.member1] = {
+          ...acc[team.member1],
+          playerId: team.member1,
+          wins: (acc[team.member1]?.wins ?? 0) + (isWin ? 1 : 0),
+          losses: (acc[team.member1]?.losses ?? 0) + (isWin ? 0 : 1),
+          total: (acc[team.member1]?.total ?? 0) + 1,
+        };
+        acc[team.member2] = {
+          ...acc[team.member2],
+          playerId: team.member2,
+          wins: (acc[team.member2]?.wins ?? 0) + (isWin ? 1 : 0),
+          losses: (acc[team.member2]?.losses ?? 0) + (isWin ? 0 : 1),
+          total: (acc[team.member2]?.total ?? 0) + 1,
+        };
+        return acc;
+      }, {})
+  )
+    .filter(([, stats]) => stats.playerId !== playerId)
+    .sort((a, b) => b[1].total - a[1].total)
+    .map(([, stats]) => stats)
+    .slice(0, 5);
+
+  const opponents = Object.entries(
+    matches
+      .map((match) => {
+        if (
+          match.team1.member1 === playerId ||
+          match.team1.member2 === playerId
+        ) {
+          return match.team2;
+        }
+
+        return match.team1;
+      })
+      .reduce<Record<number, MemberLeaderboardEntry>>((acc, team) => {
+        const isWin = team.score === 10;
+        acc[team.member1] = {
+          ...acc[team.member1],
+          playerId: team.member1,
+          wins: (acc[team.member1]?.wins ?? 0) + (isWin ? 0 : 1),
+          losses: (acc[team.member1]?.losses ?? 0) + (isWin ? 1 : 0),
+          total: (acc[team.member1]?.total ?? 0) + 1,
+        };
+        acc[team.member2] = {
+          ...acc[team.member2],
+          playerId: team.member2,
+          wins: (acc[team.member2]?.wins ?? 0) + (isWin ? 0 : 1),
+          losses: (acc[team.member2]?.losses ?? 0) + (isWin ? 1 : 0),
+          total: (acc[team.member2]?.total ?? 0) + 1,
+        };
+        return acc;
+      }, {})
+  )
+    .sort((a, b) => b[1].total - a[1].total)
+    .map(([, stats]) => stats)
+    .slice(0, 5);
+
   return {
     playerId,
     matches,
@@ -55,6 +127,8 @@ export const load: PageServerLoad = async ({
       lost,
       winrate,
       daysSinceLastMatch,
+      teammates,
+      opponents,
     },
   };
 };

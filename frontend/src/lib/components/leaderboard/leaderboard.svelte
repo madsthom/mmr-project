@@ -78,25 +78,27 @@
             </Table.Cell>
             <Table.Cell>
               <div class="flex justify-end gap-2">
-                <div class="pointer-events-none hidden w-14 md:block">
-                  {#await statisticsPromise}
-                    <Sparkline
-                      data={[]}
-                      options={{ data: { loading: true } }}
-                    />
-                  {:then stats}
-                    {#if stats != null && mmr != null}
+                {#if mmr != 0}
+                  <div class="pointer-events-none hidden w-14 md:block">
+                    {#await statisticsPromise}
                       <Sparkline
-                        data={(stats ?? [])
-                          .filter((stat) => stat.userId === userId)
-                          .map((stat) => ({
-                            date: stat.date,
-                            rating: stat.mmr,
-                          }))}
+                        data={[]}
+                        options={{ data: { loading: true } }}
                       />
-                    {/if}
-                  {/await}
-                </div>
+                    {:then stats}
+                      {#if stats != null}
+                        <Sparkline
+                          data={(stats ?? [])
+                            .filter((stat) => stat.userId === userId)
+                            .map((stat) => ({
+                              date: stat.date,
+                              rating: stat.mmr,
+                            }))}
+                        />
+                      {/if}
+                    {/await}
+                  </div>
+                {/if}
                 <span>
                   {mmr != 0 ? mmr : '🐣'}
                 </span>

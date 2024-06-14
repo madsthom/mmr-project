@@ -9,84 +9,6 @@
 
   export let data: PageData;
 
-  interface MemberLeaderboardEntry {
-    playerId: number;
-    wins: number;
-    losses: number;
-    total: number;
-  }
-
-  $: teammates = Object.entries(
-    data.matches
-      .map((match) => {
-        if (
-          match.team1.member1 === data.user.userId ||
-          match.team1.member2 === data.user.userId
-        ) {
-          return match.team1;
-        }
-
-        return match.team2;
-      })
-      .reduce<Record<number, MemberLeaderboardEntry>>((acc, team) => {
-        const isWin = team.score === 10;
-        acc[team.member1] = {
-          ...acc[team.member1],
-          playerId: team.member1,
-          wins: (acc[team.member1]?.wins ?? 0) + (isWin ? 1 : 0),
-          losses: (acc[team.member1]?.losses ?? 0) + (isWin ? 0 : 1),
-          total: (acc[team.member1]?.total ?? 0) + 1,
-        };
-        acc[team.member2] = {
-          ...acc[team.member2],
-          playerId: team.member2,
-          wins: (acc[team.member2]?.wins ?? 0) + (isWin ? 1 : 0),
-          losses: (acc[team.member2]?.losses ?? 0) + (isWin ? 0 : 1),
-          total: (acc[team.member2]?.total ?? 0) + 1,
-        };
-        return acc;
-      }, {})
-  )
-    .filter(([_player, stats]) => stats.playerId !== data.user.userId)
-    .sort((a, b) => b[1].total - a[1].total)
-    .map(([_player, stats]) => stats)
-    .slice(0, 5);
-
-  $: opponents = Object.entries(
-    data.matches
-      .map((match) => {
-        if (
-          match.team1.member1 === data.user.userId ||
-          match.team1.member2 === data.user.userId
-        ) {
-          return match.team2;
-        }
-
-        return match.team1;
-      })
-      .reduce<Record<number, MemberLeaderboardEntry>>((acc, team) => {
-        const isWin = team.score === 10;
-        acc[team.member1] = {
-          ...acc[team.member1],
-          playerId: team.member1,
-          wins: (acc[team.member1]?.wins ?? 0) + (isWin ? 0 : 1),
-          losses: (acc[team.member1]?.losses ?? 0) + (isWin ? 1 : 0),
-          total: (acc[team.member1]?.total ?? 0) + 1,
-        };
-        acc[team.member2] = {
-          ...acc[team.member2],
-          playerId: team.member2,
-          wins: (acc[team.member2]?.wins ?? 0) + (isWin ? 0 : 1),
-          losses: (acc[team.member2]?.losses ?? 0) + (isWin ? 1 : 0),
-          total: (acc[team.member2]?.total ?? 0) + 1,
-        };
-        return acc;
-      }, {})
-  )
-    .sort((a, b) => b[1].total - a[1].total)
-    .map(([_player, stats]) => stats)
-    .slice(0, 5);
-
   const winRateFormatter = new Intl.NumberFormat(undefined, {
     style: 'percent',
     maximumFractionDigits: 0,
@@ -143,7 +65,7 @@
     />
   {/if}
 
-  {#if opponents.length > 0}
+  {#if data.stats.opponents.length > 0}
     <Card.Root>
       <Card.Content class="flex flex-col p-0 md:p-6">
         <h2 class="text-xl md:text-2xl">Most common opponents</h2>
@@ -164,7 +86,7 @@
             </Table.Row>
           </Table.Header>
           <Table.Body>
-            {#each opponents as { playerId, losses, wins, total }}
+            {#each data.stats.opponents as { playerId, losses, wins, total }}
               {@const playerUser = data.users?.find(
                 (user) => user.userId == playerId
               )}
@@ -196,7 +118,7 @@
       </Card.Content>
     </Card.Root>
   {/if}
-  {#if teammates.length > 0}
+  {#if data.stats.teammates.length > 0}
     <Card.Root>
       <Card.Content class="flex flex-col p-0 md:p-6">
         <h2 class="text-xl md:text-2xl">Most common teammates</h2>
@@ -217,7 +139,7 @@
             </Table.Row>
           </Table.Header>
           <Table.Body>
-            {#each teammates as { playerId, losses, wins, total }}
+            {#each data.stats.teammates as { playerId, losses, wins, total }}
               {@const playerUser = data.users?.find(
                 (user) => user.userId == playerId
               )}

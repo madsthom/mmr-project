@@ -33,6 +33,15 @@ export const load: PageServerLoad = async ({
   const lost = totalMatches - wins;
   const winrate = totalMatches > 0 ? wins / totalMatches : 0;
 
+  const mmr = mmrHistory[mmrHistory.length - 1]?.mmr ?? null;
+
+  const msSinceLastMatch = matches[0]
+    ? new Date(matches[0].date).getTime() - new Date().getTime()
+    : null;
+  const daysSinceLastMatch = msSinceLastMatch
+    ? millisecondsToDays(msSinceLastMatch)
+    : null;
+
   return {
     playerId,
     matches,
@@ -40,10 +49,12 @@ export const load: PageServerLoad = async ({
     user,
     mmrHistory,
     stats: {
+      mmr,
       totalMatches,
       wins,
       lost,
       winrate,
+      daysSinceLastMatch,
     },
   };
 };
@@ -51,3 +62,5 @@ export const load: PageServerLoad = async ({
 const isOnTeam = (team: ViewMatchTeamV2, playerId: number) => {
   return team.member1 === playerId || team.member2 === playerId;
 };
+
+const millisecondsToDays = (ms: number) => Math.round(ms / 1000 / 60 / 60 / 24);

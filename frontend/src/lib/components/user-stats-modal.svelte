@@ -19,61 +19,19 @@
     maximumFractionDigits: 0,
   });
 
-  type RecentMatchDownload =
-    | {
-        status: 'success';
-        userId: number;
-        match: ViewMatchDetailsV2;
-      }
-    | {
-        status: 'error';
-        userId: number;
-        error: string;
-      }
-    | {
-        status: 'loading';
-        userId: number;
-      };
-
-  let recentMatch: RecentMatchDownload = {
-    status: 'loading',
-    userId: user.userId,
-  };
-
   const fetchRecentMatch = async (userId: number) => {
-    recentMatch = {
-      status: 'loading',
-      userId,
-    };
-    try {
-      const response = await fetch(`/api/recent-match?playerId=${userId}`);
-      if (response.ok) {
-        const data = await response.json();
-        recentMatch = {
-          status: 'success',
-          userId,
-          match: data.latestMatch,
-        };
-      } else {
-        recentMatch = {
-          status: 'error',
-          userId,
-          error: 'Unable to fetch recent match.',
-        };
-      }
-    } catch (error) {
-      recentMatch = {
-        status: 'error',
-        userId,
-        error: 'Unable to fetch recent match.',
-      };
+    const response = await fetch(`/api/recent-match?playerId=${userId}`);
+    if (response.ok) {
+      const data = await response.json();
+      return data.latestMatch;
+    } else {
+      throw new Error('Failed to fetch recent match');
     }
   };
 
-  // Fetch recent match every time user changes
-  $: if (user && user.userId) {
-    fetchRecentMatch(user.userId);
-  }
+  // Fetch recent match every time user changes and store in promise
+  $: recentMatchPromise =
+    user && user.userId ? fetchRecentMatch(user.userId) : null;
 </script>
 
 <Dialog.Root {open} {onOpenChange}>
@@ -109,23 +67,23 @@
       {#if users.length > 0}
         <div class="flex flex-col gap-2">
           <p class="text-base text-gray-300">Latest Match</p>
-          {#if recentMatch.status === 'loading'}
-            <Card.Root class="flex items-center gap-2 p-4">
-              <LoaderCircle class="text-muted-foreground animate-spin" />
-              <p class="text-muted-foreground text-base">
-                Fetching latest match...
-              </p>
-            </Card.Root>
-          {/if}
-          {#if recentMatch.status === 'error'}
-            <Card.Root class="flex items-center gap-2 p-4">
-              <p class="text-base text-red-500">
-                {recentMatch.error}
-              </p>
-            </Card.Root>
-          {/if}
-          {#if recentMatch.status === 'success'}
-            <MatchCard match={recentMatch.match} {users} showMmr />
+          {#if recentMatchPromise != null}
+            {#await recentMatchPromise}
+              <Card.Root class="flex items-center gap-2 p-4">
+                <LoaderCircle class="text-muted-foreground animate-spin" />
+                <p class="text-muted-foreground text-base">
+                  Fetching latest match...
+                </p>
+              </Card.Root>
+            {:then recentMatch}
+              <MatchCard match={recentMatch} {users} showMmr />
+            {:catch error}
+              <Card.Root class="flex items-center gap-2 p-4">
+                <p class="text-base text-red-500">
+                  {error}
+                </p>
+              </Card.Root>
+            {/await}
           {/if}
         </div>
       {/if}

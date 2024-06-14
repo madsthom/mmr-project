@@ -88,6 +88,11 @@
     .sort((a, b) => b[1].total - a[1].total)
     .map(([_player, stats]) => stats)
     .slice(0, 5);
+
+  const winRateFormatter = new Intl.NumberFormat(undefined, {
+    style: 'percent',
+    maximumFractionDigits: 0,
+  });
 </script>
 
 <div class="flex flex-col gap-6">
@@ -157,10 +162,11 @@
                 <span class="sm:hidden">L</span>
                 <span class="hidden sm:inline">Losses</span>
               </Table.Head>
+              <Table.Head class="text-right">Win %</Table.Head>
             </Table.Row>
           </Table.Header>
           <Table.Body>
-            {#each opponents as { playerId, losses, wins }}
+            {#each opponents as { playerId, losses, wins, total }}
               {@const playerUser = data.users?.find(
                 (user) => user.userId == playerId
               )}
@@ -177,14 +183,13 @@
                   </div>
                 </Table.Cell>
                 <Table.Cell>
-                  <div class="flex flex-row items-center gap-2">
-                    {wins}
-                  </div>
+                  {wins}
                 </Table.Cell>
                 <Table.Cell>
-                  <div class="flex flex-row items-center gap-2">
-                    {losses}
-                  </div>
+                  {losses}
+                </Table.Cell>
+                <Table.Cell class="text-right">
+                  {winRateFormatter.format(wins / total)}
                 </Table.Cell>
               </Table.Row>
             {/each}
@@ -197,7 +202,7 @@
     <Card.Root>
       <Card.Content class="flex flex-col p-0 md:p-6">
         <h2 class="text-xl md:text-2xl">Most common teammates</h2>
-        <Table.Root class="">
+        <Table.Root class="p-0">
           <Table.Header>
             <Table.Row>
               <!-- <Table.Head class="w-[3ch]">#</Table.Head> -->
@@ -210,10 +215,11 @@
                 <span class="sm:hidden">L</span>
                 <span class="hidden sm:inline">Losses</span>
               </Table.Head>
+              <Table.Head class="text-right">Win %</Table.Head>
             </Table.Row>
           </Table.Header>
           <Table.Body>
-            {#each teammates as { playerId, losses, wins }}
+            {#each teammates as { playerId, losses, wins, total }}
               {@const playerUser = data.users?.find(
                 (user) => user.userId == playerId
               )}
@@ -230,14 +236,13 @@
                   </div>
                 </Table.Cell>
                 <Table.Cell>
-                  <div class="flex flex-row items-center gap-2">
-                    {wins}
-                  </div>
+                  {wins}
                 </Table.Cell>
                 <Table.Cell>
-                  <div class="flex flex-row items-center gap-2">
-                    {losses}
-                  </div>
+                  {losses}
+                </Table.Cell>
+                <Table.Cell class="text-right">
+                  {winRateFormatter.format(wins / total)}
                 </Table.Cell>
               </Table.Row>
             {/each}

@@ -85,7 +85,7 @@
                       options={{ data: { loading: true } }}
                     />
                   {:then stats}
-                    {#if stats != null}
+                    {#if stats != null && mmr != null}
                       <Sparkline
                         data={(stats ?? [])
                           .filter((stat) => stat.userId === userId)

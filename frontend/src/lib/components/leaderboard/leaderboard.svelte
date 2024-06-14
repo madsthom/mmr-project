@@ -79,7 +79,7 @@
             <Table.Cell>
               <div class="flex justify-end gap-2">
                 {#if mmr != 0}
-                  <div class="pointer-events-none hidden w-16 md:block">
+                  <div class="pointer-events-none hidden w-14 md:block">
                     {#await statisticsPromise}
                       <Sparkline
                         data={[]}

@@ -5,8 +5,6 @@
   import * as Card from '$lib/components/ui/card';
   import LineChart from '$lib/components/ui/line-chart/line-chart.svelte';
   import * as Table from '$lib/components/ui/table';
-  import { isPresent } from '$lib/util/isPresent';
-  import { Separator } from 'bits-ui';
   import type { PageData } from './$types';
 
   export let data: PageData;

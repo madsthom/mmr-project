@@ -11,7 +11,7 @@
   import type { PageData } from './$types';
 
   export let data: PageData;
-  const { leaderboardEntries, recentMatches, users } = data;
+  const { leaderboardEntries, recentMatches, users, statisticsPromise } = data;
   let selectedUser: ViewUserDetails | null | undefined;
   $: leaderboardEntry =
     selectedUser != null
@@ -55,6 +55,7 @@
     onSelectedUser={(user) => {
       selectedUser = user;
     }}
+    {statisticsPromise}
   />
 </div>
 

@@ -2,11 +2,14 @@
   import * as Card from '$lib/components/ui/card';
   import * as Table from '$lib/components/ui/table';
   import { SHOW_STREAK_THRESHOLD } from '$lib/constants';
-  import type { ViewUserDetails } from '../../../api';
+  import type { ViewPlayerHistoryDetails, ViewUserDetails } from '../../../api';
+  import Sparkline from '../ui/sparkline/sparkline.svelte';
   import type { LeaderboardEntry } from './leader-board-entry';
+
   export let data: LeaderboardEntry[];
   export let users: ViewUserDetails[] | null | undefined;
   export let onSelectedUser: (user: ViewUserDetails) => void;
+  export let statisticsPromise: Promise<ViewPlayerHistoryDetails[]> | undefined;
 </script>
 
 <Card.Root>
@@ -14,8 +17,8 @@
     <Table.Root class="">
       <Table.Header>
         <Table.Row>
-          <Table.Head class="w-16">#</Table.Head>
-          <Table.Head class="">Player</Table.Head>
+          <Table.Head class="w-[3ch]">#</Table.Head>
+          <Table.Head class="w-[230px]">Player</Table.Head>
           <Table.Head class="">
             <span class="sm:hidden">W</span>
             <span class="hidden sm:inline">Wins</span>
@@ -42,11 +45,11 @@
               }
             }}
           >
-            <Table.Cell class="w-16 font-bold">{rank}</Table.Cell>
-            <Table.Cell>
+            <Table.Cell class="max-w-[3ch] font-bold">{rank}</Table.Cell>
+            <Table.Cell class="max-w-[230px]">
               <div class="flex flex-col items-start">
                 {#if userDisplayName != null}
-                  <span class="hidden truncate sm:block">
+                  <span class="hidden w-full truncate sm:block">
                     {userDisplayName}
                   </span>
                 {/if}
@@ -57,7 +60,7 @@
               <div class="flex flex-row items-center gap-2">
                 {wins}
                 {#if winningStreak && winningStreak >= SHOW_STREAK_THRESHOLD}
-                  <span class="text-xs" title="Winning streak">
+                  <span class="text-nowrap text-xs" title="Winning streak">
                     🔥 <span class="hidden sm:inline">{winningStreak}</span>
                   </span>
                 {/if}
@@ -67,13 +70,30 @@
               <div class="flex flex-row items-center gap-2">
                 {loses}
                 {#if losingStreak && losingStreak >= SHOW_STREAK_THRESHOLD}
-                  <span class="text-xs" title="Losing streak">
+                  <span class="text-nowrap text-xs" title="Losing streak">
                     🌧️ <span class="hidden sm:inline">{losingStreak}</span>
                   </span>
                 {/if}
               </div>
             </Table.Cell>
-            <Table.Cell class="text-right">{mmr != 0 ? mmr : '🐣'}</Table.Cell>
+            <Table.Cell class="flex justify-end gap-2">
+              <div class="hidden w-16 md:block">
+                {#await statisticsPromise}
+                  <Sparkline data={[]} options={{ data: { loading: true } }} />
+                {:then stats}
+                  {#if stats != null && mmr != 0}
+                    <Sparkline
+                      data={(stats ?? [])
+                        .filter((stat) => stat.userId === userId)
+                        .map((stat) => ({ date: stat.date, rating: stat.mmr }))}
+                    />
+                  {/if}
+                {/await}
+              </div>
+              <span>
+                {mmr != 0 ? mmr : '🐣'}
+              </span>
+            </Table.Cell>
           </Table.Row>
         {/each}
       </Table.Body>

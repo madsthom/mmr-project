@@ -4,6 +4,9 @@ import type { PageServerLoad } from './$types';
 
 export const load: PageServerLoad = async ({ locals: { apiClient } }) => {
   try {
+    // Not awaited by design, since we don't need to wait for this to render the page
+    const statisticsPromise = apiClient.statisticsApi.v1StatsPlayerHistoryGet();
+
     const [entries, matches, users] = await Promise.all([
       apiClient.leaderboardApi.v1StatsLeaderboardGet(),
       apiClient.mmrApi.v2MmrMatchesGet({
@@ -19,6 +22,7 @@ export const load: PageServerLoad = async ({ locals: { apiClient } }) => {
 
     return {
       users,
+      statisticsPromise,
       leaderboardEntries,
       recentMatches: matches ?? [],
     };

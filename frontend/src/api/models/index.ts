@@ -13,4 +13,5 @@ export * from './ViewMatchTeamV2';
 export * from './ViewMatchV2';
 export * from './ViewPlayerHistoryDetails';
 export * from './ViewProfileDetails';
+export * from './ViewTimeStatisticsEntry';
 export * from './ViewUserDetails';

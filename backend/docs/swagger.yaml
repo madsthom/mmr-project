@@ -150,6 +150,19 @@ definitions:
       userId:
         type: integer
     type: object
+  view.TimeStatisticsEntry:
+    properties:
+      count:
+        type: integer
+      dayOfWeek:
+        type: integer
+      hourOfDay:
+        type: integer
+    required:
+    - count
+    - dayOfWeek
+    - hourOfDay
+    type: object
   view.UserDetails:
     properties:
       displayName:
@@ -303,6 +316,23 @@ paths:
               $ref: '#/definitions/view.PlayerHistoryDetails'
             type: array
       summary: Get player history
+      tags:
+      - Statistics
+  /v1/stats/time-distribution:
+    get:
+      consumes:
+      - application/json
+      description: Get number of matches for each day of week and hour of day
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/view.TimeStatisticsEntry'
+            type: array
+      summary: Get match distribution over time
       tags:
       - Statistics
   /v1/users:

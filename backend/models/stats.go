@@ -20,3 +20,9 @@ func PlayerHistoryDetailsViewFromModel(playerHistory models.PlayerHistory) Playe
 		MMR:    playerHistory.MMR,
 	}
 }
+
+type TimeStatisticsEntry struct {
+	DayOfWeek int `json:"dayOfWeek" binding:"required"`
+	HourOfDay int `json:"hourOfDay" binding:"required"`
+	Count     int `json:"count" binding:"required"`
+}

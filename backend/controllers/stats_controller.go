@@ -76,3 +76,26 @@ func (sc StatsController) GetPlayerHistory(c *gin.Context) {
 	// Return player history as JSON response
 	c.JSON(http.StatusOK, playerHistory)
 }
+
+// GetTimeStatistics godoc
+//
+//	@Summary		Get match distribution over time
+//	@Description	Get number of matches for each day of week and hour of day
+//	@Tags 			Statistics
+//	@Accept			json
+//	@Produce		json
+//	@Success		200	{array}	view.TimeStatisticsEntry
+//	@Router			/v1/stats/time-distribution [get]
+func (sc StatsController) GetTimeStatistics(c *gin.Context) {
+
+	matchRepo := repos.NewMatchRepository(database.DB)
+
+	entries, err := matchRepo.GetMatchTimeDistribution()
+
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Failed to calculate match distribution over time"})
+		return
+	}
+
+	c.JSON(http.StatusOK, entries)
+}

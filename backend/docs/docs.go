@@ -230,6 +230,32 @@ const docTemplate = `{
                 }
             }
         },
+        "/v1/stats/time-distribution": {
+            "get": {
+                "description": "Get number of matches for each day of week and hour of day",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Statistics"
+                ],
+                "summary": "Get match distribution over time",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/view.TimeStatisticsEntry"
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/v1/users": {
             "get": {
                 "description": "Lists all users",
@@ -643,6 +669,25 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "userId": {
+                    "type": "integer"
+                }
+            }
+        },
+        "view.TimeStatisticsEntry": {
+            "type": "object",
+            "required": [
+                "count",
+                "dayOfWeek",
+                "hourOfDay"
+            ],
+            "properties": {
+                "count": {
+                    "type": "integer"
+                },
+                "dayOfWeek": {
+                    "type": "integer"
+                },
+                "hourOfDay": {
                     "type": "integer"
                 }
             }

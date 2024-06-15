@@ -685,9 +685,11 @@ const docTemplate = `{
                     "type": "integer"
                 },
                 "dayOfWeek": {
+                    "description": "0-6, 0 is Sunday",
                     "type": "integer"
                 },
                 "hourOfDay": {
+                    "description": "0-23",
                     "type": "integer"
                 }
             }

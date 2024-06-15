@@ -26,13 +26,13 @@ export interface ViewTimeStatisticsEntry {
      */
     count: number;
     /**
-     * 
+     * 0-6, 0 is Sunday
      * @type {number}
      * @memberof ViewTimeStatisticsEntry
      */
     dayOfWeek: number;
     /**
-     * 
+     * 0-23
      * @type {number}
      * @memberof ViewTimeStatisticsEntry
      */

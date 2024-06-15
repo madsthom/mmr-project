@@ -5,7 +5,6 @@
     type AreaChartOptions,
     type HeatmapChartOptions,
   } from '@carbon/charts-svelte';
-  import '@carbon/charts-svelte/styles.css';
 
   export let data: Array<{
     dayOfWeek: number;
@@ -21,34 +20,27 @@
     weekday: 'long',
   });
 
-  const dayOfWeekLabels = Array.from(
-    { length: 7 },
-    (_, i) => {
-      const date = new Date();
-      date.setDate(date.getDate() - date.getDay() + i + 1); // we + 1 to make 0 = monday
-      return dayOfWeekFormatter.format(date);
-    }
-    // dayOfWeekFormatter.format(new Date(2024, 8, i)) // Month that starts on a Monday (could be any - just for sorting)
-  );
+  const dayOfWeekLabels = Array.from({ length: 7 }, (_, i) => {
+    const date = new Date();
+    date.setDate(date.getDate() - date.getDay() + i + 1); // we + 1 to make 0 = monday
+    return dayOfWeekFormatter.format(date);
+  });
   const hourOfDayLabels = Array.from({ length: 24 }, (_, i) =>
     hourOfDayFormatter.format(new Date(0, 0, 0, i))
   );
 
-  console.table(data);
-  console.log(dayOfWeekLabels);
-
   const mappedChartData =
     data?.map((stat) => ({
-      day: dayOfWeekLabels[stat.dayOfWeek + 1], // we + 1 to make 0 = monday
+      day: dayOfWeekLabels[(stat.dayOfWeek + 7 - 1) % 7], // - 1 to make 0 = monday, and +7 % 7 to handle when dayOfWeek == 0
       hour: hourOfDayLabels[stat.hourOfDay],
-      value: stat.count,
+      value: stat.count * Math.random() * 100,
     })) ?? [];
 
   // https://github.com/carbon-design-system/carbon-charts/pull/1846
   const chartOptions: HeatmapChartOptions & { axes: AreaChartOptions['axes'] } =
     {
       theme: 'g100',
-      height: '320px',
+      height: '300px',
       axes: {
         bottom: {
           title: 'Hour of day',
@@ -66,13 +58,20 @@
       heatmap: {
         colorLegend: {
           title: 'Frequency',
-          type: 'linear',
+          type: 'quantize',
+        },
+      },
+      color: {
+        gradient: {
+          colors: Array.from({ length: 10 }).map(
+            (_, i) => `hsl(var(--primary) / ${(i + 1) / 10})`
+          ),
         },
       },
     };
 </script>
 
-<!-- Added margin on bottom to make sure heatmap legend is visible -->
-<div class="mb-2">
+<!-- Added padding on bottom to make sure heatmap legend is visible -->
+<div class="pb-2">
   <HeatmapChart data={mappedChartData} options={chartOptions} />
 </div>

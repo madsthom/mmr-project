@@ -18,24 +18,19 @@
 
   let filteredUsers: number[] = [];
   $: matches = (data.matches ?? []).filter((match) => {
-    console.log(filteredUsers);
     // If filteredUsers is empty, show all matches
     if (filteredUsers.length === 0) {
       return true;
     }
 
     // If filteredUsers is not empty, show only matches that contain all of the filtered users
-    const containsUser = filteredUsers.every(
+    return filteredUsers.every(
       (userId) =>
         match.team1.member1 === userId ||
         match.team1.member2 === userId ||
         match.team2.member1 === userId ||
         match.team2.member2 === userId
     );
-
-    console.log({ containsUser, match });
-
-    return containsUser;
   });
 </script>
 

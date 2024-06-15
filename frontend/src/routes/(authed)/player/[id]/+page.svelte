@@ -84,10 +84,10 @@
     />
   {/if}
 
-  {#if data.stats.opponents.length > 0}
+  {#if data.opponents.length > 0}
     <Card.Root>
       <Card.Content class="flex flex-col p-0 md:p-6">
-        <h2 class="text-xl md:text-2xl">Most common opponents</h2>
+        <h2 class="text-xl md:text-2xl">⚔️ Most common opponents</h2>
         <Table.Root class="">
           <Table.Header>
             <Table.Row>
@@ -105,7 +105,7 @@
             </Table.Row>
           </Table.Header>
           <Table.Body>
-            {#each data.stats.opponents as { playerId, losses, wins, total }}
+            {#each data.opponents as { playerId, losses, wins, total }}
               {@const playerUser = data.users?.find(
                 (user) => user.userId == playerId
               )}
@@ -137,10 +137,10 @@
       </Card.Content>
     </Card.Root>
   {/if}
-  {#if data.stats.teammates.length > 0}
+  {#if data.teammates.length > 0}
     <Card.Root>
       <Card.Content class="flex flex-col p-0 md:p-6">
-        <h2 class="text-xl md:text-2xl">Most common teammates</h2>
+        <h2 class="text-xl md:text-2xl">🤝 Most common teammates</h2>
         <Table.Root class="p-0">
           <Table.Header>
             <Table.Row>
@@ -158,7 +158,7 @@
             </Table.Row>
           </Table.Header>
           <Table.Body>
-            {#each data.stats.teammates as { playerId, losses, wins, total }}
+            {#each data.teammates as { playerId, losses, wins, total }}
               {@const playerUser = data.users?.find(
                 (user) => user.userId == playerId
               )}

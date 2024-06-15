@@ -1,7 +1,9 @@
 package controllers
 
 import (
+	"errors"
 	"github.com/gin-gonic/gin"
+	"gorm.io/gorm"
 	database "mmr/backend/db"
 	"mmr/backend/db/repos"
 	view "mmr/backend/models"
@@ -25,7 +27,7 @@ func (uc ProfileController) GetProfile(c *gin.Context) {
 	// Fetch user by identity user ID
 	identityUserID := c.GetString("identityUserId")
 	user, err := userRepo.GetByIdentityUserId(identityUserID)
-	if err != nil {
+	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
 		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch user"})
 		return
 	}

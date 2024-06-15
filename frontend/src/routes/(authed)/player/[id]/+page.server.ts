@@ -127,9 +127,9 @@ export const load: PageServerLoad = async ({
       lost,
       winrate,
       daysSinceLastMatch,
-      teammates,
-      opponents,
     },
+    teammates,
+    opponents,
   };
 };
 

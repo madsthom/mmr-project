@@ -34,6 +34,7 @@ func NewRouter() *gin.Engine {
 			stats := new(controllers.StatsController)
 			s.GET("/leaderboard", stats.GetLeaderboard)
 			s.GET("/player-history", stats.GetPlayerHistory)
+			s.GET("/time-distribution", stats.GetTimeStatistics)
 		}
 		u := v1.Group("/users")
 		{

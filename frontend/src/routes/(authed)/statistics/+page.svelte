@@ -1,7 +1,7 @@
 <script lang="ts">
   import PageTitle from '$lib/components/page-title.svelte';
+  import Heatmap from '$lib/components/ui/heatmap/heatmap.svelte';
   import LineChart from '$lib/components/ui/line-chart/line-chart.svelte';
-  import '@carbon/charts-svelte/styles.css';
   import type { PageData } from './$types';
 
   export let data: PageData;
@@ -15,6 +15,7 @@
 </script>
 
 <PageTitle>Statistics</PageTitle>
-<div class="container">
-  <LineChart data={chartData} height={500} />
-</div>
+
+<LineChart data={chartData} height={500} />
+
+<Heatmap data={data.timeDistribution ?? []} />

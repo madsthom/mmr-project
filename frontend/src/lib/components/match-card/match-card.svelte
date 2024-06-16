@@ -29,7 +29,10 @@
     <div class="flex flex-col items-center">
       vs.
       {#if match.date}
-        <p class="text-muted-foreground">
+        <p
+          class="text-muted-foreground"
+          title={new Date(match.date).toDateString()}
+        >
           {new Date(match.date).toLocaleTimeString(undefined, {
             hour: '2-digit',
             minute: '2-digit',

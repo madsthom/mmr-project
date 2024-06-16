@@ -20,9 +20,9 @@
     weekday: 'long',
   });
 
+  // Generate an array of day of week names starting from Monday
   const dayOfWeekLabels = Array.from({ length: 7 }, (_, i) => {
-    const date = new Date();
-    date.setDate(date.getDate() - date.getDay() + i + 1); // we + 1 to make 0 = monday
+    const date = new Date(1970, 0, 5 + i); // Jan 5, 1970 is a Monday
     return dayOfWeekFormatter.format(date);
   });
   const hourOfDayLabels = Array.from({ length: 24 }, (_, i) =>
@@ -33,7 +33,7 @@
     data?.map((stat) => ({
       day: dayOfWeekLabels[(stat.dayOfWeek + 7 - 1) % 7], // - 1 to make 0 = monday, and +7 % 7 to handle when dayOfWeek == 0
       hour: hourOfDayLabels[stat.hourOfDay],
-      value: stat.count * Math.random() * 100,
+      value: stat.count,
     })) ?? [];
 
   // https://github.com/carbon-design-system/carbon-charts/pull/1846

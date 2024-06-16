@@ -29,12 +29,20 @@
     hourOfDayFormatter.format(new Date(0, 0, 0, i))
   );
 
-  const mappedChartData =
-    data?.map((stat) => ({
-      day: dayOfWeekLabels[(stat.dayOfWeek + 7 - 1) % 7], // - 1 to make 0 = monday, and +7 % 7 to handle when dayOfWeek == 0
-      hour: hourOfDayLabels[stat.hourOfDay],
-      value: stat.count,
-    })) ?? [];
+  const hourOfDayUTCToCurrentTimezone = (hour: number) => {
+    const date = new Date();
+    date.setUTCHours(hour);
+    return date.toLocaleTimeString(undefined, {
+      hour: 'numeric',
+      hour12: false,
+    });
+  };
+
+  const mappedChartData = (data ?? []).map((stat) => ({
+    day: dayOfWeekLabels[(stat.dayOfWeek + 7 - 1) % 7],
+    hour: hourOfDayUTCToCurrentTimezone(stat.hourOfDay),
+    value: stat.count,
+  }));
 
   // https://github.com/carbon-design-system/carbon-charts/pull/1846
   const chartOptions: HeatmapChartOptions & { axes: AreaChartOptions['axes'] } =

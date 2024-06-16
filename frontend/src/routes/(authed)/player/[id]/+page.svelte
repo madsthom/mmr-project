@@ -87,7 +87,9 @@
   {#if data.opponents.length > 0}
     <Card.Root>
       <Card.Content class="flex flex-col p-0 md:p-6">
-        <h2 class="text-xl md:text-2xl">⚔️ Most common opponents</h2>
+        <h2 class="px-4 py-3 text-xl md:p-0 md:text-2xl">
+          ⚔️ Most common opponents
+        </h2>
         <Table.Root class="">
           <Table.Header>
             <Table.Row>
@@ -140,7 +142,9 @@
   {#if data.teammates.length > 0}
     <Card.Root>
       <Card.Content class="flex flex-col p-0 md:p-6">
-        <h2 class="text-xl md:text-2xl">🤝 Most common teammates</h2>
+        <h2 class="px-4 py-3 text-xl md:p-0 md:text-2xl">
+          🤝 Most common teammates
+        </h2>
         <Table.Root class="p-0">
           <Table.Header>
             <Table.Row>

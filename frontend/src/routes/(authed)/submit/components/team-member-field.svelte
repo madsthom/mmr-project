@@ -1,10 +1,10 @@
 <script lang="ts">
+  import PlayerButton from '$lib/components/player-button.svelte';
   import Button from '$lib/components/ui/button/button.svelte';
   import { Input } from '$lib/components/ui/input';
   import { isPresent } from '$lib/util/isPresent';
   import X from 'lucide-svelte/icons/x';
   import type { ViewUserDetails } from '../../../../api';
-  import PlayerButton from './player-button.svelte';
 
   export let label: string;
   export let userId: number | null;

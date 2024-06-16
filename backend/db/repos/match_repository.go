@@ -3,6 +3,7 @@ package repos
 import (
 	"database/sql"
 	"mmr/backend/db/models"
+	view "mmr/backend/models"
 
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
@@ -13,6 +14,7 @@ type IMatchRepository interface {
 	ListMatches(limit int, offset int, orderBy *clause.OrderByColumn, includeMmrCalculations bool, userId *uint) ([]*models.Match, error)
 	ClearMMRCalculations()
 	CheckExistingMatch(playerOneID uint, playerTwoID uint, playerThreeID uint, playerFourID uint, teamOneScore int, teamTwoScore int) bool
+	GetMatchTimeDistribution() ([]*view.TimeStatisticsEntry, error)
 }
 
 type MatchRepository struct {
@@ -85,4 +87,20 @@ func (mr *MatchRepository) CheckExistingMatch(playerOneID uint, playerTwoID uint
 		Count(&count)
 
 	return count > 0
+}
+
+func (mr *MatchRepository) GetMatchTimeDistribution() ([]*view.TimeStatisticsEntry, error) {
+	var timeStatistics []*view.TimeStatisticsEntry
+
+	err := mr.db.Model(&models.Match{}).
+		Select("EXTRACT(DOW FROM created_at) as day_of_week, EXTRACT(HOUR FROM created_at) as hour_of_day, COUNT(*) as count").
+		Group("day_of_week, hour_of_day").
+		Order("day_of_week, hour_of_day").
+		Find(&timeStatistics).Error
+
+	if err != nil {
+		return nil, err
+	}
+
+	return timeStatistics, nil
 }

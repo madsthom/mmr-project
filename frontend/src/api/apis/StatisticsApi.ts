@@ -16,10 +16,13 @@
 import * as runtime from '../runtime';
 import type {
   ViewPlayerHistoryDetails,
+  ViewTimeStatisticsEntry,
 } from '../models/index';
 import {
     ViewPlayerHistoryDetailsFromJSON,
     ViewPlayerHistoryDetailsToJSON,
+    ViewTimeStatisticsEntryFromJSON,
+    ViewTimeStatisticsEntryToJSON,
 } from '../models/index';
 
 export interface V1StatsPlayerHistoryGetRequest {
@@ -70,6 +73,34 @@ export class StatisticsApi extends runtime.BaseAPI {
      */
     async v1StatsPlayerHistoryGet(requestParameters: V1StatsPlayerHistoryGetRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<ViewPlayerHistoryDetails>> {
         const response = await this.v1StatsPlayerHistoryGetRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     * Get number of matches for each day of week and hour of day
+     * Get match distribution over time
+     */
+    async v1StatsTimeDistributionGetRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<ViewTimeStatisticsEntry>>> {
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        const response = await this.request({
+            path: `/v1/stats/time-distribution`,
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => jsonValue.map(ViewTimeStatisticsEntryFromJSON));
+    }
+
+    /**
+     * Get number of matches for each day of week and hour of day
+     * Get match distribution over time
+     */
+    async v1StatsTimeDistributionGet(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<ViewTimeStatisticsEntry>> {
+        const response = await this.v1StatsTimeDistributionGetRaw(initOverrides);
         return await response.value();
     }
 

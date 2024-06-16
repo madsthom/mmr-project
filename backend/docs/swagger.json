@@ -220,6 +220,32 @@
                 }
             }
         },
+        "/v1/stats/time-distribution": {
+            "get": {
+                "description": "Get number of matches for each day of week and hour of day",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Statistics"
+                ],
+                "summary": "Get match distribution over time",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/view.TimeStatisticsEntry"
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/v1/users": {
             "get": {
                 "description": "Lists all users",
@@ -633,6 +659,27 @@
             "type": "object",
             "properties": {
                 "userId": {
+                    "type": "integer"
+                }
+            }
+        },
+        "view.TimeStatisticsEntry": {
+            "type": "object",
+            "required": [
+                "count",
+                "dayOfWeek",
+                "hourOfDay"
+            ],
+            "properties": {
+                "count": {
+                    "type": "integer"
+                },
+                "dayOfWeek": {
+                    "description": "0-6, 0 is Sunday",
+                    "type": "integer"
+                },
+                "hourOfDay": {
+                    "description": "0-23",
                     "type": "integer"
                 }
             }

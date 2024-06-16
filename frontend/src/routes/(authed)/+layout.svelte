@@ -1,4 +1,5 @@
 <script lang="ts">
+  import '@carbon/charts-svelte/styles.css';
   import '../../app.pcss';
 
   import Navbar from './components/navbar.svelte';

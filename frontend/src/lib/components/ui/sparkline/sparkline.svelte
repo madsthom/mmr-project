@@ -4,7 +4,6 @@
     ScaleTypes,
     type AreaChartOptions,
   } from '@carbon/charts-svelte';
-  import '@carbon/charts-svelte/styles.css';
 
   export let data: Array<{ date: string; rating: number }>;
   export let options: Partial<AreaChartOptions> = {};

@@ -4,7 +4,6 @@
     ScaleTypes,
     type LineChartOptions,
   } from '@carbon/charts-svelte';
-  import '@carbon/charts-svelte/styles.css';
 
   // TODO: Make this component more generic, and not hardcoded to showing MMR stats
 

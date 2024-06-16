@@ -24,14 +24,10 @@ export const actions = {
       return fail(400);
     }
 
-    console.log({ userId });
-
     try {
-      // await apiClient.profileApi.v1ProfileClaimPost({
-      //   user: { userId },
-      // });
-
-      return redirect(303, '/profile');
+      await apiClient.profileApi.v1ProfileClaimPost({
+        user: { userId },
+      });
     } catch (error) {
       if (error instanceof ResponseError) {
         console.log(error);
@@ -39,5 +35,7 @@ export const actions = {
       }
       return fail(500);
     }
+
+    return redirect(303, '/profile');
   },
 };

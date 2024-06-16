@@ -26,12 +26,13 @@ export const actions: Actions = {
       });
     }
 
+    let userId;
+
     try {
       const user = await apiClient.usersApi.v1UsersPost({
         user: form.data,
       });
-
-      throw redirect(303, redirectTo != null ? redirectTo + user.userId : '/');
+      userId = user.userId;
     } catch (error) {
       if (error instanceof ResponseError) {
         const errorResponse = await error.response.json();
@@ -43,5 +44,7 @@ export const actions: Actions = {
         form,
       });
     }
+
+    throw redirect(303, redirectTo != null ? redirectTo + userId : '/');
   },
 };

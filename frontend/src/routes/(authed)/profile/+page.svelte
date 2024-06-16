@@ -2,12 +2,23 @@
   import Kpi from '$lib/components/kpi.svelte';
   import PageTitle from '$lib/components/page-title.svelte';
   import Button from '$lib/components/ui/button/button.svelte';
+  import * as Card from '$lib/components/ui/card';
+  import { Info } from 'lucide-svelte';
 
   export let data;
 </script>
 
 <div class="flex flex-col gap-3">
   <PageTitle>Profile</PageTitle>
+
+  {#if data.playerId == null}
+    <Card.Root class="flex flex-col gap-3 border-white p-4">
+      <div class="flex space-x-2 text-white">
+        <Info /><span>You have not claimed a player yet</span>
+      </div>
+      <Button href="/profile/claim">Claim a player</Button>
+    </Card.Root>
+  {/if}
 
   {#if data.stats != null}
     <div class="grid grid-cols-[repeat(auto-fill,minmax(100px,1fr))] gap-2">

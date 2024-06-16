@@ -65,7 +65,7 @@ func (uc ProfileController) ClaimUser(c *gin.Context) {
 	}
 
 	claimedUser, err := userRepo.GetByIdentityUserId(identityUserID)
-	if err != nil {
+	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
 		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch user"})
 		return
 	}

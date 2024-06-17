@@ -6,7 +6,7 @@
   import * as Card from '$lib/components/ui/card';
   import LineChart from '$lib/components/ui/line-chart/line-chart.svelte';
   import * as Table from '$lib/components/ui/table';
-  import { X } from 'lucide-svelte';
+  import { Handshake, Swords, X } from 'lucide-svelte';
   import type { PageData } from './$types';
   import Filter from './components/filter.svelte';
 
@@ -97,8 +97,10 @@
   {#if data.opponents.length > 0}
     <Card.Root>
       <Card.Content class="flex flex-col p-0 md:p-6">
-        <h2 class="px-4 py-3 text-xl md:p-0 md:text-2xl">
-          ⚔️ Most common opponents
+        <h2
+          class="flex items-center space-x-2 px-4 py-3 text-xl md:p-0 md:text-2xl"
+        >
+          <Swords /><span>Most common opponents</span>
         </h2>
         <Table.Root class="">
           <Table.Header>
@@ -152,8 +154,10 @@
   {#if data.teammates.length > 0}
     <Card.Root>
       <Card.Content class="flex flex-col p-0 md:p-6">
-        <h2 class="px-4 py-3 text-xl md:p-0 md:text-2xl">
-          🤝 Most common teammates
+        <h2
+          class="flex items-center space-x-2 px-4 py-3 text-xl md:p-0 md:text-2xl"
+        >
+          <Handshake /><span>Most common teammates</span>
         </h2>
         <Table.Root class="p-0">
           <Table.Header>

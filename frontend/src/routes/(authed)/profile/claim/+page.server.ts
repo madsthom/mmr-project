@@ -36,6 +36,6 @@ export const actions = {
       return fail(500);
     }
 
-    return redirect(303, '/profile');
+    return redirect(303, `/player/${userId}`);
   },
 };

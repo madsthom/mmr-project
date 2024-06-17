@@ -2,6 +2,7 @@
   import Kpi from '$lib/components/kpi.svelte';
   import { MatchCard } from '$lib/components/match-card';
   import PageTitle from '$lib/components/page-title.svelte';
+  import { Button } from '$lib/components/ui/button';
   import * as Card from '$lib/components/ui/card';
   import LineChart from '$lib/components/ui/line-chart/line-chart.svelte';
   import * as Table from '$lib/components/ui/table';
@@ -32,13 +33,22 @@
         match.team2.member2 === userId
     );
   });
+
+  const profileSuffix = data.isCurrentUser ? ' - You' : '';
 </script>
 
 <div class="flex flex-col gap-6">
   {#if data.user?.displayName}
-    <PageTitle>{data.user?.displayName} ({data.user?.name})</PageTitle>
+    <PageTitle
+      >{data.user?.displayName} ({data.user?.name}){profileSuffix}</PageTitle
+    >
   {:else}
-    <PageTitle>{data.user?.name}</PageTitle>
+    <PageTitle>{data.user?.name}{profileSuffix}</PageTitle>
+  {/if}
+  {#if data.isCurrentUser}
+    <form method="post" action="/signout" class="contents">
+      <Button type="submit" variant="secondary">Logout</Button>
+    </form>
   {/if}
 
   <div class="grid grid-cols-[repeat(auto-fill,minmax(100px,1fr))] gap-2">

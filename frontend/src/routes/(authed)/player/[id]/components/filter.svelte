@@ -23,7 +23,11 @@
 </script>
 
 <div class="relative flex flex-col gap-2">
-  <Input bind:value={filter} placeholder="Filter..." {autofocus} />
+  <Input
+    bind:value={filter}
+    placeholder="Filter..."
+    autofocus={autofocus ? autofocus : undefined}
+  />
   {#if filter.length > 1}
     {#if filteredUsers.length > 0}
       <ul class="absolute top-[100%] z-10 mt-3 w-full space-y-2">

@@ -1,10 +1,8 @@
 // See https://kit.svelte.dev/docs/types#app
 // for information about these interfaces
 
-import type { createApiClient } from '$lib/server/api/apiClient';
+import type { ApiClient } from '$lib/server/api/apiClient';
 import type { Session, SupabaseClient } from '@supabase/supabase-js';
-
-type ApiClient = ReturnType<typeof createApiClient>;
 
 declare global {
   namespace App {

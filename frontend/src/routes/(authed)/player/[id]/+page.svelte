@@ -2,10 +2,11 @@
   import Kpi from '$lib/components/kpi.svelte';
   import { MatchCard } from '$lib/components/match-card';
   import PageTitle from '$lib/components/page-title.svelte';
+  import { Button } from '$lib/components/ui/button';
   import * as Card from '$lib/components/ui/card';
   import LineChart from '$lib/components/ui/line-chart/line-chart.svelte';
   import * as Table from '$lib/components/ui/table';
-  import { X } from 'lucide-svelte';
+  import { Handshake, Swords, X } from 'lucide-svelte';
   import type { PageData } from './$types';
   import Filter from './components/filter.svelte';
 
@@ -32,13 +33,22 @@
         match.team2.member2 === userId
     );
   });
+
+  const profileSuffix = data.isCurrentUser ? ' - You' : '';
 </script>
 
 <div class="flex flex-col gap-6">
   {#if data.user?.displayName}
-    <PageTitle>{data.user?.displayName} ({data.user?.name})</PageTitle>
+    <PageTitle
+      >{data.user?.displayName} ({data.user?.name}){profileSuffix}</PageTitle
+    >
   {:else}
-    <PageTitle>{data.user?.name}</PageTitle>
+    <PageTitle>{data.user?.name}{profileSuffix}</PageTitle>
+  {/if}
+  {#if data.isCurrentUser}
+    <form method="post" action="/signout" class="contents">
+      <Button type="submit" variant="secondary">Logout</Button>
+    </form>
   {/if}
 
   <div class="grid grid-cols-[repeat(auto-fill,minmax(100px,1fr))] gap-2">
@@ -84,10 +94,14 @@
     />
   {/if}
 
-  {#if data.stats.opponents.length > 0}
+  {#if data.opponents.length > 0}
     <Card.Root>
       <Card.Content class="flex flex-col p-0 md:p-6">
-        <h2 class="text-xl md:text-2xl">Most common opponents</h2>
+        <h2
+          class="flex items-center space-x-2 px-4 py-3 text-xl md:p-0 md:text-2xl"
+        >
+          <Swords /><span>Most common opponents</span>
+        </h2>
         <Table.Root class="">
           <Table.Header>
             <Table.Row>
@@ -105,7 +119,7 @@
             </Table.Row>
           </Table.Header>
           <Table.Body>
-            {#each data.stats.opponents as { playerId, losses, wins, total }}
+            {#each data.opponents as { playerId, losses, wins, total }}
               {@const playerUser = data.users?.find(
                 (user) => user.userId == playerId
               )}
@@ -137,10 +151,14 @@
       </Card.Content>
     </Card.Root>
   {/if}
-  {#if data.stats.teammates.length > 0}
+  {#if data.teammates.length > 0}
     <Card.Root>
       <Card.Content class="flex flex-col p-0 md:p-6">
-        <h2 class="text-xl md:text-2xl">Most common teammates</h2>
+        <h2
+          class="flex items-center space-x-2 px-4 py-3 text-xl md:p-0 md:text-2xl"
+        >
+          <Handshake /><span>Most common teammates</span>
+        </h2>
         <Table.Root class="p-0">
           <Table.Header>
             <Table.Row>
@@ -158,7 +176,7 @@
             </Table.Row>
           </Table.Header>
           <Table.Body>
-            {#each data.stats.teammates as { playerId, losses, wins, total }}
+            {#each data.teammates as { playerId, losses, wins, total }}
               {@const playerUser = data.users?.find(
                 (user) => user.userId == playerId
               )}

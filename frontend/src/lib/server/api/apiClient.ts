@@ -1,11 +1,12 @@
-import { env } from '$env/dynamic/private';
 import {
   Configuration,
   LeaderboardApi,
   MatchesApi,
+  ProfileApi,
   StatisticsApi,
   UsersApi,
-} from '../../../api';
+} from '$api';
+import { env } from '$env/dynamic/private';
 
 export const createConfiguration = (token: string) =>
   new Configuration({
@@ -18,7 +19,10 @@ export const createApiClient = (token: string) => {
   return {
     leaderboardApi: new LeaderboardApi(configuration),
     mmrApi: new MatchesApi(configuration),
+    profileApi: new ProfileApi(configuration),
     statisticsApi: new StatisticsApi(configuration),
     usersApi: new UsersApi(configuration),
   };
 };
+
+export type ApiClient = ReturnType<typeof createApiClient>;

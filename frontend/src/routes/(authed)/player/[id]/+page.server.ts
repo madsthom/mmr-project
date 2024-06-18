@@ -10,7 +10,8 @@ export const load: PageServerLoad = async ({
   if (Number.isNaN(playerId)) {
     throw new Error('Invalid player ID');
   }
-  const [matches, users, mmrHistory] = await Promise.all([
+  const [userProfile, matches, users, mmrHistory] = await Promise.all([
+    apiClient.profileApi.v1ProfileGet(),
     apiClient.mmrApi.v2MmrMatchesGet({
       userId: playerId,
       limit: 1000,
@@ -19,6 +20,8 @@ export const load: PageServerLoad = async ({
     apiClient.usersApi.v1UsersGet(),
     apiClient.statisticsApi.v1StatsPlayerHistoryGet({ userId: playerId }),
   ]);
+
+  const { userId: currentUserPlayerId } = userProfile;
 
   const user = users.find((user) => user.userId === playerId);
   if (!user) {
@@ -115,7 +118,7 @@ export const load: PageServerLoad = async ({
     .slice(0, 5);
 
   return {
-    playerId,
+    isCurrentUser: playerId === currentUserPlayerId,
     matches,
     users,
     user,
@@ -127,9 +130,9 @@ export const load: PageServerLoad = async ({
       lost,
       winrate,
       daysSinceLastMatch,
-      teammates,
-      opponents,
     },
+    teammates,
+    opponents,
   };
 };
 

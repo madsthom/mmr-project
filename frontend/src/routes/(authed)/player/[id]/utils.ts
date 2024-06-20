@@ -16,7 +16,7 @@ export const movePlayerToMember1 = (
   if (match.team1.member2 === playerId) {
     return {
       ...match,
-      team1: movePlayerInTeam(match.team1, { from: 'member2', to: 'member1' }),
+      team1: flipMembersOfTeam(match.team1),
       mmrCalculations: flipMembersOfTeamInMMRCalculation(
         match.mmrCalculations,
         'team1'
@@ -35,7 +35,7 @@ export const movePlayerToMember1 = (
 
   return {
     ...match,
-    team1: movePlayerInTeam(match.team2, { from: 'member2', to: 'member1' }),
+    team1: flipMembersOfTeam(match.team2),
     team2: match.team1,
     mmrCalculations: flipMembersOfTeamInMMRCalculation(
       flipTeamsInMMRCalculation(match.mmrCalculations),
@@ -44,14 +44,11 @@ export const movePlayerToMember1 = (
   };
 };
 
-const movePlayerInTeam = (
-  team: ViewMatchTeamV2,
-  { from, to }: { from: 'member1' | 'member2'; to: 'member1' | 'member2' }
-) => {
+const flipMembersOfTeam = (team: ViewMatchTeamV2) => {
   return {
     ...team,
-    [to]: team[from],
-    [from]: team[to],
+    member1: team.member2,
+    member2: team.member1,
   };
 };
 

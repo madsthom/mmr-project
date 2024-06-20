@@ -1,6 +1,7 @@
 import type { ViewMatchTeamV2 } from '../../../../api';
 import type { PageServerLoad } from './$types';
 import type { MemberLeaderboardEntry } from './types';
+import { movePlayerToMember1 } from './utils';
 
 export const load: PageServerLoad = async ({
   params,
@@ -10,7 +11,7 @@ export const load: PageServerLoad = async ({
   if (Number.isNaN(playerId)) {
     throw new Error('Invalid player ID');
   }
-  const [userProfile, matches, users, mmrHistory] = await Promise.all([
+  const [userProfile, rawMatches, users, mmrHistory] = await Promise.all([
     apiClient.profileApi.v1ProfileGet(),
     apiClient.mmrApi.v2MmrMatchesGet({
       userId: playerId,
@@ -20,6 +21,10 @@ export const load: PageServerLoad = async ({
     apiClient.usersApi.v1UsersGet(),
     apiClient.statisticsApi.v1StatsPlayerHistoryGet({ userId: playerId }),
   ]);
+
+  const matches = rawMatches.map((match) =>
+    movePlayerToMember1(match, playerId)
+  );
 
   const { userId: currentUserPlayerId } = userProfile;
 

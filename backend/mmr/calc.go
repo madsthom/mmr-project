@@ -63,8 +63,9 @@ func CalculateNewMMR(team1 *Team, team2 *Team, verbose bool) (Team, Team) {
 	winnerAverageTeam := teamsWithNewSkills[0]
 	loserAverageTeam := teamsWithNewSkills[1]
 
-	winnerDiff := math.Abs(winner.Mu() - winnerAverageTeam.Mu())
-	loserDiff := math.Abs(loser.Mu() - loserAverageTeam.Mu())
+	var scoreMultiplier = 1.0 / (1.0 + float64(loserTeam.Score))
+	winnerDiff := math.Abs((winner.Mu() - winnerAverageTeam.Mu()) * scoreMultiplier)
+	loserDiff := math.Abs((loser.Mu() - loserAverageTeam.Mu()) * scoreMultiplier)
 
 	if verbose {
 		fmt.Printf("Winner: %s\n", winnerAverageTeam)

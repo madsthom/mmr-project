@@ -52,7 +52,7 @@ jobs:
         name: Check Atlas CLI version
         working-directory: ./backend
       - run: |
-          atlas migrate apply --env gorm --revisions-schema public --url ${{ secrets.DATABASE_URL }} || echo "Command failed with exit code $?"
+          atlas migrate apply --env gorm --revisions-schema public --url ${{ secrets.DATABASE_URL }}
         name: Apply migrations
         working-directory: ./backend
   deploy:

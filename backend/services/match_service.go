@@ -85,7 +85,7 @@ func (ms MatchService) GetPlayerMuAndSigma(userID uint) (Mu float64, Sigma float
 	playerHistory, err := userRepo.GetLatestPlayerHistory(userID)
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return trueskill.DefaultMu, trueskill.DefaultSigma
+			return trueskill.DefaultMu, 2
 		}
 		panic("Failed to get player history")
 	}

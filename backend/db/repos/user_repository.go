@@ -64,7 +64,7 @@ func (ur *UserRepository) GetByName(name string) (*models.User, error) {
 }
 
 func (ur *UserRepository) CreateByName(name string, displayName *string) (*models.User, error) {
-	newUser := &models.User{Name: name, DisplayName: displayName, MMR: 0, Mu: trueskill.DefaultMu, Sigma: trueskill.DefaultSigma}
+	newUser := &models.User{Name: name, DisplayName: displayName, MMR: 0, Mu: trueskill.DefaultMu, Sigma: 2}
 	if err := ur.db.Create(newUser).Error; err != nil {
 		return nil, err
 	}

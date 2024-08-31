@@ -43,8 +43,8 @@ type Match struct {
 	TeamTwoID       uint
 	TeamTwo         Team            `gorm:"foreignKey:TeamTwoID"`
 	MMRCalculations *MMRCalculation `gorm:"foreignKey:MatchID"`
-	SeasonID        *uint
-	Season          *Season `gorm:"foreignKey:SeasonID"`
+	SeasonID        uint
+	Season          Season `gorm:"foreignKey:SeasonID"`
 }
 
 type MMRCalculation struct {

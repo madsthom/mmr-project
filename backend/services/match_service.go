@@ -13,9 +13,9 @@ import (
 
 type MatchService struct{}
 
-func (ms MatchService) CreateMatch(teamOneId, teamTwoId uint) uint {
+func (ms MatchService) CreateMatch(seasonID uint, teamOneId, teamTwoId uint) uint {
 	matchRepo := repos.NewMatchRepository(database.DB)
-	match, err := matchRepo.CreateMatch(&models.Match{TeamOneID: teamOneId, TeamTwoID: teamTwoId})
+	match, err := matchRepo.CreateMatch(&models.Match{TeamOneID: teamOneId, TeamTwoID: teamTwoId, SeasonID: &seasonID})
 	if err != nil {
 		panic("Failed to create match")
 	}
@@ -80,9 +80,9 @@ func (ms MatchService) GetUserByID(userID uint) *models.User {
 	return user
 }
 
-func (ms MatchService) GetPlayerMuAndSigma(userID uint) (Mu float64, Sigma float64) {
+func (ms MatchService) GetPlayerMuAndSigma(seasonID uint, userID uint) (Mu float64, Sigma float64) {
 	userRepo := repos.NewUserRepository(database.DB)
-	playerHistory, err := userRepo.GetLatestPlayerHistory(userID)
+	playerHistory, err := userRepo.GetLatestPlayerHistory(seasonID, userID)
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return trueskill.DefaultMu, 2
@@ -93,9 +93,9 @@ func (ms MatchService) GetPlayerMuAndSigma(userID uint) (Mu float64, Sigma float
 	return playerHistory.Mu, playerHistory.Sigma
 }
 
-func (ms MatchService) GetMatches(limit int, offset int, orderByCreatedAtDesc bool, includeMmrCalculations bool, userId *uint) []*models.Match {
+func (ms MatchService) GetMatches(seasonID uint, limit int, offset int, orderByCreatedAtDesc bool, includeMmrCalculations bool, userId *uint) []*models.Match {
 	matchRepo := repos.NewMatchRepository(database.DB)
-	matches, err := matchRepo.ListMatches(limit, offset, &clause.OrderByColumn{Column: clause.Column{Name: "created_at"}, Desc: orderByCreatedAtDesc}, includeMmrCalculations, userId)
+	matches, err := matchRepo.ListMatches(seasonID, limit, offset, &clause.OrderByColumn{Column: clause.Column{Name: "created_at"}, Desc: orderByCreatedAtDesc}, includeMmrCalculations, userId)
 
 	if err != nil {
 		panic("Failed to get matches")
@@ -104,12 +104,16 @@ func (ms MatchService) GetMatches(limit int, offset int, orderByCreatedAtDesc bo
 	return matches
 }
 
-func (ms MatchService) ClearAllMMRHistory() {
+func (ms MatchService) ClearAllMMRHistory(seasonID uint) {
 	userRepo := repos.NewUserRepository(database.DB)
-	userRepo.ClearPlayerHistories()
+	if userRepo.ClearPlayerHistories(seasonID) != nil {
+		panic("Failed to clear player histories")
+	}
 
 	matchRepo := repos.NewMatchRepository(database.DB)
-	matchRepo.ClearMMRCalculations()
+	if matchRepo.ClearMMRCalculations(seasonID) != nil {
+		panic("Failed to clear MMR calculations")
+	}
 }
 
 func (ms MatchService) CheckExistingMatch(playerOneID uint, playerTwoID uint, playerThreeID uint, playerFourID uint, teamOneScore int, teamTwoScore int) bool {

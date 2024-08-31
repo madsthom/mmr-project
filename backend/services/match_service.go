@@ -15,7 +15,7 @@ type MatchService struct{}
 
 func (ms MatchService) CreateMatch(seasonID uint, teamOneId, teamTwoId uint) uint {
 	matchRepo := repos.NewMatchRepository(database.DB)
-	match, err := matchRepo.CreateMatch(&models.Match{TeamOneID: teamOneId, TeamTwoID: teamTwoId, SeasonID: &seasonID})
+	match, err := matchRepo.CreateMatch(&models.Match{TeamOneID: teamOneId, TeamTwoID: teamTwoId, SeasonID: seasonID})
 	if err != nil {
 		panic("Failed to create match")
 	}

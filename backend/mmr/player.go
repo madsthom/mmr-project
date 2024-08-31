@@ -1,8 +1,8 @@
 package mmr
 
-import "github.com/mafredri/go-trueskill"
+import "github.com/intinig/go-openskill/types"
 
 type Player struct {
 	Initials string
-	Player   trueskill.Player
+	Player   types.Rating
 }

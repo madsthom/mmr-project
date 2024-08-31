@@ -70,20 +70,20 @@ func (m MatchController) SubmitMatch(c *gin.Context) {
 		Score:   int16(team2Score),
 	}
 
-	team1, team2 = mmr.CalculateNewMMR(&team1, &team2, false)
+	team1, team2 = mmr.CalculateNewMMR(&team1, &team2)
 
-	user1.Mu = team1.Players[0].Player.Mu()
-	user1.Sigma = team1.Players[0].Player.Sigma()
-	user1.MMR = int(mmr.MapTrueSkillToMMR(user1.Mu, user1.Sigma))
-	user2.Mu = team1.Players[1].Player.Mu()
-	user2.Sigma = team1.Players[1].Player.Sigma()
-	user2.MMR = int(mmr.MapTrueSkillToMMR(user2.Mu, user2.Sigma))
-	user3.Mu = team2.Players[0].Player.Mu()
-	user3.Sigma = team2.Players[0].Player.Sigma()
-	user3.MMR = int(mmr.MapTrueSkillToMMR(user3.Mu, user3.Sigma))
-	user4.Mu = team2.Players[1].Player.Mu()
-	user4.Sigma = team2.Players[1].Player.Sigma()
-	user4.MMR = int(mmr.MapTrueSkillToMMR(user4.Mu, user4.Sigma))
+	user1.Mu = team1.Players[0].Player.Mu
+	user1.Sigma = team1.Players[0].Player.Sigma
+	user1.MMR = int(mmr.RankingDisplayValue(user1.Mu, user1.Sigma))
+	user2.Mu = team1.Players[1].Player.Mu
+	user2.Sigma = team1.Players[1].Player.Sigma
+	user2.MMR = int(mmr.RankingDisplayValue(user2.Mu, user2.Sigma))
+	user3.Mu = team2.Players[0].Player.Mu
+	user3.Sigma = team2.Players[0].Player.Sigma
+	user3.MMR = int(mmr.RankingDisplayValue(user3.Mu, user3.Sigma))
+	user4.Mu = team2.Players[1].Player.Mu
+	user4.Sigma = team2.Players[1].Player.Sigma
+	user4.MMR = int(mmr.RankingDisplayValue(user4.Mu, user4.Sigma))
 
 	tm1m1 := matchService.UpsertUser(user1)
 	tm1m2 := matchService.UpsertUser(user2)
@@ -104,10 +104,10 @@ func (m MatchController) SubmitMatch(c *gin.Context) {
 	matchService.CreatePlayerHistory(match, user3.ID, user3.Mu, user3.Sigma, user3.MMR)
 	matchService.CreatePlayerHistory(match, user4.ID, user4.Mu, user4.Sigma, user4.MMR)
 
-	user1OldMMR := int(mmr.MapTrueSkillToMMR(player1.Player.Mu(), player1.Player.Sigma()))
-	user2OldMMR := int(mmr.MapTrueSkillToMMR(player2.Player.Mu(), player2.Player.Sigma()))
-	user3OldMMR := int(mmr.MapTrueSkillToMMR(player3.Player.Mu(), player3.Player.Sigma()))
-	user4OldMMR := int(mmr.MapTrueSkillToMMR(player4.Player.Mu(), player4.Player.Sigma()))
+	user1OldMMR := int(mmr.RankingDisplayValue(player1.Player.Mu, player1.Player.Sigma))
+	user2OldMMR := int(mmr.RankingDisplayValue(player2.Player.Mu, player2.Player.Sigma))
+	user3OldMMR := int(mmr.RankingDisplayValue(player3.Player.Mu, player3.Player.Sigma))
+	user4OldMMR := int(mmr.RankingDisplayValue(player4.Player.Mu, player4.Player.Sigma))
 	matchService.CreateMatchMMRCalculation(match, user1.MMR-user1OldMMR, user2.MMR-user2OldMMR, user3.MMR-user3OldMMR, user4.MMR-user4OldMMR)
 
 	c.JSON(http.StatusOK, gin.H{"message": fmt.Sprintf("Match submitted: %v", json)})
@@ -175,20 +175,20 @@ func (m MatchController) SubmitMatchV2(c *gin.Context) {
 		Score:   int16(team2Score),
 	}
 
-	team1, team2 = mmr.CalculateNewMMR(&team1, &team2, false)
+	team1, team2 = mmr.CalculateNewMMR(&team1, &team2)
 
-	user1.Mu = team1.Players[0].Player.Mu()
-	user1.Sigma = team1.Players[0].Player.Sigma()
-	user1.MMR = int(mmr.MapTrueSkillToMMR(user1.Mu, user1.Sigma))
-	user2.Mu = team1.Players[1].Player.Mu()
-	user2.Sigma = team1.Players[1].Player.Sigma()
-	user2.MMR = int(mmr.MapTrueSkillToMMR(user2.Mu, user2.Sigma))
-	user3.Mu = team2.Players[0].Player.Mu()
-	user3.Sigma = team2.Players[0].Player.Sigma()
-	user3.MMR = int(mmr.MapTrueSkillToMMR(user3.Mu, user3.Sigma))
-	user4.Mu = team2.Players[1].Player.Mu()
-	user4.Sigma = team2.Players[1].Player.Sigma()
-	user4.MMR = int(mmr.MapTrueSkillToMMR(user4.Mu, user4.Sigma))
+	user1.Mu = team1.Players[0].Player.Mu
+	user1.Sigma = team1.Players[0].Player.Sigma
+	user1.MMR = int(mmr.RankingDisplayValue(user1.Mu, user1.Sigma))
+	user2.Mu = team1.Players[1].Player.Mu
+	user2.Sigma = team1.Players[1].Player.Sigma
+	user2.MMR = int(mmr.RankingDisplayValue(user2.Mu, user2.Sigma))
+	user3.Mu = team2.Players[0].Player.Mu
+	user3.Sigma = team2.Players[0].Player.Sigma
+	user3.MMR = int(mmr.RankingDisplayValue(user3.Mu, user3.Sigma))
+	user4.Mu = team2.Players[1].Player.Mu
+	user4.Sigma = team2.Players[1].Player.Sigma
+	user4.MMR = int(mmr.RankingDisplayValue(user4.Mu, user4.Sigma))
 
 	tm1m1 := matchService.UpsertUser(user1)
 	tm1m2 := matchService.UpsertUser(user2)
@@ -209,10 +209,10 @@ func (m MatchController) SubmitMatchV2(c *gin.Context) {
 	matchService.CreatePlayerHistory(match, user3.ID, user3.Mu, user3.Sigma, user3.MMR)
 	matchService.CreatePlayerHistory(match, user4.ID, user4.Mu, user4.Sigma, user4.MMR)
 
-	user1OldMMR := int(mmr.MapTrueSkillToMMR(player1.Player.Mu(), player1.Player.Sigma()))
-	user2OldMMR := int(mmr.MapTrueSkillToMMR(player2.Player.Mu(), player2.Player.Sigma()))
-	user3OldMMR := int(mmr.MapTrueSkillToMMR(player3.Player.Mu(), player3.Player.Sigma()))
-	user4OldMMR := int(mmr.MapTrueSkillToMMR(player4.Player.Mu(), player4.Player.Sigma()))
+	user1OldMMR := int(mmr.RankingDisplayValue(player1.Player.Mu, player1.Player.Sigma))
+	user2OldMMR := int(mmr.RankingDisplayValue(player2.Player.Mu, player2.Player.Sigma))
+	user3OldMMR := int(mmr.RankingDisplayValue(player3.Player.Mu, player3.Player.Sigma))
+	user4OldMMR := int(mmr.RankingDisplayValue(player4.Player.Mu, player4.Player.Sigma))
 	matchService.CreateMatchMMRCalculation(match, user1.MMR-user1OldMMR, user2.MMR-user2OldMMR, user3.MMR-user3OldMMR, user4.MMR-user4OldMMR)
 
 	c.JSON(http.StatusOK, gin.H{"message": fmt.Sprintf("Match submitted: %v", json)})

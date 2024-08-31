@@ -86,7 +86,7 @@ func (lr *LeaderboardRepository) GetLeaderboard() ([]*LeaderboardEntry, error) {
 		entry := &LeaderboardEntry{
 			UserID:        user.ID,
 			Name:          user.Name,
-			MMR:           int(mmr.MapTrueSkillToMMR(user.Mu, user.Sigma)),
+			MMR:           int(mmr.RankingDisplayValue(user.Mu, user.Sigma)),
 			Wins:          int(teamCounts.Winning),
 			Loses:         int(teamCounts.Losing),
 			WinningStreak: int(teamCounts.WinningStreak),

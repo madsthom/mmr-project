@@ -4,6 +4,7 @@ import (
 	database "mmr/backend/db"
 	"mmr/backend/db/repos"
 	view "mmr/backend/models"
+	"mmr/backend/services"
 	queryParser "mmr/backend/utils"
 	"net/http"
 
@@ -25,8 +26,11 @@ func (sc StatsController) GetLeaderboard(c *gin.Context) {
 	// Initialize leaderboard repository
 	leaderboardRepo := repos.NewLeaderboardRepository(database.DB)
 
+	seasonService := new(services.SeasonService)
+	seasonID := seasonService.CurrentSeasonID()
+
 	// Fetch leaderboard entries
-	entries, err := leaderboardRepo.GetLeaderboard()
+	entries, err := leaderboardRepo.GetLeaderboard(seasonID)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch leaderboard entries"})
 		return
@@ -51,12 +55,15 @@ func (sc StatsController) GetLeaderboard(c *gin.Context) {
 func (sc StatsController) GetPlayerHistory(c *gin.Context) {
 	// Initialize user repository
 	userRepo := repos.NewUserRepository(database.DB)
+	seasonService := new(services.SeasonService)
 
 	// If no user ID is provided, default to nil which will fetch all user histories
 	userId := queryParser.GetNullableUintQueryValue(c, "userId")
 
+	seasonID := seasonService.CurrentSeasonID()
+
 	// Fetch user history
-	entries, err := userRepo.ListPlayerHistory(userId)
+	entries, err := userRepo.ListPlayerHistory(&seasonID, userId)
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch player history"})
 		return

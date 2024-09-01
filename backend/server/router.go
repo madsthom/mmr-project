@@ -20,7 +20,6 @@ func NewRouter() *gin.Engine {
 		mg := v1.Group("/mmr", middleware.RequireAuth)
 		{
 			match := new(controllers.MatchController)
-			mg.POST("/matches", match.SubmitMatch)
 			mg.GET("/matches", match.GetMatches)
 		}
 		p := v1.Group("/profile", middleware.RequireAuth)

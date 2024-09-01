@@ -20,9 +20,9 @@ type IUserRepository interface {
 	SaveUser(user *models.User) (*models.User, error)
 	StoreRanking(matchID uint, userID uint, mu float64, sigma float64, mmr int) (*models.PlayerHistory, error)
 	StoreMatchMMRCalculation(matchID uint, player1Delta int, player2Delta int, player3Delta int, player4Delta int) (*models.MMRCalculation, error)
-	GetLatestPlayerHistory(playerID uint) (*models.PlayerHistory, error)
-	ListPlayerHistory(playerID *uint) ([]*models.PlayerHistory, error)
-	ClearPlayerHistories()
+	GetLatestPlayerHistory(seasonID uint, playerID uint) (*models.PlayerHistory, error)
+	ListPlayerHistory(seasonID *uint, playerID *uint) ([]*models.PlayerHistory, error)
+	ClearPlayerHistories(seasonID uint) error
 	ClaimUserByID(userID uint, identityUserID string) (*models.User, error)
 }
 
@@ -133,19 +133,20 @@ func (ur *UserRepository) StoreMatchMMRCalculation(matchID uint, player1Delta in
 	return mmrCalculation, nil
 }
 
-func (ur *UserRepository) GetLatestPlayerHistory(playerID uint) (*models.PlayerHistory, error) {
+func (ur *UserRepository) GetLatestPlayerHistory(seasonID uint, playerID uint) (*models.PlayerHistory, error) {
 	playerHistory := &models.PlayerHistory{}
-	if err := ur.db.Where("user_id = ?", playerID).Order("created_at desc").First(playerHistory).Error; err != nil {
+	if err := ur.db.Joins("Match").Where("\"Match\".season_id = ? AND user_id = ?", seasonID, playerID).Order("created_at desc").First(playerHistory).Error; err != nil {
 		return nil, err
 	}
 	return playerHistory, nil
 }
 
-func (ur *UserRepository) ListPlayerHistory(playerID *uint) ([]*models.PlayerHistory, error) {
+func (ur *UserRepository) ListPlayerHistory(seasonID *uint, playerID *uint) ([]*models.PlayerHistory, error) {
 	var playerHistories []*models.PlayerHistory
 	query := ur.db.Model(&models.PlayerHistory{}).
 		Preload("User").
 		Joins("Match").
+		Where("\"Match\".season_id = ?", seasonID).
 		Order("\"Match\".created_at asc")
 
 	if playerID != nil {
@@ -159,8 +160,9 @@ func (ur *UserRepository) ListPlayerHistory(playerID *uint) ([]*models.PlayerHis
 	return playerHistories, nil
 }
 
-func (ur *UserRepository) ClearPlayerHistories() {
-	ur.db.Exec("TRUNCATE TABLE player_histories RESTART IDENTITY;")
+func (ur *UserRepository) ClearPlayerHistories(seasonID uint) error {
+	err := ur.db.Where("match_id IN (SELECT id FROM matches WHERE season_id = ?)", seasonID).Delete(&models.PlayerHistory{}).Error
+	return err
 }
 
 func (ur *UserRepository) ClaimUserByID(userID uint, identityUserID string) (*models.User, error) {

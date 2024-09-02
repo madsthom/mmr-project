@@ -22,12 +22,15 @@ type AdminController struct{}
 //	@Router			/v1/admin/recalculate [post]
 func (m AdminController) RecalculateMatches(c *gin.Context) {
 	matchService := new(services.MatchService)
+	seasonService := new(services.SeasonService)
 
-	matchService.ClearAllMMRHistory()
+	seasonID := seasonService.CurrentSeasonID()
+
+	matchService.ClearAllMMRHistory(seasonID)
 	var currentOffset = 0
 	var limit = 200
 	for {
-		matches := matchService.GetMatches(limit, currentOffset, false, false, nil)
+		matches := matchService.GetMatches(seasonID, limit, currentOffset, false, false, nil)
 
 		for _, match := range matches {
 			dbTeam1 := match.TeamOne
@@ -38,8 +41,8 @@ func (m AdminController) RecalculateMatches(c *gin.Context) {
 			user3 := &dbTeam2.UserOne
 			user4 := &dbTeam2.UserTwo
 
-			player1 := m.createPlayer(matchService, user1)
-			player2 := m.createPlayer(matchService, user2)
+			player1 := m.createPlayer(seasonID, matchService, user1)
+			player2 := m.createPlayer(seasonID, matchService, user2)
 			team1Score := dbTeam1.Score
 
 			team1 := mmr.Team{
@@ -47,8 +50,8 @@ func (m AdminController) RecalculateMatches(c *gin.Context) {
 				Score:   int16(team1Score),
 			}
 
-			player3 := m.createPlayer(matchService, user3)
-			player4 := m.createPlayer(matchService, user4)
+			player3 := m.createPlayer(seasonID, matchService, user3)
+			player4 := m.createPlayer(seasonID, matchService, user4)
 			team2Score := dbTeam2.Score
 
 			team2 := mmr.Team{
@@ -99,7 +102,7 @@ func (m AdminController) RecalculateMatches(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "Recalculated matches"})
 }
 
-func (m AdminController) createPlayer(matchService *services.MatchService, user *models.User) mmr.Player {
-	Mu, Sigma := matchService.GetPlayerMuAndSigma(user.ID)
+func (m AdminController) createPlayer(seasonID uint, matchService *services.MatchService, user *models.User) mmr.Player {
+	Mu, Sigma := matchService.GetPlayerMuAndSigma(seasonID, user.ID)
 	return mmr.CreateNewPlayer(user.Name, Mu, Sigma)
 }

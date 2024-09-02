@@ -1,6 +1,8 @@
 package models
 
-import _ "ariga.io/atlas-provider-gorm/gormschema"
+import (
+	_ "ariga.io/atlas-provider-gorm/gormschema"
+)
 import "gorm.io/gorm"
 
 type User struct {
@@ -41,6 +43,8 @@ type Match struct {
 	TeamTwoID       uint
 	TeamTwo         Team            `gorm:"foreignKey:TeamTwoID"`
 	MMRCalculations *MMRCalculation `gorm:"foreignKey:MatchID"`
+	SeasonID        uint
+	Season          Season `gorm:"foreignKey:SeasonID"`
 }
 
 type MMRCalculation struct {
@@ -51,4 +55,8 @@ type MMRCalculation struct {
 	TeamOnePlayerTwoMMRDelta int
 	TeamTwoPlayerOneMMRDelta int
 	TeamTwoPlayerTwoMMRDelta int
+}
+
+type Season struct {
+	gorm.Model
 }

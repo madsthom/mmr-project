@@ -11,8 +11,8 @@ import (
 
 type IMatchRepository interface {
 	CreateMatch(match *models.Match) (*models.Match, error)
-	ListMatches(limit int, offset int, orderBy *clause.OrderByColumn, includeMmrCalculations bool, userId *uint) ([]*models.Match, error)
-	ClearMMRCalculations()
+	ListMatches(seasonID uint, limit int, offset int, orderBy *clause.OrderByColumn, includeMmrCalculations bool, userId *uint) ([]*models.Match, error)
+	ClearMMRCalculations(seasonID uint) error
 	CheckExistingMatch(playerOneID uint, playerTwoID uint, playerThreeID uint, playerFourID uint, teamOneScore int, teamTwoScore int) bool
 	GetMatchTimeDistribution() ([]*view.TimeStatisticsEntry, error)
 }
@@ -32,7 +32,7 @@ func (mr *MatchRepository) CreateMatch(match *models.Match) (*models.Match, erro
 	return match, nil
 }
 
-func (mr *MatchRepository) ListMatches(limit int, offset int, orderBy *clause.OrderByColumn, includeMmrCalculations bool, userId *uint) ([]*models.Match, error) {
+func (mr *MatchRepository) ListMatches(seasonID uint, limit int, offset int, orderBy *clause.OrderByColumn, includeMmrCalculations bool, userId *uint) ([]*models.Match, error) {
 	var matches []*models.Match
 
 	if orderBy == nil {
@@ -43,7 +43,8 @@ func (mr *MatchRepository) ListMatches(limit int, offset int, orderBy *clause.Or
 		Preload("TeamOne.UserOne").
 		Preload("TeamOne.UserTwo").
 		Preload("TeamTwo.UserOne").
-		Preload("TeamTwo.UserTwo")
+		Preload("TeamTwo.UserTwo").
+		Where("season_id = ?", seasonID)
 
 	if includeMmrCalculations {
 		query = query.Preload("MMRCalculations")
@@ -69,8 +70,10 @@ func (mr *MatchRepository) ListMatches(limit int, offset int, orderBy *clause.Or
 	return matches, nil
 }
 
-func (mr *MatchRepository) ClearMMRCalculations() {
-	mr.db.Exec("TRUNCATE TABLE mmr_calculations RESTART IDENTITY;")
+func (mr *MatchRepository) ClearMMRCalculations(seasonID uint) error {
+	// Remove all MMR calculations where the match belongs to seasonID
+	err := mr.db.Where("match_id IN (SELECT id FROM matches WHERE season_id = ?)", seasonID).Delete(&models.MMRCalculation{}).Error
+	return err
 }
 
 func (mr *MatchRepository) CheckExistingMatch(playerOneID uint, playerTwoID uint, playerThreeID uint, playerFourID uint, teamOneScore int, teamTwoScore int) bool {

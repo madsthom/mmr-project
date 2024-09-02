@@ -20,7 +20,7 @@ type LeaderboardEntry struct {
 // ILeaderboardRepository interface declaration
 type ILeaderboardRepository interface {
 	// GetLeaderboard fetches users from the database along with the count of winning and losing teams they belong to
-	GetLeaderboard() ([]*LeaderboardEntry, error)
+	GetLeaderboard(seasonID uint) ([]*LeaderboardEntry, error)
 }
 
 // LeaderboardRepository struct
@@ -34,7 +34,7 @@ func NewLeaderboardRepository(db *gorm.DB) ILeaderboardRepository {
 }
 
 // GetLeaderboard fetches users from the database along with the count of winning and losing teams they belong to
-func (lr *LeaderboardRepository) GetLeaderboard() ([]*LeaderboardEntry, error) {
+func (lr *LeaderboardRepository) GetLeaderboard(seasonID uint) ([]*LeaderboardEntry, error) {
 	var results []*LeaderboardEntry
 
 	// Fetch users from the database
@@ -54,6 +54,8 @@ func (lr *LeaderboardRepository) GetLeaderboard() ([]*LeaderboardEntry, error) {
 
 		// Count the number of winning and losing teams where the user is either UserOne or UserTwo
 		if err := lr.db.Model(&models.Team{}).
+			Joins("JOIN matches ON matches.team_one_id = teams.id OR matches.team_two_id = teams.id").
+			Where("matches.season_id = ?", seasonID).
 			Select("SUM(CASE WHEN winner = true THEN 1 ELSE 0 END) AS winning, SUM(CASE WHEN winner = false THEN 1 ELSE 0 END) AS losing").
 			Where("(user_one_id = ? OR user_two_id = ?)", user.ID, user.ID).
 			Scan(&teamCounts).Error; err != nil {
@@ -62,6 +64,8 @@ func (lr *LeaderboardRepository) GetLeaderboard() ([]*LeaderboardEntry, error) {
 
 		// Count number of rows created after the last time the user lost a game
 		lr.db.Model(&models.Team{}).
+			Joins("JOIN matches ON matches.team_one_id = teams.id OR matches.team_two_id = teams.id").
+			Where("matches.season_id = ?", seasonID).
 			Where("(user_one_id = ? OR user_two_id = ?)", user.ID, user.ID).
 			Where("id > (SELECT MAX(id) from teams WHERE winner = false AND (user_one_id = ? OR user_two_id = ?))", user.ID, user.ID).
 			Count(&teamCounts.WinningStreak)
@@ -73,6 +77,8 @@ func (lr *LeaderboardRepository) GetLeaderboard() ([]*LeaderboardEntry, error) {
 
 		// Count number of rows created after the last time the user won a game
 		lr.db.Model(&models.Team{}).
+			Joins("JOIN matches ON matches.team_one_id = teams.id OR matches.team_two_id = teams.id").
+			Where("matches.season_id = ?", seasonID).
 			Where("(user_one_id = ? OR user_two_id = ?)", user.ID, user.ID).
 			Where("id > (SELECT MAX(id) from teams WHERE winner = true AND (user_one_id = ? OR user_two_id = ?))", user.ID, user.ID).
 			Count(&teamCounts.LosingStreak)
@@ -93,7 +99,14 @@ func (lr *LeaderboardRepository) GetLeaderboard() ([]*LeaderboardEntry, error) {
 			LosingStreak:  int(teamCounts.LosingStreak),
 		}
 
-		if entry.Wins+entry.Loses < 10 {
+		totalGames := entry.Wins + entry.Loses
+		// If the user has played 0 games, skip them
+		if totalGames == 0 {
+			continue
+		}
+
+		// If the user has played less than 10 games, set their MMR to 0
+		if totalGames < 10 {
 			entry.MMR = 0
 		}
 

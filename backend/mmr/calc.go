@@ -5,10 +5,10 @@ import (
 	"github.com/intinig/go-openskill/types"
 )
 
-func CreateNewPlayer(initials string, mu float64, sigma float64) Player {
+func CreateNewPlayer(initials string, playerRating types.Rating) Player {
 	return Player{
 		Initials: initials,
-		Player:   rating.NewWithOptions(&types.OpenSkillOptions{Mu: &mu, Sigma: &sigma}),
+		Player:   playerRating,
 	}
 }
 

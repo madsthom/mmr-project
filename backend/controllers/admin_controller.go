@@ -103,6 +103,6 @@ func (m AdminController) RecalculateMatches(c *gin.Context) {
 }
 
 func (m AdminController) createPlayer(seasonID uint, matchService *services.MatchService, user *models.User) mmr.Player {
-	Mu, Sigma := matchService.GetPlayerMuAndSigma(seasonID, user.ID)
-	return mmr.CreateNewPlayer(user.Name, Mu, Sigma)
+	playerRating := matchService.GetPlayerRatingOrDefault(seasonID, user.ID)
+	return mmr.CreateNewPlayer(user.Name, playerRating)
 }

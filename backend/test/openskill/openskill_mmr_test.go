@@ -1,6 +1,8 @@
-package trueskill
+package openskill
 
 import (
+	"github.com/intinig/go-openskill/ptr"
+	"github.com/intinig/go-openskill/types"
 	"mmr/backend/mmr"
 	"os"
 	"testing"
@@ -9,15 +11,15 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestTrueskillMMRCalculation(t *testing.T) {
+func TestOpenskillMMRCalculation(t *testing.T) {
 	defaultRating := rating.New()
 	team1 := mmr.Team{
-		Players: []mmr.Player{mmr.CreateNewPlayer("test1", 27, defaultRating.Sigma-1), mmr.CreateNewPlayer("test2", defaultRating.Mu, defaultRating.Sigma)},
+		Players: []mmr.Player{mmr.CreateNewPlayer("test1", rating.NewWithOptions(&types.OpenSkillOptions{Mu: ptr.Float64(27), Sigma: ptr.Float64(defaultRating.Sigma - 1)})), mmr.CreateNewPlayer("test2", defaultRating)},
 		Score:   10,
 	}
 
 	team2 := mmr.Team{
-		Players: []mmr.Player{mmr.CreateNewPlayer("test3", defaultRating.Mu, defaultRating.Sigma), mmr.CreateNewPlayer("test4", defaultRating.Mu, defaultRating.Sigma)},
+		Players: []mmr.Player{mmr.CreateNewPlayer("test3", defaultRating), mmr.CreateNewPlayer("test4", defaultRating)},
 		Score:   7,
 	}
 

@@ -217,6 +217,6 @@ func (m MatchController) GetMatchesV2(c *gin.Context) {
 }
 
 func (m MatchController) createPlayer(seasonID uint, matchService *services.MatchService, user *models.User) mmr.Player {
-	Mu, Sigma := matchService.GetPlayerMuAndSigma(seasonID, user.ID)
-	return mmr.CreateNewPlayer(user.Name, Mu, Sigma)
+	playerRating := matchService.GetPlayerRatingOrDefault(seasonID, user.ID)
+	return mmr.CreateNewPlayer(user.Name, playerRating)
 }

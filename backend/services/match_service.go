@@ -2,11 +2,12 @@ package services
 
 import (
 	"errors"
+	"github.com/intinig/go-openskill/rating"
+	"github.com/intinig/go-openskill/types"
 	database "mmr/backend/db"
 	"mmr/backend/db/models"
 	"mmr/backend/db/repos"
 
-	"github.com/mafredri/go-trueskill"
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
 )
@@ -80,17 +81,17 @@ func (ms MatchService) GetUserByID(userID uint) *models.User {
 	return user
 }
 
-func (ms MatchService) GetPlayerMuAndSigma(seasonID uint, userID uint) (Mu float64, Sigma float64) {
+func (ms MatchService) GetPlayerRatingOrDefault(seasonID uint, userID uint) types.Rating {
 	userRepo := repos.NewUserRepository(database.DB)
 	playerHistory, err := userRepo.GetLatestPlayerHistory(seasonID, userID)
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return trueskill.DefaultMu, 2
+			return rating.New()
 		}
 		panic("Failed to get player history")
 	}
 
-	return playerHistory.Mu, playerHistory.Sigma
+	return rating.NewWithOptions(&types.OpenSkillOptions{Mu: &playerHistory.Mu, Sigma: &playerHistory.Sigma})
 }
 
 func (ms MatchService) GetMatches(seasonID uint, limit int, offset int, orderByCreatedAtDesc bool, includeMmrCalculations bool, userId *uint) []*models.Match {

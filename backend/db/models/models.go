@@ -9,9 +9,9 @@ type User struct {
 	gorm.Model
 	Name           string `gorm:"unique"`
 	DisplayName    *string
-	MMR            int
-	Mu             float64
-	Sigma          float64
+	MMR            int     // TODO: Migrate usage of this field to player history
+	Mu             float64 // TODO: Migrate usage of this field to player history
+	Sigma          float64 // TODO: Migrate usage of this field to player history
 	IdentityUserId *string `gorm:"unique"`
 }
 

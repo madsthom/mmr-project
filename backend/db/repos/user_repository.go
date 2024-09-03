@@ -3,10 +3,9 @@ package repos
 import (
 	"database/sql"
 	"errors"
-	"mmr/backend/db/models"
-
-	"github.com/mafredri/go-trueskill"
+	"github.com/intinig/go-openskill/rating"
 	"gorm.io/gorm"
+	"mmr/backend/db/models"
 )
 
 type IUserRepository interface {
@@ -64,7 +63,8 @@ func (ur *UserRepository) GetByName(name string) (*models.User, error) {
 }
 
 func (ur *UserRepository) CreateByName(name string, displayName *string) (*models.User, error) {
-	newUser := &models.User{Name: name, DisplayName: displayName, MMR: 0, Mu: trueskill.DefaultMu, Sigma: 2}
+	defaultPlayerRating := rating.New()
+	newUser := &models.User{Name: name, DisplayName: displayName, MMR: 0, Mu: defaultPlayerRating.Mu, Sigma: defaultPlayerRating.Sigma}
 	if err := ur.db.Create(newUser).Error; err != nil {
 		return nil, err
 	}

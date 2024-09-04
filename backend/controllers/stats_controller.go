@@ -75,17 +75,22 @@ func (sc StatsController) GetPlayerHistory(c *gin.Context) {
 		return
 	}
 
-	userCount := make(map[uint]int)
+	matchesPerUserID := make(map[uint]int)
 	for _, entry := range entries {
-		userCount[entry.UserID]++
+		matchesPerUserID[entry.UserID]++
 	}
 
 	// Filter entries to include only those with userIDs that have 10 or more occurrences
 	var filteredEntries []*models.PlayerHistory
 	for _, entry := range entries {
-		if userCount[entry.UserID] >= 10 {
+		if matchesPerUserID[entry.UserID] >= 10 {
 			filteredEntries = append(filteredEntries, entry)
 		}
+	}
+
+	if len(filteredEntries) == 0 {
+		c.JSON(http.StatusOK, []view.PlayerHistoryDetails{})
+		return
 	}
 
 	// Create list of view.PlayerHistoryDetails objects

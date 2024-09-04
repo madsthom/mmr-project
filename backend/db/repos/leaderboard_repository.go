@@ -67,7 +67,7 @@ func (lr *LeaderboardRepository) GetLeaderboard(seasonID uint) ([]*LeaderboardEn
 			Joins("JOIN matches ON matches.team_one_id = teams.id OR matches.team_two_id = teams.id").
 			Where("matches.season_id = ?", seasonID).
 			Where("(user_one_id = ? OR user_two_id = ?)", user.ID, user.ID).
-			Where("id > (SELECT MAX(id) from teams WHERE winner = false AND (user_one_id = ? OR user_two_id = ?))", user.ID, user.ID).
+			Where("teams.id > (SELECT MAX(id) from teams WHERE winner = false AND (user_one_id = ? OR user_two_id = ?))", user.ID, user.ID).
 			Count(&teamCounts.WinningStreak)
 
 		// If the user has never lost a game, set the winning streak to the number of wins
@@ -80,7 +80,7 @@ func (lr *LeaderboardRepository) GetLeaderboard(seasonID uint) ([]*LeaderboardEn
 			Joins("JOIN matches ON matches.team_one_id = teams.id OR matches.team_two_id = teams.id").
 			Where("matches.season_id = ?", seasonID).
 			Where("(user_one_id = ? OR user_two_id = ?)", user.ID, user.ID).
-			Where("id > (SELECT MAX(id) from teams WHERE winner = true AND (user_one_id = ? OR user_two_id = ?))", user.ID, user.ID).
+			Where("teams.id > (SELECT MAX(id) from teams WHERE winner = true AND (user_one_id = ? OR user_two_id = ?))", user.ID, user.ID).
 			Count(&teamCounts.LosingStreak)
 
 		// If the user has never won a game, set the losing streak to the number of losses

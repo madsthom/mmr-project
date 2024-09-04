@@ -2,6 +2,7 @@ package controllers
 
 import (
 	database "mmr/backend/db"
+	"mmr/backend/db/models"
 	"mmr/backend/db/repos"
 	view "mmr/backend/models"
 	"mmr/backend/services"
@@ -74,9 +75,27 @@ func (sc StatsController) GetPlayerHistory(c *gin.Context) {
 		return
 	}
 
+	matchesPerUserID := make(map[uint]int)
+	for _, entry := range entries {
+		matchesPerUserID[entry.UserID]++
+	}
+
+	// Filter entries to include only those with userIDs that have 10 or more occurrences
+	var filteredEntries []*models.PlayerHistory
+	for _, entry := range entries {
+		if matchesPerUserID[entry.UserID] >= 10 {
+			filteredEntries = append(filteredEntries, entry)
+		}
+	}
+
+	if len(filteredEntries) == 0 {
+		c.JSON(http.StatusOK, []view.PlayerHistoryDetails{})
+		return
+	}
+
 	// Create list of view.PlayerHistoryDetails objects
 	var playerHistory []view.PlayerHistoryDetails
-	for _, entry := range entries {
+	for _, entry := range filteredEntries {
 		playerHistory = append(playerHistory, view.PlayerHistoryDetailsViewFromModel(*entry))
 	}
 

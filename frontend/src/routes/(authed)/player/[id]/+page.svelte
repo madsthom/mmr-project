@@ -52,9 +52,7 @@
   {/if}
 
   <div class="grid grid-cols-[repeat(auto-fill,minmax(100px,1fr))] gap-2">
-    {#if data.stats.mmr != null}
-      <Kpi title="MMR">{data.stats.mmr}</Kpi>
-    {/if}
+    <Kpi title="MMR">{data.stats.mmr ?? '🐣'}</Kpi>
     <Kpi title="# Matches">
       {data.stats.totalMatches}
     </Kpi>

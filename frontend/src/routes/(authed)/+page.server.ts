@@ -17,7 +17,21 @@ export const load: PageServerLoad = async ({ locals: { apiClient } }) => {
     ]);
 
     const leaderboardEntries = entries
-      .toSorted((a, b) => (b.mmr ?? 0) - (a.mmr ?? 0))
+      .toSorted((a, b) => {
+        if (a.mmr === b.mmr) {
+          return (b.userId ?? 0) - (a.userId ?? 0);
+        }
+
+        if (a.mmr == null) {
+          return 1;
+        }
+
+        if (b.mmr == null) {
+          return -1;
+        }
+
+        return b.mmr - a.mmr;
+      })
       .map<LeaderboardEntry>((entry, idx) => ({ ...entry, rank: idx + 1 }));
 
     return {

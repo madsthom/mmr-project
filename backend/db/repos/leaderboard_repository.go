@@ -10,7 +10,7 @@ import (
 type LeaderboardEntry struct {
 	UserID        uint   `json:"userId"`
 	Name          string `json:"name"`
-	MMR           int    `json:"mmr"`
+	MMR           *int   `json:"mmr"`
 	Wins          int    `json:"wins"`
 	Loses         int    `json:"loses"`
 	WinningStreak int    `json:"winningStreak"`
@@ -88,11 +88,12 @@ func (lr *LeaderboardRepository) GetLeaderboard(seasonID uint) ([]*LeaderboardEn
 			teamCounts.LosingStreak = teamCounts.Losing
 		}
 
+		userMMR := int(mmr.RankingDisplayValue(user.Mu, user.Sigma))
 		// Create a new LeaderboardEntry object and populate it with the user's information and the counts of wins and losses
 		entry := &LeaderboardEntry{
 			UserID:        user.ID,
 			Name:          user.Name,
-			MMR:           int(mmr.RankingDisplayValue(user.Mu, user.Sigma)),
+			MMR:           &userMMR,
 			Wins:          int(teamCounts.Winning),
 			Loses:         int(teamCounts.Losing),
 			WinningStreak: int(teamCounts.WinningStreak),
@@ -107,7 +108,7 @@ func (lr *LeaderboardRepository) GetLeaderboard(seasonID uint) ([]*LeaderboardEn
 
 		// If the user has played less than 10 games, set their MMR to 0
 		if totalGames < 10 {
-			entry.MMR = 0
+			entry.MMR = nil
 		}
 
 		// Append the entry to the results slice

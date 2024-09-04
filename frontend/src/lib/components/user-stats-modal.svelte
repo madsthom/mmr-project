@@ -45,7 +45,7 @@
           (leaderboardEntry.wins ?? 0) + (leaderboardEntry.loses ?? 0)}
         <div class="grid grid-cols-[repeat(auto-fill,minmax(100px,1fr))] gap-2">
           <Kpi title="Rank">{leaderboardEntry.rank}</Kpi>
-          <Kpi title="MMR">{leaderboardEntry.mmr}</Kpi>
+          <Kpi title="MMR">{leaderboardEntry.mmr ?? '🐣'}</Kpi>
           <Kpi title="Win %">
             {percentFormatter.format(
               totalGamesPlayed > 0

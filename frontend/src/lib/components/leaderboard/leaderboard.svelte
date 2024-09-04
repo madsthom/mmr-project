@@ -78,7 +78,7 @@
             </Table.Cell>
             <Table.Cell>
               <div class="flex justify-end gap-2">
-                {#if mmr != 0}
+                {#if mmr != null}
                   <div class="pointer-events-none hidden w-14 md:block">
                     {#await statisticsPromise}
                       <Sparkline
@@ -100,7 +100,7 @@
                   </div>
                 {/if}
                 <span>
-                  {mmr != 0 ? mmr : '🐣'}
+                  {mmr ?? '🐣'}
                 </span>
               </div>
             </Table.Cell>

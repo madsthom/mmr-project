@@ -42,7 +42,8 @@ export const load: PageServerLoad = async ({
   const lost = totalMatches - wins;
   const winrate = totalMatches > 0 ? wins / totalMatches : 0;
 
-  const mmr = mmrHistory[mmrHistory.length - 1]?.mmr ?? null;
+  const mmr =
+    totalMatches > 10 ? mmrHistory[mmrHistory.length - 1]?.mmr ?? null : null;
 
   const msSinceLastMatch = matches[0]
     ? new Date(matches[0].date).getTime() - new Date().getTime()
@@ -127,7 +128,7 @@ export const load: PageServerLoad = async ({
     matches,
     users,
     user,
-    mmrHistory,
+    mmrHistory: totalMatches > 10 ? mmrHistory : [],
     stats: {
       mmr,
       totalMatches,

@@ -1,13 +1,21 @@
+using Microsoft.EntityFrameworkCore;
+using MMRProject.Api.Data;
+
 namespace MMRProject.Api.Services;
 
 public interface ISeasonService
 {
-    Task<int> CurrentSeasonIdAsync();
+    Task<long?> CurrentSeasonIdAsync();
 }
 
-public class SeasonService : ISeasonService
+public class SeasonService(ApiDbContext dbContext) : ISeasonService
 {
-    public async Task<int> CurrentSeasonIdAsync()
+    public async Task<long?> CurrentSeasonIdAsync()
     {
+        var currentSeason = await dbContext.Seasons
+            .OrderByDescending(x => x.CreatedAt)
+            .FirstOrDefaultAsync();
+
+        return currentSeason?.Id;
     }
 }

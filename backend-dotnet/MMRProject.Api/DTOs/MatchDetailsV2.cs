@@ -11,8 +11,8 @@ public record MatchDetailsV2
 public record MatchTeamV2
 {
     public required int Score { get; set; }
-    public required string Member1 { get; set; }
-    public required string Member2 { get; set; }
+    public required long Member1 { get; set; }
+    public required long Member2 { get; set; }
 }
 
 public record MatchMMRCalculationDetails

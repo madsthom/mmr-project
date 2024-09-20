@@ -1,52 +1,43 @@
 using Microsoft.AspNetCore.Mvc;
 using MMRProject.Api.DTOs;
+using MMRProject.Api.Extensions;
+using MMRProject.Api.Mappers;
+using MMRProject.Api.Services;
 
 namespace MMRProject.Api.Controllers;
 
 [ApiController]
-[Route("api/v2/mmr")]
-public class MMRV2Controller(ILogger<MMRV2Controller> logger) : ControllerBase
+[Route("api/v2/mmr/matches")]
+public class MMRV2Controller(
+    ILogger<MMRV2Controller> logger,
+    ISeasonService seasonService,
+    IMatchesService matchesService
+) : ControllerBase
 {
-    [HttpGet("matches")]
-    public async Task<IEnumerable<MatchDetailsV2>> GetMatches([FromQuery] int limit = 100, [FromQuery] int offset = 0)
+    [HttpGet]
+    public async Task<IEnumerable<MatchDetailsV2>> GetMatches([FromQuery] long? userId, [FromQuery] int limit = 100, [FromQuery] int offset = 0)
     {
-        return
-        [
-            new MatchDetailsV2
-            {
-                Date = DateTimeOffset.Now,
-                Team1 = new MatchTeamV2()
-                {
-                    Score = 1,
-                    Member1 = "Player1",
-                    Member2 = "Player2"
-                },
-                Team2 = new MatchTeamV2()
-                {
-                    Score = 0,
-                    Member1 = "Player3",
-                    Member2 = "Player4"
-                },
-                MMRCalculation = new MatchMMRCalculationDetails
-                {
-                    Team1 = new MatchMMRCalculationTeam()
-                    {
-                        Player1MMRDelta = 10,
-                        Player2MMRDelta = -10
-                    },
-                    Team2 = new MatchMMRCalculationTeam()
-                    {
-                        Player1MMRDelta = -10,
-                        Player2MMRDelta = 10
-                    }
-                }
-            }
-        ];
-    }
-    
-    [HttpPost("matches")]
-    public async Task SubmitMatch()
-    {
+        var currentSeasonId = await seasonService.CurrentSeasonIdAsync();
+        if (!currentSeasonId.HasValue)
+        {
+            return Array.Empty<MatchDetailsV2>();
+        }
 
+        var matches = await matchesService.GetMatchesForSeason(currentSeasonId.Value, limit, offset, true, true, userId);
+
+        return matches.Select(MatchMapper.MapMatchToMatchDetails).WhereNotNull();
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> SubmitMatch([FromBody] SubmitMatchV2Request request)
+    {
+        var currentSeasonId = await seasonService.CurrentSeasonIdAsync();
+        if (!currentSeasonId.HasValue)
+        {
+            return BadRequest("No current season");
+        }
+        
+        await matchesService.SubmitMatch(currentSeasonId.Value, request);
+        return Created();
     }
 }

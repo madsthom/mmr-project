@@ -20,6 +20,7 @@ builder.Services.AddUserContextResolver();
 
 builder.Services.AddScoped<IMatchesService, MatchesService>();
 builder.Services.AddScoped<ISeasonService, SeasonService>();
+builder.Services.AddScoped<IStatisticsService, StatisticsService>();
 builder.Services.AddScoped<IUserService, UserService>();
 
 builder.Services.AddControllers();

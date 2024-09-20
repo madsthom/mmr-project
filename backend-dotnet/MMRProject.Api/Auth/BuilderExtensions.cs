@@ -17,6 +17,8 @@ public static class BuilderExtensions
                 o.TokenValidationParameters = new TokenValidationParameters
                 {
                     ValidateIssuerSigningKey = true,
+                    ValidateIssuer = false,
+                    ValidateAudience = true,
                     IssuerSigningKey = supabaseSignatureKey,
                     ValidAudiences = ["authenticated"],
                     // ValidIssuer = validIssuer

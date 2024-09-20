@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using MMRProject.Api.Data;
 using MMRProject.Api.Data.Entities;
+using MMRProject.Api.UserContext;
 
 namespace MMRProject.Api.Services;
 
@@ -9,10 +10,13 @@ public interface IUserService
     Task<List<User>> AllUsersAsync(string? searchQuery = default);
     Task<User> CreateUserAsync(string name, string? displayName);
     Task<User?> GetUserAsync(long userId);
+    Task<User?> GetCurrentAuthenticatedUserAsync();
+    Task<User> ClaimUserForCurrentAuthenticatedUserAsync(long userId);
     Task<PlayerHistory?> LatestPlayerHistoryAsync(long userId, long seasonId);
 }
 
-public class UserService(ApiDbContext dbContext) : IUserService
+public class UserService(ILogger<UserService> logger, ApiDbContext dbContext, IUserContextResolver userContextResolver)
+    : IUserService
 {
     public async Task<List<User>> AllUsersAsync(string? searchQuery = default)
     {
@@ -45,6 +49,41 @@ public class UserService(ApiDbContext dbContext) : IUserService
     public async Task<User?> GetUserAsync(long userId)
     {
         return await dbContext.Users.FindAsync(userId);
+    }
+
+    public Task<User?> GetCurrentAuthenticatedUserAsync()
+    {
+        var identityUserId = userContextResolver.GetIdentityUserId();
+
+        return dbContext.Users.FirstOrDefaultAsync(x => x.IdentityUserId == identityUserId);
+    }
+
+    public async Task<User> ClaimUserForCurrentAuthenticatedUserAsync(long userId)
+    {
+        var identityUserId = userContextResolver.GetIdentityUserId();
+        var user = await dbContext.Users.FindAsync(userId);
+
+        if (user is null)
+        {
+            throw new Exception("User not found");
+        }
+
+        if (user.IdentityUserId == identityUserId)
+        {
+            return user;
+        }
+
+        if (user.IdentityUserId is not null)
+        {
+            throw new Exception("User already claimed by another user");
+        }
+
+        logger.LogInformation("Claiming user {UserId} for identity user {IdentityUserId}", userId, identityUserId);
+        user.IdentityUserId = identityUserId;
+
+        await dbContext.SaveChangesAsync();
+
+        return user;
     }
 
     public async Task<PlayerHistory?> LatestPlayerHistoryAsync(long userId, long seasonId)

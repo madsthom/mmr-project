@@ -1,6 +1,8 @@
 using Microsoft.EntityFrameworkCore;
+using MMRProject.Api.Auth;
 using MMRProject.Api.Data;
 using MMRProject.Api.Services;
+using MMRProject.Api.UserContext;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -11,6 +13,10 @@ builder.Services.AddDbContextPool<ApiDbContext>(opt =>
         o => o.SetPostgresVersion(13, 0)
     )
 );
+
+builder.AddAuth();
+
+builder.Services.AddUserContextResolver();
 
 builder.Services.AddScoped<IMatchesService, MatchesService>();
 builder.Services.AddScoped<ISeasonService, SeasonService>();
@@ -34,6 +40,6 @@ app.UseHttpsRedirection();
 
 app.UseAuthorization();
 
-app.MapControllers();
+app.MapControllers().RequireAuthorization();
 
 app.Run();

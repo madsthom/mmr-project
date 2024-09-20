@@ -12,20 +12,14 @@ public class ProfileController(IUserService userService) : ControllerBase
     [HttpGet]
     public async Task<ProfileDetails> GetProfile()
     {
-        // TODO: Implement this. Grabbing user from identityUserId
-        return new ProfileDetails
-        {
-            UserId = null
-        };
+        var user = await userService.GetCurrentAuthenticatedUserAsync();
+        return new ProfileDetails { UserId = user?.Id };
     }
 
     [HttpPost("claim")]
     public async Task<ProfileDetails> ClaimProfile([FromBody] ClaimProfileRequest request)
     {
-        // TODO: Implement this. Claiming profile for user
-        return new ProfileDetails
-        {
-            UserId = request.UserId
-        };
+        var user = await userService.ClaimUserForCurrentAuthenticatedUserAsync(request.UserId);
+        return new ProfileDetails { UserId = user.Id };
     }
 }

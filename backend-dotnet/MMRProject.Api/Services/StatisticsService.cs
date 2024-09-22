@@ -51,33 +51,17 @@ public class StatisticsService(ApiDbContext dbContext, IUserService userService)
                 )
                 .Where(x => x.team.UserOneId == user.Id || x.team.UserTwoId == user.Id)
                 .Where(x => x.match.SeasonId == seasonId)
-                .Select(tm => new
-                {
-                    Wins = tm.team.Winner!.Value ? 1 : 0,
-                    Losses = tm.team.Winner!.Value == false ? 1 : 0
-                })
+                .OrderByDescending(x => x.match.Id)
+                .Select(tm => new WinOrLoss(1, tm.team.Winner!.Value))
                 .ToListAsync();
             
-            teamCounts.Wins = counts.Sum(x => x.Wins);
-            teamCounts.Losses = counts.Sum(x => x.Losses);
+            teamCounts.Wins = counts.Where(x => x.IsWin).Sum(x => x.Count);
+            teamCounts.Losses = counts.Where(x => !x.IsWin).Sum(x => x.Count);
 
-            if (teamCounts.Losses == 0)
-            {
-                teamCounts.WinningStreak = teamCounts.Wins;
-            }
-            else
-            {
-                teamCounts.WinningStreak = await Streak(seasonId, user.Id, true);
-            }
-
-            if (teamCounts.Wins == 0)
-            {
-                teamCounts.LosingStreak = teamCounts.Losses;
-            }
-            else
-            {
-                teamCounts.LosingStreak = await Streak(seasonId, user.Id, false);
-            }
+            var currentStreak = CalculateStreak(counts);
+            
+            teamCounts.WinningStreak = currentStreak.isWinning ? currentStreak.Streak : 0;
+            teamCounts.LosingStreak = currentStreak.isWinning ? 0 : currentStreak.Streak;
 
             var totalGames = teamCounts.Wins + teamCounts.Losses;
             if (totalGames == 0)
@@ -113,6 +97,7 @@ public class StatisticsService(ApiDbContext dbContext, IUserService userService)
         return leaderboardEntries;
     }
 
+    private sealed record WinOrLoss(int Count, bool IsWin);
     private sealed class TeamCounts
     {
         public int Wins { get; set; }
@@ -120,29 +105,30 @@ public class StatisticsService(ApiDbContext dbContext, IUserService userService)
         public int WinningStreak { get; set; }
         public int LosingStreak { get; set; }
     }
-
-    private async Task<int> Streak(long seasonId, long userId, bool winning)
+    
+    private static (int Streak, bool isWinning) CalculateStreak(List<WinOrLoss> winOrLosses)
     {
-        return await dbContext.Teams
-            .Join(dbContext.Matches,
-                team => team.Id,
-                match => match.TeamOneId,
-                (team, match) => new { team, match })
-            .Union(
-                dbContext.Teams.Join(dbContext.Matches,
-                    team => team.Id,
-                    match => match.TeamTwoId,
-                    (team, match) => new { team, match })
-            )
-            .Where(x => x.match.SeasonId == seasonId)
-            .Where(x => x.team.UserOneId == userId || x.team.UserTwoId == userId)
-            .Where(x => x.team.Id > dbContext.Teams
-                .Where(t => t.Winner!.Value != winning && (t.UserOneId == userId || t.UserTwoId == userId))
-                .OrderByDescending(t => t.Id)
-                .Select(t => t.Id)
-                .FirstOrDefault()
-            )
-            .CountAsync();
+        if (winOrLosses.Count == 0)
+        {
+            return (0, true);
+        }
+        
+        var firstWinOrLoss = winOrLosses.First();
+        var currentStreak = firstWinOrLoss.Count;
+        var isWinning = firstWinOrLoss.IsWin;
+        foreach (var winOrLoss in winOrLosses.Skip(1))
+        {
+            if (winOrLoss.IsWin == isWinning)
+            {
+                currentStreak += winOrLoss.Count;
+            }
+            else
+            {
+                break;
+            }
+        }
+
+        return (currentStreak, isWinning);
     }
 
     public async Task<IEnumerable<PlayerHistoryDetails>> GetPlayerHistoryAsync(long seasonId, long? userId)

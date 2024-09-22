@@ -11,6 +11,7 @@ public interface IStatisticsService
 {
     Task<IEnumerable<LeaderboardEntry>> GetLeaderboardAsync(long seasonId);
     Task<IEnumerable<PlayerHistoryDetails>> GetPlayerHistoryAsync(long seasonId, long? userId);
+    Task<IEnumerable<TimeStatisticsEntry>> GetTimeDistributionAsync();
 }
 
 public class StatisticsService(ApiDbContext dbContext, IUserService userService) : IStatisticsService
@@ -30,7 +31,9 @@ public class StatisticsService(ApiDbContext dbContext, IUserService userService)
                 LosingStreak = 0
             };
 
+            // TODO: Do it without a join + union, but just join with or condition
             var counts = await dbContext.Teams
+                .AsNoTracking()
                 .Join(dbContext.Matches,
                     team => team.Id,
                     match => match.TeamOneId,
@@ -54,12 +57,12 @@ public class StatisticsService(ApiDbContext dbContext, IUserService userService)
                 .OrderByDescending(x => x.match.Id)
                 .Select(tm => new WinOrLoss(1, tm.team.Winner!.Value))
                 .ToListAsync();
-            
+
             teamCounts.Wins = counts.Where(x => x.IsWin).Sum(x => x.Count);
             teamCounts.Losses = counts.Where(x => !x.IsWin).Sum(x => x.Count);
 
             var currentStreak = CalculateStreak(counts);
-            
+
             teamCounts.WinningStreak = currentStreak.isWinning ? currentStreak.Streak : 0;
             teamCounts.LosingStreak = currentStreak.isWinning ? 0 : currentStreak.Streak;
 
@@ -98,6 +101,7 @@ public class StatisticsService(ApiDbContext dbContext, IUserService userService)
     }
 
     private sealed record WinOrLoss(int Count, bool IsWin);
+
     private sealed class TeamCounts
     {
         public int Wins { get; set; }
@@ -105,14 +109,14 @@ public class StatisticsService(ApiDbContext dbContext, IUserService userService)
         public int WinningStreak { get; set; }
         public int LosingStreak { get; set; }
     }
-    
+
     private static (int Streak, bool isWinning) CalculateStreak(List<WinOrLoss> winOrLosses)
     {
         if (winOrLosses.Count == 0)
         {
             return (0, true);
         }
-        
+
         var firstWinOrLoss = winOrLosses.First();
         var currentStreak = firstWinOrLoss.Count;
         var isWinning = firstWinOrLoss.IsWin;
@@ -156,5 +160,22 @@ public class StatisticsService(ApiDbContext dbContext, IUserService userService)
             .Where(x => x.UserId.HasValue && userIdOccurrences[x.UserId.Value] >= 10);
 
         return filteredPlayerHistories.Select(PlayerHistoryMapper.MapPlayerHistoryToPlayerHistoryDetails);
+    }
+
+    public async Task<IEnumerable<TimeStatisticsEntry>> GetTimeDistributionAsync()
+    {
+        var timeStatistics = await dbContext.Database
+            .SqlQueryRaw<TimeStatisticsEntry>("""
+                        SELECT
+                            EXTRACT(DOW FROM created_at) AS DayOfWeek, 
+                            EXTRACT(HOUR FROM created_at) AS HourOfDay, 
+                            COUNT(*) AS Count
+                        FROM matches
+                        GROUP BY DayOfWeek, HourOfDay
+                        ORDER BY DayOfWeek, HourOfDay
+                        """)
+            .ToListAsync();
+
+        return timeStatistics;
     }
 }

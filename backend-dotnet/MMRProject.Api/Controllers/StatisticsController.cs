@@ -37,6 +37,6 @@ public class StatisticsController(IStatisticsService statisticsService, ISeasonS
     [HttpGet("time-distribution")]
     public async Task<IEnumerable<TimeStatisticsEntry>> GetTimeDistribution()
     {
-        throw new NotImplementedException();
+        return await statisticsService.GetTimeDistributionAsync();
     }
 }

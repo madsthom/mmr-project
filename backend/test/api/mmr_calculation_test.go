@@ -1,4 +1,4 @@
-package integration
+package api_test
 
 import (
 	"bytes"
@@ -7,47 +7,33 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"mmr/backend/controllers" // Adjust the import based on your project structure
+	api "mmr/backend/api"
 	view "mmr/backend/models"
 
-	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/assert"
 )
 
-// setupRouter initializes the Gin router in test mode and returns it
-func setupRouter() *gin.Engine {
-	// Set Gin to test mode
-	gin.SetMode(gin.TestMode)
-
-	// Create a new Gin router
-	return gin.New() // Just return the new router without registering routes
-}
-
 // postRequest is a helper function to create a POST request
-func postRequest(router *gin.Engine, url string, requestBody interface{}) *httptest.ResponseRecorder {
-	body, err := json.Marshal(requestBody)
-	if err != nil {
-		return nil // Return nil on failure to marshal
-	}
+func postRequest(url string, requestBody interface{}) *httptest.ResponseRecorder {
+    body, err := json.Marshal(requestBody)
+    if err != nil {
+        return nil // Return nil on failure to marshal
+    }
 
-	req, _ := http.NewRequest("POST", url, bytes.NewBuffer(body))
-	req.Header.Set("Content-Type", "application/json")
+    req, _ := http.NewRequest("POST", url, bytes.NewBuffer(body))
+    req.Header.Set("Content-Type", "application/json")
 
-	// Create a response recorder to capture the response
-	rr := httptest.NewRecorder()
-	router.ServeHTTP(rr, req)
+    // Create a response recorder to capture the response
+    rr := httptest.NewRecorder()
 
-	return rr
+    // Call the handler from the api package
+    api.Handler(rr, req) // Use your actual handler function
+
+    return rr
 }
 
-// TestSubmitMMRCalculation tests the MMR calculation endpoint with unique players
+// TestSubmitMMRCalculationNewPlayers tests the MMR calculation endpoint with unique players
 func TestSubmitMMRCalculationNewPlayers(t *testing.T) {
-	router := setupRouter()
-
-	// Register the MMR calculation endpoint
-	calculationController := controllers.CalculationController{}
-	router.POST("/v2/mmr/calculate", calculationController.SubmitMMRCalculation)
-
 	// Prepare a request with unique players
 	requestBody := view.MMRCalculationRequest{
 		Team1: view.MMRCalculationTeam{
@@ -66,7 +52,7 @@ func TestSubmitMMRCalculationNewPlayers(t *testing.T) {
 		},
 	}
 
-	rr := postRequest(router, "/v2/mmr/calculate", requestBody)
+	rr := postRequest("/v2/mmr/calculate", requestBody)
 
 	// Check the status code
 	assert.Equal(t, http.StatusOK, rr.Code)
@@ -97,16 +83,10 @@ func TestSubmitMMRCalculationNewPlayers(t *testing.T) {
 
 	assert.Equal(t, 26.964185503295965, response.Team2.Players[1].Mu)
 	assert.Equal(t, 8.17755635771097, response.Team2.Players[1].Sigma)
-}	
+}
 
 // TestSubmitMMRCalculationWithRealMuAndSigma tests the MMR calculation with real Mu and Sigma values
 func TestSubmitMMRCalculationWithRealMuAndSigma(t *testing.T) {
-	router := setupRouter()
-
-	// Register the MMR calculation endpoint
-	calculationController := controllers.CalculationController{}
-	router.POST("/v2/mmr/calculate", calculationController.SubmitMMRCalculation)
-
 	// Prepare a request with real Mu and Sigma values
 	requestBody := view.MMRCalculationRequest{
 		Team1: view.MMRCalculationTeam{
@@ -125,7 +105,7 @@ func TestSubmitMMRCalculationWithRealMuAndSigma(t *testing.T) {
 		},
 	}
 
-	rr := postRequest(router, "/v2/mmr/calculate", requestBody)
+	rr := postRequest("/v2/mmr/calculate", requestBody)
 
 	// Check the status code
 	assert.Equal(t, http.StatusOK, rr.Code)
@@ -250,11 +230,7 @@ func TestSerializationPrecision(t *testing.T) {
 	}
 }
 
-
-
 // Helper function to create a pointer to a float64 value
 func float64Ptr(f float64) *float64 {
 	return &f
 }
-
-

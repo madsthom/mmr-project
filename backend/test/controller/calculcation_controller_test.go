@@ -83,7 +83,21 @@ func TestSubmitMMRCalculationNewPlayers(t *testing.T) {
 	assert.Equal(t, 200, response.Team2.Score)
 	assert.Equal(t, 2, len(response.Team1.Players))
 	assert.Equal(t, 2, len(response.Team2.Players))
-}
+
+	// Check Mu and Sigma values for Team 1
+	assert.Equal(t, 23.035814496704035, response.Team1.Players[0].Mu)
+	assert.Equal(t, 8.17755635771097, response.Team1.Players[0].Sigma)
+
+	assert.Equal(t, 23.035814496704035, response.Team1.Players[1].Mu)
+	assert.Equal(t, 8.17755635771097, response.Team1.Players[1].Sigma)
+
+	// Check Mu and Sigma values for Team 2
+	assert.Equal(t, 26.964185503295965, response.Team2.Players[0].Mu)
+	assert.Equal(t, 8.17755635771097, response.Team2.Players[0].Sigma)
+
+	assert.Equal(t, 26.964185503295965, response.Team2.Players[1].Mu)
+	assert.Equal(t, 8.17755635771097, response.Team2.Players[1].Sigma)
+}	
 
 // TestSubmitMMRCalculationWithRealMuAndSigma tests the MMR calculation with real Mu and Sigma values
 func TestSubmitMMRCalculationWithRealMuAndSigma(t *testing.T) {
@@ -144,7 +158,103 @@ func TestSubmitMMRCalculationWithRealMuAndSigma(t *testing.T) {
 	assert.Equal(t, 7.349420941427839, response.Team2.Players[1].Sigma)
 }
 
+// TestSerializationPrecision tests that serialization and deserialization preserves Mu and Sigma values.
+func TestSerializationPrecision(t *testing.T) {
+	// Prepare a sample MMRCalculationRequest with Mu and Sigma as nil
+	originalRequest := view.MMRCalculationRequest{
+		Team1: view.MMRCalculationTeam{
+			Score: 100,
+			Players: []view.MMRCalculationPlayerRating{
+				{Id: 1, Mu: nil, Sigma: nil},
+				{Id: 2, Mu: nil, Sigma: nil},
+			},
+		},
+		Team2: view.MMRCalculationTeam{
+			Score: 200,
+			Players: []view.MMRCalculationPlayerRating{
+				{Id: 3, Mu: nil, Sigma: nil},
+				{Id: 4, Mu: nil, Sigma: nil},
+			},
+		},
+	}
+
+	// Serialize the original request to JSON
+	data, err := json.Marshal(originalRequest)
+	assert.NoError(t, err)
+
+	// Deserialize the JSON back into a new request object
+	var newRequest view.MMRCalculationRequest
+	err = json.Unmarshal(data, &newRequest)
+	assert.NoError(t, err)
+
+	// Check if the original request and new request are equal
+	assert.Equal(t, originalRequest.Team1.Score, newRequest.Team1.Score)
+	assert.Equal(t, originalRequest.Team2.Score, newRequest.Team2.Score)
+
+	for i := range originalRequest.Team1.Players {
+		assert.Equal(t, originalRequest.Team1.Players[i].Id, newRequest.Team1.Players[i].Id)
+		assert.Nil(t, newRequest.Team1.Players[i].Mu)
+		assert.Nil(t, newRequest.Team1.Players[i].Sigma)
+	}
+
+	for i := range originalRequest.Team2.Players {
+		assert.Equal(t, originalRequest.Team2.Players[i].Id, newRequest.Team2.Players[i].Id)
+		assert.Nil(t, newRequest.Team2.Players[i].Mu)
+		assert.Nil(t, newRequest.Team2.Players[i].Sigma)
+	}
+
+	// Now prepare a sample with real Mu and Sigma values
+	realMu := 25.0
+	realSigma := 7.5
+
+	originalRequestWithValues := view.MMRCalculationRequest{
+		Team1: view.MMRCalculationTeam{
+			Score: 100,
+			Players: []view.MMRCalculationPlayerRating{
+				{Id: 1, Mu: &realMu, Sigma: &realSigma},
+				{Id: 2, Mu: &realMu, Sigma: &realSigma},
+			},
+		},
+		Team2: view.MMRCalculationTeam{
+			Score: 200,
+			Players: []view.MMRCalculationPlayerRating{
+				{Id: 3, Mu: &realMu, Sigma: &realSigma},
+				{Id: 4, Mu: &realMu, Sigma: &realSigma},
+			},
+		},
+	}
+
+	// Serialize the original request to JSON
+	dataWithValues, err := json.Marshal(originalRequestWithValues)
+	assert.NoError(t, err)
+
+	// Deserialize the JSON back into a new request object
+	var newRequestWithValues view.MMRCalculationRequest
+	err = json.Unmarshal(dataWithValues, &newRequestWithValues)
+	assert.NoError(t, err)
+
+	// Check if the original request and new request are equal
+	assert.Equal(t, originalRequestWithValues.Team1.Score, newRequestWithValues.Team1.Score)
+	assert.Equal(t, originalRequestWithValues.Team2.Score, newRequestWithValues.Team2.Score)
+
+	for i := range originalRequestWithValues.Team1.Players {
+		assert.Equal(t, originalRequestWithValues.Team1.Players[i].Id, newRequestWithValues.Team1.Players[i].Id)
+		assert.Equal(t, *originalRequestWithValues.Team1.Players[i].Mu, *newRequestWithValues.Team1.Players[i].Mu)
+		assert.Equal(t, *originalRequestWithValues.Team1.Players[i].Sigma, *newRequestWithValues.Team1.Players[i].Sigma)
+	}
+
+	for i := range originalRequestWithValues.Team2.Players {
+		assert.Equal(t, originalRequestWithValues.Team2.Players[i].Id, newRequestWithValues.Team2.Players[i].Id)
+		assert.Equal(t, *originalRequestWithValues.Team2.Players[i].Mu, *newRequestWithValues.Team2.Players[i].Mu)
+		assert.Equal(t, *originalRequestWithValues.Team2.Players[i].Sigma, *newRequestWithValues.Team2.Players[i].Sigma)
+	}
+}
+
+
+
 // Helper function to create a pointer to a float64 value
 func float64Ptr(f float64) *float64 {
 	return &f
 }
+
+

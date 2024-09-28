@@ -43,4 +43,14 @@ app.UseAuthorization();
 
 app.MapControllers().RequireAuthorization();
 
+using (var scope = app.Services.CreateScope())
+{
+    var configuration = scope.ServiceProvider.GetRequiredService<IConfiguration>();
+    if (configuration.GetValue<bool>("Migration:Enabled"))
+    {
+        var db = scope.ServiceProvider.GetRequiredService<ApiDbContext>();
+        db.Database.Migrate();   
+    }
+}
+
 app.Run();

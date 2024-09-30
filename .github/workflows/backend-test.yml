@@ -6,8 +6,12 @@ name: .NET - build and test
 on:
   push:
     branches: ["main"]
+    paths:
+      - "backend-dotnet/**/*"
   pull_request:
     branches: ["main"]
+    paths:
+      - "backend-dotnet/**/*"
 
 jobs:
   build:
@@ -20,8 +24,11 @@ jobs:
         with:
           dotnet-version: 8.0.x
       - name: Restore dependencies
+        working-directory: ./backend-dotnet
         run: dotnet restore
       - name: Build
+        working-directory: ./backend-dotnet
         run: dotnet build --no-restore
       - name: Test
+        working-directory: ./backend-dotnet
         run: dotnet test --no-build --verbosity normal

@@ -2,6 +2,8 @@ using Microsoft.EntityFrameworkCore;
 using MMRProject.Api.Data;
 using MMRProject.Api.Data.Entities;
 using MMRProject.Api.DTOs;
+using MMRProject.Api.MMRCalculationApi;
+using MMRProject.Api.MMRCalculationApi.Models;
 
 namespace MMRProject.Api.Services;
 
@@ -15,7 +17,11 @@ public interface IMatchesService
     Task RecalculateMMRForMatchesInSeason(long seasonId, long? fromMatchId = null);
 }
 
-public class MatchesService(ApiDbContext dbContext, IUserService userService) : IMatchesService
+public class MatchesService(
+    ApiDbContext dbContext,
+    IUserService userService,
+    IMMRCalculationApiClient mmrCalculationApiClient,
+    ILogger<MatchesService> logger) : IMatchesService
 {
     public async Task<IEnumerable<Match>> GetMatchesForSeason(long seasonId, int limit, int offset,
         bool orderByCreatedAtDescending,
@@ -89,8 +95,11 @@ public class MatchesService(ApiDbContext dbContext, IUserService userService) : 
 
     private async Task CalculateMMR(long seasonId, Match match)
     {
-        // TODO: Implement MMR calculation by calling service?
-        await Task.Delay(300);
+        var teamOnePlayerOne = await PlayerRatingForUserAsync(match.TeamOne!.UserOneId!.Value, seasonId);
+        var teamOnePlayerTwo = await PlayerRatingForUserAsync(match.TeamOne!.UserTwoId!.Value, seasonId);
+        var teamTwoPlayerOne = await PlayerRatingForUserAsync(match.TeamTwo!.UserOneId!.Value, seasonId);
+        var teamTwoPlayerTwo = await PlayerRatingForUserAsync(match.TeamTwo!.UserTwoId!.Value, seasonId);
+
         var mmrCalculationRequest = new MMRCalculationRequest
         {
             Team1 = new MMRCalculationTeam
@@ -98,8 +107,8 @@ public class MatchesService(ApiDbContext dbContext, IUserService userService) : 
                 Score = (int)match.TeamOne!.Score!, // TODO: Fix this
                 Players =
                 [
-                    await PlayerRatingForUserAsync(match.TeamOne!.UserOneId!.Value, seasonId),
-                    await PlayerRatingForUserAsync(match.TeamOne!.UserTwoId!.Value, seasonId)
+                    teamOnePlayerOne.Rating,
+                    teamOnePlayerTwo.Rating
                 ]
             },
             Team2 = new MMRCalculationTeam
@@ -107,28 +116,86 @@ public class MatchesService(ApiDbContext dbContext, IUserService userService) : 
                 Score = (int)match.TeamTwo!.Score!,
                 Players =
                 [
-                    await PlayerRatingForUserAsync(match.TeamTwo!.UserOneId!.Value, seasonId),
-                    await PlayerRatingForUserAsync(match.TeamTwo!.UserTwoId!.Value, seasonId)
+                    teamTwoPlayerOne.Rating,
+                    teamTwoPlayerTwo.Rating
                 ]
             }
         };
 
-        // TODO: Call API to calculate MMR
+        MMRCalculationResponse mmrCalculationResponse;
+        try
+        {
+            mmrCalculationResponse = await mmrCalculationApiClient.CalculateMMRAsync(mmrCalculationRequest);
+        }
+        catch (Exception e)
+        {
+            logger.LogCritical(e, "Failed to calculate MMR for match {MatchId}", match.Id);
+            // TODO: Handle this better
+            throw;
+        }
 
-        // TODO: Insert player histories
-        // TODO: Insert MMR calculations
+        // TODO: Maybe through services?
+        var playerResults = mmrCalculationResponse.Team1.Players
+            .Concat(mmrCalculationResponse.Team2.Players)
+            .ToDictionary(x => x.Id);
+
+        var playerHistories = playerResults.Values.Select(playerResult => new PlayerHistory
+        {
+            CreatedAt = DateTime.UtcNow,
+            UpdatedAt = DateTime.UtcNow,
+            UserId = playerResult.Id,
+            MatchId = match.Id,
+            Mmr = playerResult.MMR,
+            Mu = playerResult.Mu,
+            Sigma = playerResult.Sigma
+        });
+
+        await dbContext.PlayerHistories.AddRangeAsync(playerHistories);
+
+        await dbContext.MmrCalculations.AddAsync(new MmrCalculation
+        {
+            CreatedAt = DateTime.UtcNow,
+            UpdatedAt = DateTime.UtcNow,
+            MatchId = match.Id,
+            TeamOnePlayerOneMmrDelta = MMRDeltaForPlayer(teamOnePlayerOne.Rating.Id,
+                teamOnePlayerOne.History, playerResults),
+            TeamOnePlayerTwoMmrDelta = MMRDeltaForPlayer(teamOnePlayerTwo.Rating.Id,
+                teamOnePlayerTwo.History, playerResults),
+            TeamTwoPlayerOneMmrDelta = MMRDeltaForPlayer(teamTwoPlayerOne.Rating.Id,
+                teamTwoPlayerOne.History, playerResults),
+            TeamTwoPlayerTwoMmrDelta = MMRDeltaForPlayer(teamTwoPlayerTwo.Rating.Id,
+                teamTwoPlayerTwo.History, playerResults)
+        });
+
+        await dbContext.SaveChangesAsync();
     }
 
-    private async Task<MMRCalculationPlayerRating> PlayerRatingForUserAsync(long userId, long seasonId)
+    private int? MMRDeltaForPlayer(long playerId,
+        PlayerHistory? currentHistory,
+        Dictionary<long, MMRCalculationPlayerResult> playerResults)
+    {
+        if (!playerResults.TryGetValue(playerId, out var playerResult))
+        {
+            logger.LogCritical("Failed to find MMR for player {PlayerId}", playerId);
+            return null;
+        }
+
+        // If there is no current MMR, then use 0 as the delta
+        return currentHistory?.Mmr is not null ? playerResult.MMR - (int)currentHistory.Mmr.Value : 0;
+    }
+
+    private async Task<(PlayerHistory? History, MMRCalculationPlayerRating Rating)> PlayerRatingForUserAsync(
+        long userId,
+        long seasonId)
     {
         var playerHistory = await userService.LatestPlayerHistoryAsync(userId, seasonId);
 
-        return new MMRCalculationPlayerRating
+        return (playerHistory, new MMRCalculationPlayerRating
         {
             Id = userId,
             Mu = playerHistory?.Mu,
             Sigma = playerHistory?.Sigma
-        };
+        });
     }
 
     private async Task<bool> CheckExistingMatch(long playerOneId, long playerTwoId, long playerThreeId,

@@ -1,4 +1,4 @@
-namespace MMRProject.Api.DTOs;
+namespace MMRProject.Api.MMRCalculationApi.Models;
 
 public record MMRCalculationRequest
 {

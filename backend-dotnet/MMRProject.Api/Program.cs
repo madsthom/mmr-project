@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using MMRProject.Api.Auth;
 using MMRProject.Api.Data;
+using MMRProject.Api.MMRCalculationApi;
 using MMRProject.Api.Services;
 using MMRProject.Api.UserContext;
 
@@ -22,6 +23,11 @@ builder.Services.AddScoped<IMatchesService, MatchesService>();
 builder.Services.AddScoped<ISeasonService, SeasonService>();
 builder.Services.AddScoped<IStatisticsService, StatisticsService>();
 builder.Services.AddScoped<IUserService, UserService>();
+
+builder.Services.AddHttpClient<IMMRCalculationApiClient, MMRCalculationApiClient>(client =>
+{
+    client.BaseAddress = new Uri(builder.Configuration["MMRCalculationAPI:BaseUrl"]!);
+});
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle

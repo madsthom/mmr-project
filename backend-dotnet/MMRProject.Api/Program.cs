@@ -27,6 +27,7 @@ builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddHttpClient<IMMRCalculationApiClient, MMRCalculationApiClient>(client =>
 {
     client.BaseAddress = new Uri(builder.Configuration["MMRCalculationAPI:BaseUrl"]!);
+    client.DefaultRequestHeaders.Add("X-API-KEY", builder.Configuration["MMRCalculationAPI:ApiKey"]);
 });
 
 builder.Services.AddControllers();
@@ -55,7 +56,7 @@ using (var scope = app.Services.CreateScope())
     if (configuration.GetValue<bool>("Migration:Enabled"))
     {
         var db = scope.ServiceProvider.GetRequiredService<ApiDbContext>();
-        db.Database.Migrate();   
+        db.Database.Migrate();
     }
 }
 

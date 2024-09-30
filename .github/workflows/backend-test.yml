@@ -24,11 +24,11 @@ jobs:
         with:
           dotnet-version: 8.0.x
       - name: Restore dependencies
-        working-directory: ./backend-dotnet
+        working-directory: ./backend-dotnet/MMRProject.Api
         run: dotnet restore
       - name: Build
-        working-directory: ./backend-dotnet
+        working-directory: ./backend-dotnet/MMRProject.Api
         run: dotnet build --no-restore
       - name: Test
-        working-directory: ./backend-dotnet
+        working-directory: ./backend-dotnet/MMRProject.Api
         run: dotnet test --no-build --verbosity normal

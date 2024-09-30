@@ -3,37 +3,51 @@ package api_test
 import (
 	"bytes"
 	"encoding/json"
+	"github.com/gin-gonic/gin"
 	"net/http"
 	"net/http/httptest"
 	"testing"
 
-	api "mmr/backend/api"
+	"mmr/backend/controllers"
 	view "mmr/backend/models"
 
 	"github.com/stretchr/testify/assert"
 )
 
+// setupRouter initializes the Gin router in test mode and returns it
+func setupRouter() *gin.Engine {
+	// Set Gin to test mode
+	gin.SetMode(gin.TestMode)
+
+	// Create a new Gin router
+	return gin.New() // Just return the new router without registering routes
+}
+
 // postRequest is a helper function to create a POST request
-func postRequest(url string, requestBody interface{}) *httptest.ResponseRecorder {
-    body, err := json.Marshal(requestBody)
-    if err != nil {
-        return nil // Return nil on failure to marshal
-    }
+func postRequest(router *gin.Engine, url string, requestBody interface{}) *httptest.ResponseRecorder {
+	body, err := json.Marshal(requestBody)
+	if err != nil {
+		return nil // Return nil on failure to marshal
+	}
 
-    req, _ := http.NewRequest("POST", url, bytes.NewBuffer(body))
-    req.Header.Set("Content-Type", "application/json")
+	req, _ := http.NewRequest("POST", url, bytes.NewBuffer(body))
+	req.Header.Set("Content-Type", "application/json")
 
-    // Create a response recorder to capture the response
-    rr := httptest.NewRecorder()
+	// Create a response recorder to capture the response
+	rr := httptest.NewRecorder()
+	router.ServeHTTP(rr, req)
 
-    // Call the handler from the api package
-    api.Handler(rr, req) // Use your actual handler function
-
-    return rr
+	return rr
 }
 
 // TestSubmitMMRCalculationNewPlayers tests the MMR calculation endpoint with unique players
 func TestSubmitMMRCalculationNewPlayers(t *testing.T) {
+	router := setupRouter()
+
+	// Register the MMR calculation endpoint
+	calculationController := controllers.CalculationController{}
+	router.POST("/v1/mmr-calculation", calculationController.SubmitMMRCalculation)
+
 	// Prepare a request with unique players
 	requestBody := view.MMRCalculationRequest{
 		Team1: view.MMRCalculationTeam{
@@ -52,7 +66,7 @@ func TestSubmitMMRCalculationNewPlayers(t *testing.T) {
 		},
 	}
 
-	rr := postRequest("/v2/mmr/calculate", requestBody)
+	rr := postRequest(router, "/v1/mmr-calculation", requestBody)
 
 	// Check the status code
 	assert.Equal(t, http.StatusOK, rr.Code)
@@ -87,6 +101,12 @@ func TestSubmitMMRCalculationNewPlayers(t *testing.T) {
 
 // TestSubmitMMRCalculationWithRealMuAndSigma tests the MMR calculation with real Mu and Sigma values
 func TestSubmitMMRCalculationWithRealMuAndSigma(t *testing.T) {
+	router := setupRouter()
+
+	// Register the MMR calculation endpoint
+	calculationController := controllers.CalculationController{}
+	router.POST("/v1/mmr-calculation", calculationController.SubmitMMRCalculation)
+
 	// Prepare a request with real Mu and Sigma values
 	requestBody := view.MMRCalculationRequest{
 		Team1: view.MMRCalculationTeam{
@@ -105,7 +125,7 @@ func TestSubmitMMRCalculationWithRealMuAndSigma(t *testing.T) {
 		},
 	}
 
-	rr := postRequest("/v2/mmr/calculate", requestBody)
+	rr := postRequest(router, "/v1/mmr-calculation", requestBody)
 
 	// Check the status code
 	assert.Equal(t, http.StatusOK, rr.Code)
@@ -184,8 +204,8 @@ func TestSerializationPrecision(t *testing.T) {
 	}
 
 	// Now prepare a sample with real Mu and Sigma values
-	realMu := 25.0
-	realSigma := 7.5
+	realMu := 24.510947050344704
+	realSigma := 1.9410748715281192
 
 	originalRequestWithValues := view.MMRCalculationRequest{
 		Team1: view.MMRCalculationTeam{

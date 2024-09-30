@@ -6,13 +6,13 @@ type MMRCalculationResponse struct {
 }
 
 type MMRTeamResult struct {
-	Score   int                  `json:"score" binding:"required"`
+	Score   int               `json:"score" binding:"required"`
 	Players []PlayerMMRResult `json:"players" binding:"required"`
 }
 
 type PlayerMMRResult struct {
 	Id    int64   `json:"id" binding:"required"`
-	Mu    float64 `json:"mu" binding:"required"`   // Required in the response
+	Mu    float64 `json:"mu" binding:"required"`    // Required in the response
 	Sigma float64 `json:"sigma" binding:"required"` // Required in the response
-	MMR   float64 `json:"mmr" binding:"required"`   // New field in the response
+	MMR   int     `json:"mmr" binding:"required"`   // New field in the response
 }

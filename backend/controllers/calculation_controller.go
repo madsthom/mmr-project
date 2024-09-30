@@ -17,12 +17,12 @@ type CalculationController struct{}
 //
 //	@Summary		Submit an MMR calculation request
 //	@Description	Submit two teams' details for MMR calculation
-//	@Tags 			MMR
+//	@Tags 			Calculation
 //	@Accept			json
 //	@Produce		json
 //	@Param			request	body		view.MMRCalculationRequest	true	"MMR Calculation Request"
 //	@Success		200		{object}	view.MMRCalculationResponse	"MMR calculation result"
-//	@Router			/v2/mmr/calculate [post]
+//	@Router			/v1/mmr-calculation [post]
 func (m CalculationController) SubmitMMRCalculation(c *gin.Context) {
 	var req view.MMRCalculationRequest
 	err := c.ShouldBindJSON(&req)
@@ -31,7 +31,7 @@ func (m CalculationController) SubmitMMRCalculation(c *gin.Context) {
 		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	
+
 	ensurePlayers(c, req)
 
 	// Create players for Team 1
@@ -68,27 +68,26 @@ func (m CalculationController) SubmitMMRCalculation(c *gin.Context) {
 // Checks if the player IDs from both teams are unique and that there are exactly 4 unique players.
 // If any validation fails, it responds with an appropriate error message and aborts the request.
 func ensurePlayers(c *gin.Context, req view.MMRCalculationRequest) {
-	// Extract all player IDs into a single slice
-	var playerIDs []int64
+	// Check for duplicates using a map
+	playerMap := make(map[int64]struct{})
 
-	// Add all player IDs from Team 1
+	// Add all player IDs from Team 1 and Team 2
+	// Ensure there are no duplicates
 	for _, player := range req.Team1.Players {
-		playerIDs = append(playerIDs, player.Id)
+		if _, exists := playerMap[player.Id]; exists {
+			c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("Player ID %d is duplicated", player.Id)})
+			return
+		}
+		playerMap[player.Id] = struct{}{}
 	}
 
 	// Add all player IDs from Team 2
 	for _, player := range req.Team2.Players {
-		playerIDs = append(playerIDs, player.Id)
-	}
-
-	// Check for duplicates using a map
-	playerMap := make(map[int64]struct{})
-	for _, id := range playerIDs {
-		if _, exists := playerMap[id]; exists {
-			c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("Player ID %d is duplicated", id)})
+		if _, exists := playerMap[player.Id]; exists {
+			c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("Player ID %d is duplicated", player.Id)})
 			return
 		}
-		playerMap[id] = struct{}{}
+		playerMap[player.Id] = struct{}{}
 	}
 
 	// Ensure there are exactly 4 unique players
@@ -98,7 +97,6 @@ func ensurePlayers(c *gin.Context, req view.MMRCalculationRequest) {
 	}
 }
 
-
 // Creates a player instance from the given MMRCalculationPlayerRating
 func (m CalculationController) createPlayer(playerRating view.MMRCalculationPlayerRating) mmr.PlayerV2 {
 	var internalRating types.Rating
@@ -106,19 +104,20 @@ func (m CalculationController) createPlayer(playerRating view.MMRCalculationPlay
 	// Check if Mu and Sigma are provided; use defaults if they are nil
 	if playerRating.Mu != nil && playerRating.Sigma != nil {
 		// Create Rating with provided Mu and Sigma
-		internalRating = types.Rating{
-			Mu:    *playerRating.Mu,
-			Sigma: *playerRating.Sigma,
-			Z:     3, // Or set Z to a specific value if necessary
-		}
+		internalRating = rating.NewWithOptions(
+			&types.OpenSkillOptions{
+				Mu:    playerRating.Mu,
+				Sigma: playerRating.Sigma,
+			},
+		)
 	} else {
 		// Use the New function to get a Rating with default options
 		internalRating = rating.New()
 	}
 
 	return mmr.PlayerV2{
-		Id: playerRating.Id,
-		Player:   internalRating,
+		Id:     playerRating.Id,
+		Player: internalRating,
 	}
 }
 
@@ -132,7 +131,7 @@ func (m CalculationController) createTeamResult(score int, team mmr.TeamV2) view
 			Id:    player.Id, // Using Initials as the unique identifier
 			Mu:    player.Player.Mu,
 			Sigma: player.Player.Sigma,
-			MMR:   float64(mmr.RankingDisplayValue(player.Player.Mu, player.Player.Sigma)),
+			MMR:   int(mmr.RankingDisplayValue(player.Player.Mu, player.Player.Sigma)),
 		}
 	}
 

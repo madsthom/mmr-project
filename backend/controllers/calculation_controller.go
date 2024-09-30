@@ -40,7 +40,7 @@ func (m CalculationController) SubmitMMRCalculation(c *gin.Context) {
 
 	team1 := mmr.TeamV2{
 		Players: []mmr.PlayerV2{player1, player2},
-		Score:   int16(req.Team1.Score),
+		Score:   int16(*req.Team1.Score),
 	}
 
 	// Create players for Team 2
@@ -49,7 +49,7 @@ func (m CalculationController) SubmitMMRCalculation(c *gin.Context) {
 
 	team2 := mmr.TeamV2{
 		Players: []mmr.PlayerV2{player3, player4},
-		Score:   int16(req.Team2.Score),
+		Score:   int16(*req.Team2.Score),
 	}
 
 	// Calculate new MMR
@@ -57,8 +57,8 @@ func (m CalculationController) SubmitMMRCalculation(c *gin.Context) {
 
 	// Prepare response
 	response := view.MMRCalculationResponse{
-		Team1: m.createTeamResult(req.Team1.Score, team1),
-		Team2: m.createTeamResult(req.Team2.Score, team2),
+		Team1: m.createTeamResult(*req.Team1.Score, team1),
+		Team2: m.createTeamResult(*req.Team2.Score, team2),
 	}
 
 	// Respond with the updated team data
@@ -136,7 +136,7 @@ func (m CalculationController) createTeamResult(score int, team mmr.TeamV2) view
 	}
 
 	return view.MMRTeamResult{
-		Score:   score,
+		Score:   &score,
 		Players: playersResults,
 	}
 }

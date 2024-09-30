@@ -25,7 +25,7 @@ public static class MatchMapper
             Date = match.CreatedAt.Value,
             Team1 = team1,
             Team2 = team2,
-            MMRCalculation = MapMmrCalculationsToMatchMmrCalculationDetails(match.MmrCalculations.FirstOrDefault())
+            MMRCalculations = MapMmrCalculationsToMatchMmrCalculationDetails(match.MmrCalculations.FirstOrDefault())
         };
     }
 

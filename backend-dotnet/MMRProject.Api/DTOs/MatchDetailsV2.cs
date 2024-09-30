@@ -5,7 +5,7 @@ public record MatchDetailsV2
     public DateTimeOffset Date { get; set; }
     public required MatchTeamV2 Team1 { get; set; }
     public required MatchTeamV2 Team2 { get; set; }
-    public MatchMMRCalculationDetails? MMRCalculation { get; set; }
+    public MatchMMRCalculationDetails? MMRCalculations { get; set; }
 }
 
 public record MatchTeamV2

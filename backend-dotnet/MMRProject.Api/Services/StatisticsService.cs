@@ -138,6 +138,8 @@ public class StatisticsService(ApiDbContext dbContext, IUserService userService)
     public async Task<IEnumerable<PlayerHistoryDetails>> GetPlayerHistoryAsync(long seasonId, long? userId)
     {
         var query = dbContext.PlayerHistories
+            .Include(x => x.User)
+            .Include(x => x.Match)
             .Where(x => x.Match!.SeasonId == seasonId);
 
         if (userId.HasValue)

@@ -11,7 +11,7 @@ public class MMRCalculationApiClient(HttpClient httpClient) : IMMRCalculationApi
 {
     public async Task<MMRCalculationResponse> CalculateMMRAsync(MMRCalculationRequest request)
     {
-        var response = await httpClient.PostAsJsonAsync("api/v2/mmr/calculate", request);
+        var response = await httpClient.PostAsJsonAsync("api/v1/mmr-calculation", request);
         response.EnsureSuccessStatusCode();
         var result = await response.Content.ReadFromJsonAsync<MMRCalculationResponse>();
         if (result == null)

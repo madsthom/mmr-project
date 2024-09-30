@@ -19,6 +19,7 @@ public class AdminController(
         [FromHeader(Name = "X-API-KEY")] string apiKey
     )
     {
+        // TODO: Improve performance of this - it is very slow because we call MMR calculation API for each match
         var adminKey = configuration["Admin:Secret"];
         if (string.IsNullOrWhiteSpace(adminKey))
         {

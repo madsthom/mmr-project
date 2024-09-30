@@ -7,6 +7,11 @@ type Team struct {
 	Score   int16
 }
 
+type TeamV2 struct {
+	Players []PlayerV2
+	Score   int16
+}
+
 // Size returns the number of players in the team
 func (t *Team) Size() int {
 	return len(t.Players)

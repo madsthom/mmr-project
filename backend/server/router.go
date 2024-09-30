@@ -48,6 +48,11 @@ func NewRouter() *gin.Engine {
 			admin := new(controllers.AdminController)
 			a.POST("/recalculate", admin.RecalculateMatches)
 		}
+		calc := v1.Group("/mmr-calculation", middleware.RequireAdminAuth)
+		{
+			calculation := new(controllers.CalculationController)
+			calc.POST("", calculation.SubmitMMRCalculation)
+		}
 	}
 
 	v2 := router.Group("/api/v2")

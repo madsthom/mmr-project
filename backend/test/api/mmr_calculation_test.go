@@ -81,8 +81,8 @@ func TestSubmitMMRCalculationNewPlayers(t *testing.T) {
 	}
 
 	// Perform assertions on the response
-	assert.Equal(t, 100, response.Team1.Score)
-	assert.Equal(t, 200, response.Team2.Score)
+	assert.Equal(t, 100, *response.Team1.Score)
+	assert.Equal(t, 200, *response.Team2.Score)
 	assert.Equal(t, 2, len(response.Team1.Players))
 	assert.Equal(t, 2, len(response.Team2.Players))
 
@@ -142,8 +142,8 @@ func TestSubmitMMRCalculationWithRealMuAndSigma(t *testing.T) {
 	}
 
 	// Perform assertions on the response
-	assert.Equal(t, 100, response.Team1.Score)
-	assert.Equal(t, 200, response.Team2.Score)
+	assert.Equal(t, 100, *response.Team1.Score)
+	assert.Equal(t, 200, *response.Team2.Score)
 	assert.Equal(t, 2, len(response.Team1.Players))
 	assert.Equal(t, 2, len(response.Team2.Players))
 
@@ -194,8 +194,8 @@ func TestSerializationPrecision(t *testing.T) {
 	assert.NoError(t, err)
 
 	// Check if the original request and new request are equal
-	assert.Equal(t, originalRequest.Team1.Score, newRequest.Team1.Score)
-	assert.Equal(t, originalRequest.Team2.Score, newRequest.Team2.Score)
+	assert.Equal(t, *originalRequest.Team1.Score, *newRequest.Team1.Score)
+	assert.Equal(t, *originalRequest.Team2.Score, *newRequest.Team2.Score)
 
 	for i := range originalRequest.Team1.Players {
 		assert.Equal(t, originalRequest.Team1.Players[i].Id, newRequest.Team1.Players[i].Id)
@@ -242,8 +242,8 @@ func TestSerializationPrecision(t *testing.T) {
 	assert.NoError(t, err)
 
 	// Check if the original request and new request are equal
-	assert.Equal(t, originalRequestWithValues.Team1.Score, newRequestWithValues.Team1.Score)
-	assert.Equal(t, originalRequestWithValues.Team2.Score, newRequestWithValues.Team2.Score)
+	assert.Equal(t, *originalRequestWithValues.Team1.Score, *newRequestWithValues.Team1.Score)
+	assert.Equal(t, *originalRequestWithValues.Team2.Score, *newRequestWithValues.Team2.Score)
 
 	for i := range originalRequestWithValues.Team1.Players {
 		assert.Equal(t, originalRequestWithValues.Team1.Players[i].Id, newRequestWithValues.Team1.Players[i].Id)
